@@ -1,0 +1,89 @@
+#+TITLE: wizrd: An LLM-based Assistant for R
+
+* Motivation
+
+LLMs are very good at generating code and documentation, as well as
+analyzing code, for example to suggest improvements or to annotate
+code with inferred types. Thus, there is a clear trend towards
+integration of LLMs with IDEs, and products like GitHub Co-Pilot
+support R, despite it not being one of their target languages.
+
+One thing that sets R apart from other languages is that it is
+designed for interactive analysis, conventionally through a console
+interface. As the user enters code, objects are created in the global
+environment, and each line of code enters into the history of the
+session. By integrating an LLM directly into the R session, as opposed
+to operating on a buffer of code, we can enhance the user's experience
+as they interact with their data. The user could pass a data object or
+function object to an LLM for an explanation or other advice. The LLM
+could analyze the code that the user has entered so far and suggest
+improvements or next steps.
+
+LLMs can also help with the two fundamental R workflows that often
+interact: software development and data analysis. Both often start
+with prototyping at the console and then move to persisting code in a
+buffer. The software workflow then proceeds to refactor the code into
+reusable functions and eventually to incorporate the functions into a
+package, complete with documentation. The analysis workflow moves from
+a script to a literate programming document, usually an Rmd
+file. Generative AI can automate many of these tasks, including
+refactoring and generation of Rd and Rmd files.
+
+Alternatively, the user might prefer a notebook style interface, which
+would benefit from the same features, only more incrementally.
+
+* Design
+
+There are several components to the design:
+ * An R interface to something like LLaMA.cpp, so that we can interact
+   with models from R,
+ * The model itself, which needs to be fine-tuned and/or indexed for
+   this specific use case, and exist on the user's machine,
+ * The user-friendly interface to the model, allowing the user to
+   engage in dialog directly from the R console.
+ * IDE integration, probably by extending the Ark LSP by Lionel Henry.
+
+** Model interface
+
+LLaMA.cpp seems like the ideal basis for an R interface to LLMs,
+because it is conveniently implemented in C/C++ and has a strong
+ecosystem around it, including LlamaIndex for RAG, fine-tuning etc,
+although it is only available from Python.
+
+There is a barebones R interface to LLaMA.cpp called [[https://github.com/coolbutuseless/rllama][rllama]]. It is
+very basic, not released anywhere, and hasn't been updated in a
+year. We will probably need to make our own.
+
+** Model development
+
+Things we want the model to be able to do:
+ * Generate code, documentation and reports,
+ * Explain, review and annotate code, including type inference,
+   suggestions for improvement, etc, potentially by generating an Rmd,
+ * Refactor code, such as converting non-standard tidyverse code to
+   standard R code, improving its reusablility, and
+ * Suggest the next steps of an analysis or software project.
+   
+We could consider fine-tuning or indexing (RAG) the model using data
+sources like:
+ * The CRAN, Bioconductor and GitHub corpuses of vignettes and
+   documentation, including artifacts on GitHub that are not packaged,
+ * The [[https://zenodo.org/records/4091818][type tracing dataset]] from Jan Vitek's group.
+
+As a point of reference, GitHub contains ~768k Rmd files.
+
+** User interface
+
+The user interface would represent the agent with a single object
+(like =wizrd=) exported by the package. The =print()= method on the
+object would prompt the user for input using =readline()=, so the user
+just has to enter "wizrd" for help.
+
+The model would have access to the history of the session, using the
+histry package, as well as the objects visible in the search path,
+loaded help files, the list of installed packages, etc. Optionally,
+the agent could also hook into errors in order to offer immediate
+assistance. It could also profile the user's code behind the scenes
+and suggest optimizations if the user is spending a lot of time
+waiting. Ideally in a way that is less annoying than Clippy from MS
+Office.
