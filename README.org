@@ -45,14 +45,54 @@ There are several components to the design:
 
 ** Model interface
 
+We will define an abstraction layer for sending prompts to and
+receiving replies from an LLM. The user will instantiate a Model using the
+backend-specific API. That Model will use default prompts and concern
+itself only with communication to the backend. If the user wants to
+customize the prompts to a specific Model, they can define a Model
+subclass that wraps the base Model. Dispatch will then generate
+Model-specific prompts (see below) where desired.
+
 LLaMA.cpp seems like the ideal basis for an R interface to LLMs,
 because it is conveniently implemented in C/C++ and has a strong
 ecosystem around it, including LlamaIndex for RAG, fine-tuning etc,
 although it is only available from Python.
 
 There is a barebones R interface to LLaMA.cpp called [[https://github.com/coolbutuseless/rllama][rllama]]. It is
-very basic, not released anywhere, and hasn't been updated in a
-year. We will probably need to make our own.
+very basic, not released anywhere, directly embeds/copies code from
+the llama.cpp project, and hasn't been updated in a year. It would be
+easier to implement something like rllama after the release of the
+[[https://github.com/ggerganov/llama.cpp/issues/5215][llamax]] C library, which will wrap the C++ constructs in a high-level
+API.
+
+However, a simpler approach might be to leverage the llama.cpp [[https://github.com/ggerganov/llama.cpp/tree/master/examples/server][HTTP
+server]]. Its REST interface implements the OpenAI API, so if we
+implemented a client for that, we would also support other servers,
+such as Chat GPT itself. The server has tons of features, including
+key-based access and automatic downloading of models from Hugging
+Face.
+
+Advantages of the REST approach include:
+ * No native code, just a dependency on a web client,
+ * Client/server architecture enables computing on a remote host, such
+   as a shared/cloud node with more resources (GPUs), enabling the use
+   of larger, more performant models.
+
+The R package could automate installation of the web server, as
+binaries for most platforms are provided from GitHub.
+
+Related work includes:
+ * The [[https://github.com/jcrodriguez1989/chatgpt/tree/main][chatgpt]] package, which is hard-coded against the OpenAI
+   endpoint and its GPT 3.5 model,
+ * The [[https://cran.r-project.org/web/packages/ollamar/index.html][ollamar]] package, which is similar to chatgpt except for ollama,
+ * The [[https://github.com/JamesHWade/gpttools][gpttools]] package, which a simple chat abstraction over many
+   popular models, but without using OOP,
+ * The [[https://github.com/MichelNivard/gptstudio][gptstudio]] package, which integrates the same models as gpttools
+   into RStudio, but for some reason does not leverage gpttools, even
+   though they share authors.
+
+It would be interesting to support tool calling on local models. Some
+models [[https://llama.meta.com/docs/model-cards-and-prompt-formats/llama3_1/][support]] adhoc tool calling via system prompts.
 
 ** Model development
 
@@ -72,6 +112,17 @@ sources like:
 
 As a point of reference, GitHub contains ~768k Rmd files.
 
+A good model to start with is the [[https://ollama.com/mannix/deepseek-coder-v2-lite-instruct][4 bit quantization]] of
+=deepseek-coder-v2-lite-instruct=. The full model seems to work as
+well as GPT4o in simple testing. Both seem capable at the above tasks,
+so it is not clear whether fine-tuning will be necessary.
+
+However, we do want to enable extending the system to new
+models. Besides pointing to the model representation, a model
+extension will also want to provide customized prompts for each type
+of interaction. This behavior will be implemented by extending the
+Model class (see below).
+
 ** User interface
 
 The user interface would represent the agent with a single object
@@ -87,3 +138,24 @@ assistance. It could also profile the user's code behind the scenes
 and suggest optimizations if the user is spending a lot of time
 waiting. Ideally in a way that is less annoying than Clippy from MS
 Office.
+
+Besides the direct chat interface, the package will provide
+convenience functions for common tasks like generating Rd for a
+function. Each function will perform one or more tasks. Each task will
+be represented by a class, so that we can rely on dispatch to
+customize the generation of prompts for each Task and Model
+combination (and maybe also the target object, which might be
+a function, environment, histry object, etc).
+
+The general logic for any task will be:
+1. Use dispatch to determine the optimal prompt given a particular
+   Task and Model,
+2. Send the prompt to the Model, which returns the response,
+3. Interpret the response to finalize execution of the task.
+
+The model could request information on an object in the R session
+using a protocol like {R_get X}. A prompt for that might be: "If I ask
+you for help with a function, and you don't know the code, ask for it
+using {R_get X} where X is the name of the function". A more
+transparent alternative would be expecting the user to use a syntax
+like ={R foo}= to inline substitute the result of evaluating =foo=.
