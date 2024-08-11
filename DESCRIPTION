@@ -1,0 +1,32 @@
+Package: wizrd
+Type: Package
+Title: Integration of Large Language Models (LLMs) into R
+Version: 0.1.0
+Authors@R: c(
+    person(given = "Michael", family = "Lawrence", role = c("aut", "cre"),
+           email = "michafla@gene.com")
+)
+Description: The wizrd package integrates Large Language Models (LLMs) within
+	     the R session to enhance data analysis and package development.
+	     It allows users to leverage the power of LLMs for generating code,
+	     guiding data exploration, and creating documentation.
+License: MIT
+Imports:
+    tools,
+    S7,
+    httr,
+    jsonlite,
+    checkmate
+Suggests:
+    base64enc,
+    png,
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0)
+Depends: 
+    R (>= 3.5.0)
+Encoding: UTF-8
+RoxygenNote: 7.1.1
+VignetteBuilder: knitr
+URL: https://github.com/lawremi/wizrd
+BugReports: https://github.com/lawremi/wizrd/issues
