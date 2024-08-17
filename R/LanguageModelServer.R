@@ -1,13 +1,11 @@
 LanguageModelServer <- new_class("LanguageModelServer",
                                  properties = list(
-                                     url = scalar(class_character),
-                                     key_prefix =
-                                         nullable(scalar(class_character))
-                                 ),
+                                     url = prop_string,
+                                     key_prefix = prop_string_nullable
+                                 )),
                                  abstract = TRUE)
 
-method(llm, LanguageModelServer) <- function(x, name) {
-    assert_string(name)
+method(language_model, LanguageModelServer) <- function(x, name) {
     RemoteLanguageModel(server = x, name = name)
 }
 
@@ -23,5 +21,5 @@ create_request <- function(server) {
 ## TODO ([X] done):
 
 ## Commercial: [X] OpenAI, Gemini, Anthropic, Perplexity
-## Local / open-source: [X] LlamaCpp (server), Ollama, llamafile
+## Local / open-source: [X] LlamaCpp (server, llamafile), Ollama
 ## Third party hosts: Hugging Face, Bedrock, Azure, Vertex AI

@@ -81,10 +81,13 @@ Advantages of the REST approach include:
 The R package could automate installation of the web server, as
 binaries for most platforms are provided from GitHub.
 
-Related work includes:
+There is a good [[https://www.twosigma.com/articles/a-guide-to-large-language-model-abstractions/][overview]] of large language model abstractions (in
+Python). Related work in R includes:
  * The [[https://github.com/jcrodriguez1989/chatgpt/tree/main][chatgpt]] package, which is hard-coded against the OpenAI
    endpoint and its GPT 3.5 model,
  * The [[https://cran.r-project.org/web/packages/ollamar/index.html][ollamar]] package, which is similar to chatgpt except for ollama,
+ * The [[https://github.com/JBGruber/rollama][rollama]] package, which converts the R console into a chat
+   interface based on ollama (and side effects),
  * The [[https://github.com/JamesHWade/gpttools][gpttools]] package, which a simple chat abstraction over many
    popular models, but without using OOP,
  * The [[https://github.com/MichelNivard/gptstudio][gptstudio]] package, which integrates the same models as gpttools

@@ -29,8 +29,11 @@ s7_schema <- list(
 )
 
 S7_class <- new_S3_class("S7_class")
+S7_any <- new_S3_class("S7_any")
 S7_base_class <- new_S3_class("S7_base_class")
 S7_union <- new_S3_class("S7_union")
+S7_S3_class <- new_S3_class("S7_S3_class")
+
 S7_property <- new_S3_class("S7_property")
 
 scalar_S7_property <- new_S3_class("scalar_S7_property")
@@ -116,8 +119,12 @@ method(as_json_schema, S7_base_class) <- function(from, description = NULL,
     schema
 }
 
-method(as_json_schema, NULL) <- function(from) {
-    list(type = NULL)
+method(as_json_schema, NULL) <- function(from, description = NULL) {
+    c(list(type = NULL), description = description)
+}
+
+method(as_json_schema, S7_any) <- function(from, description = NULL) {
+    c(list(), description = description)
 }
 
 method(as_json_schema, S7_property) <- function(from, description = NULL, ...) {

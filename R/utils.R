@@ -32,16 +32,19 @@ new_scalar_property <- function(class, ..., validator = NULL, nullable = FALSE) 
     prop
 }
 
-new_string_property <- function(..., validator = NULL, choices = NULL) {
-    prop <- new_scalar_property(class_character,
-                        validator = function(prop) {
-                            c(if (!is.null(choices) && !all(prop %in% choices))
-                                paste("contains values not in",
-                                      deparse(choices)),
-                              if (!is.null(validator))
-                                  validator(prop)
-                              )
-                        })
+new_string_property <- function(..., validator = NULL, default = "",
+                                choices = NULL)
+{
+    prop <- new_scalar_property(
+        class_character,
+        validator = function(prop) {
+            c(if (!is.null(choices) && !all(prop %in% choices))
+                paste("contains values not in",
+                      deparse(choices)),
+              if (!is.null(validator))
+                  validator(prop)
+              )
+        }, default = default)
     prop$choices <- choices
     class(prop) <- c("string_S7_property", class(prop))
     prop
@@ -51,16 +54,15 @@ new_string_property <- function(..., validator = NULL, choices = NULL) {
 prop_string <- new_string_property()
 prop_string_nullable <- new_string_property(nullable = TRUE)
 
-new_flag_property <- function(...) {
-    new_scalar_property(class_logical, ...)
+new_flag_property <- function(..., default = FALSE) {
+    new_scalar_property(class_logical, ..., default = default)
 }
 
 prop_flag <- new_flag_property()
 
-prop_number <- new_number_property()
-
 ## TODO: make this handle non-scalars as well
 new_number_property <- function(class = class_numeric, ..., validator = NULL,
+                                default = min(max(min, 0L), max),
                                 min = -Inf, max = Inf)
 {
     prop <- new_scalar_property(class, ..., validator = function(prop) {
@@ -78,14 +80,17 @@ new_number_property <- function(class = class_numeric, ..., validator = NULL,
     prop
 }
 
+prop_number <- new_number_property()
+
+new_int_property <- function(..., min = .Machine$integer.min,
+                             max = .Machine$integer.max)
+{
+    new_number_property(class_integer, ..., min = min, max = max)
+}
+
 prop_int <- new_int_property()
 prop_int_nn <- new_int_property(low = 0L)
 prop_int_pos <- new_int_property(low = 1L)
-
-new_int_property <- function(...)
-{
-    new_number_property(class_integer, ...)
-}
 
 new_list_property <- function(..., validator = NULL, of = class_any,
                               named = FALSE)
@@ -117,13 +122,12 @@ new_as_generic <- function(class) {
     generic
 }
 
-make_command <- function(command, ...) {
-    args <- list(...)
+make_args <- function(command, ...) {
+    args <- c(...)
     names(args) <- sub("_", "-", names(args), fixed = TRUE)
     logicals <- vapply(args, is.logical, logical(1L))
     args[logicals] <- lapply(args[logicals], function(x) if (x) "")
-    argstr <- paste0("--", names(args), " ", args, collapse = " ")
-    paste(command, argstr)
+    paste0("--", names(args), " ", args)
 }
 
 get_api_key <- function(prefix) {
@@ -189,6 +193,7 @@ Rd_for_function <- function(FUN, name = deparse(substitute(FUN))) {
             if (!is.null(name))
                 get_Rd(name, package)
         }
+    }
 }
 
 find_name <- function(what, env) {
@@ -196,4 +201,16 @@ find_name <- function(what, env) {
     pos <- Position(identical, objs, what)
     if (!is.na(pos))
         names(objs)[pos]
+}
+
+`:=` <- function(x, y) {
+    sym <- substitute(x)
+    stopifnot(is.name(sym))
+    call <- substitute(y)
+    stopifnot(is.call(call))
+    
+    nm <- deparse(sym)
+    call$name <- nm
+
+    assign(nm, eval(call, parent.frame()), parent.frame())
 }

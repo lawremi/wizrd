@@ -6,10 +6,14 @@ Authors@R: c(
     person(given = "Michael", family = "Lawrence", role = c("aut", "cre"),
            email = "michafla@gene.com")
 )
-Description: The wizrd package integrates Large Language Models (LLMs) within
-	     the R session to enhance data analysis and package development.
-	     It allows users to leverage the power of LLMs for generating code,
-	     guiding data exploration, and creating documentation.
+Description: Ride the LLM hype llama with an abstraction for creating specialized
+	     agents on top of various LLM backends, commercially hosted or
+	     local. Craft and optimize parameterized prompts. Chat using text
+	     and images. Stream chat responses. Generate embeddings and realize
+	     the RAG to riches dream. Implement tools using R functions and
+	     instruct the model to call them. Construct an agent by wrapping a
+	     model in an R function. Use cases include generating code, guiding
+	     data exploration, and creating documentation. Powered by S7.
 License: MIT
 Imports:
     tools,
@@ -18,6 +22,7 @@ Imports:
     jsonlite,
     checkmate
 Suggests:
+    processx,
     base64enc,
     png,
     knitr,

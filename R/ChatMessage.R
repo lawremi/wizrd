@@ -9,32 +9,10 @@ ChatMessage <- new_class("ChatMessage",
                              tool_calls = new_list_property(of = ToolCall)
                          ))
 
-normalize_chat_message <- new_generic("normalize_chat_message", "x")
-
-method(normalize_chat_message, ChatMessage) <- identity
-
-method(normalize_chat_message, class_any) <- function(x) {
-    ChatMessage(role = "user", content = normalize_chat_content, object = x)
-}
-
-normalize_chat_content <- new_generic("normalize_chat_content", "x")
-
-method(normalize_chat_content, class_list) <- function(x) {
-    lapply(x, normalize_chat_content)
-}
-
-method(normalize_chat_content, class_character) <- function(x) {
-    paste(x, collapse = "\n")
-}
-
-nativeRaster <- new_S3_class("nativeRaster")
-raster <- new_S3_class("raster")
-union_raster <- new_union(nativeRaster, raster)
-
-method(normalize_chat_content, union_raster) <- identity
-
-method(normalize_chat_content, class_any) <- function(x) {
-    capture.output(print(x))
+method(convert, list(class_any, ChatMessage)) <- function(from, role = "user",
+                                                          format = SerialFormat)
+{
+    ChatMessage(role = role, content = serialize(x, format), object = x)
 }
 
 split_into_blocks <- function(x) {

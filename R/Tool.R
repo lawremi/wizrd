@@ -1,67 +1,156 @@
-validate_arg_schema <- function(prop) {
-    c(if (!identical(prop$type, "object"))
-          "$type must be 'object'",
-      validate_list(prop$properties, names = "named"))
+validate_Tool <- function(object) {
+    ## TODO: validate examples against Signature
+    extra_sig_args <- setdiff(names(object@signature@arguments),
+                              names(formals(object)))
+    extra_example_args <- setdiff(names(unlist(object@examples,
+                                               recursive = FALSE)),
+                                  names(formals(object)))
+    ex_problems <- unlist(lapply(object@examples), function(ex) {
+        mapply(function(arg, cls, nm) {
+            if (!inherits(arg, cls))
+                paste0("example argument '", nm,
+                       "' does not inherit from class '",
+                       S7:::S7_class_name(cls), "'")
+        }, ex, object@signature@arguments[names(ex)], names(ex)) 
+    })
+    
+    c(if (length(extra_sig_args))
+        paste("@signature@arguments contains extra args:",
+              paste(extra_sig_args, collapse = ", ")),
+      
+      if (length(extra_example_args))
+          paste("@examples contains extra args:",
+                paste(extra_example_args, collapse = ", "))
+      ex_problems
+      )
 }
 
 Tool <- new_class("Tool", class_function,
                   properties = list(
-                      name = new_string_property(),
-                      description = new_string_property(nullable = TRUE),
-                      arg_schema = new_property(class_list,
-                                                validator = validate_arg_schema)
+                      name = prop_string,
+                      description = prop_string_nullable,
+                      signature = ToolSignature,
+                      examples = new_list_property(of = class_list,
+                                                   named = TRUE)
                   ),
-                  validator = function(object) {
-                      extra_args <- setdiff(names(object@arg_schema$properties),
-                                            names(formals(object)))
-                      if (length(extra_args))
-                          paste("@arg_schema$properties contains extra args:",
-                                paste(extra_args, collapse = ", "))
-                  })
+                  validator = validate_Tool)
 
-as_arg_schema <- new_generic("as_arg_schema", "x")
+any_signature <- function(args) {
+    args <- as.list(args)
+    args[] <- class_any
+    if (!is.null(args$...))
+        args$... <- class_list
+    ToolSignature(arguments = args, value = class_any)
+}
 
-method(as_arg_schema, NULL) <- function(x, FUN, Rd) {
+norm_examples <- function(examples, FUN) {
+    lapply(examples, function(example) {
+        as.list(match.call(FUN, as.call(c(list(FUN), example))))[-1L]
+    })
+}
+
+tool <- function(FUN, signature = any_signature(formals(FUN)),
+                 name = deparse(substitute(FUN)),
+                 description = NULL, examples = list())
+{
+    FUN <- match.fun(FUN)
+    if (is.null(description)) {
+        Rd <- Rd_for_function(FUN, name)
+        if (!is.null(Rd))
+            description <- Rd_description(Rd)
+    }
+    examples <- norm_examples(examples, FUN)
+    Tool(FUN, name = name, description = description, signature = signature,
+         examples = examples)
+}
+
+equip <- function(x, tool, instructions = NULL) {
+    x@tools[[tool@name]] <- bind_tool(tool, x, instructions)
+    x
+}
+
+BoundTool <- new_class("BoundTool", Tool,
+                       properties = list(
+                           binding = FormatBinding,
+                           instructions = prop_string_nullable
+                       ))
+
+bind_fun <- function(FUN) {
+    function(args) {
+        do.call(FUN, args)
+    }
+}
+
+bind <- new_generic("bind", c("x", "to"))
+
+method(bind, list(Tool, LanguageModel)) <- function(x, to, instructions = NULL) {
+    assert_string(instructions, null.ok = TRUE)
+    format_binding <- FormatBinding(input = tool_input_format(to, x),
+                                    output = tool_output_format(to, x))
+    do.call(BoundTool, c(bind_fun(x), props(x), binding = format_binding,
+                         instructions = instructions))
+}
+
+method(bind, list(BoundTool, LanguageModel)) <- function(x, to) x
+
+tool_input_format <- new_generic("tool_input_format", "x",
+                                 function(x, tool, ...) S7_dispatch())
+
+method(tool_input_format, LanguageModel) <- function(x, tool) {
+    tool_input_json_format(x, tool)
+}
+
+tool_output_format <- new_generic("tool_output_format", "x",
+                                  function(x, tool, ...) S7_dispatch())
+
+method(tool_output_format, LanguageModel) <- function(x, tool) {
+    tool_output_json_format(x, tool)
+}
+
+tool_input_json_format <- function(tool) {
+    Rd <- Rd_for_function(S7_data(tool), tool@name)
+    args <- tool@signature@arguments
+    formals <- formals(tool)
+    
     if (!is.null(Rd))
-        props <- lapply(Rd_args(Rd)[names(formals(FUN))],
+        props <- lapply(Rd_args(Rd)[names(formals)],
                         function(x) list(description = x))
     else {
-        props <- as.list(formals(FUN))
+        props <- as.list(formals)
         props[] <- TRUE
     }
+    
     props <- mapply(function(prop, default) {
         default <- deparse(default)
         if (nzchar(default))
             list(description =
-                     paste(c(prop$description, "default:", default),
+                     paste(c(if (is.list(prop)) prop$description, "default:",
+                             default),
                            collapse = " "))
         else prop
-    }, props, formals(FUN), SIMPLIFY = FALSE)
-    list(type = "object", properties = props)
-}
+    }, props, formals, SIMPLIFY = FALSE)
+    
+    schema <- list(type = "object", properties = props)
 
-method(as_arg_schema, class_list) <- function(x, FUN, Rd) {
-    schema <- as_arg_schema(NULL, FUN, Rd)
-    extra_args <- setdiff(names(x), names(formals(FUN)))
-    if (length(extra_args) > 0L)
-        stop("Extra arguments in 'arg_schema': ",
-             paste(extra_args, collapse = ", "))
-    schema$properties[names(x)] <- mapply(function(xi, prop) {
-        xi_schema <- as_json_schema(xi)
+    schema$properties[names(args)] <- mapply(function(arg, prop) {
+        arg_schema <- as_json_schema(arg)
         if (is.list(prop))
-            xi_schema$description <- paste(c(xi_schema$description,
-                                             prop$description), collapse = " ")
-        xi_schema
-    }, x, schema$properties[names(x)], SIMPLIFY = FALSE)
-    schema
+            arg_schema$description <-
+                paste(c(arg_schema$description, prop$description),
+                      collapse = " ")
+        arg_schema
+    }, args, schema$properties[names(args)], SIMPLIFY = FALSE)
+
+    JSONFormat(format, schema = schema)
 }
 
-Tool_from_function <- function(FUN, name = deparse(substitute(FUN)),
-                               description = NULL, arg_schema = NULL)
-{
-    Rd <- Rd_for_function(FUN, name)
-    if (is.null(description) && !is.null(Rd))
-        description <- paste(Rd_description(Rd), "Return value:", Rd_value(Rd))
-    arg_schema <- as_arg_schema(arg_schema, FUN, Rd)
-    Tool(FUN, name = name, description = description, arg_schema = arg_schema)
+tool_output_json_format <- function(tool) {
+    Rd <- Rd_for_function(S7_data(tool), tool@name)
+    Rd_description <- if (!is.null(Rd)) Rd_value(Rd)
+
+    schema <- as_json_schema(tool@signature@value)
+    schema$description <- paste(c(Rd_description, schema$description),
+                                collapse = " ")
+    
+    schema
 }

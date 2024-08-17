@@ -3,12 +3,12 @@ OpenAIAPIServer <- new_class("OpenAIAPIServer", LanguageModelServer)
 OpenAIAPIResponse <- new_class("OpenAIAPIResponse", class_list)
 
 openai_body_messages <- function(messages) {
-    assert_messages(messages)
+    assert_list(messages, "ChatMessage")
     lapply(messages, openai_encode_message)
 }
 
 openai_body_tools <- function(tools) {
-    assert_list(tools, "function")
+    assert_list(tools, "BoundTool")
     lapply(tools, openai_encode_tool)
 }
 
@@ -20,8 +20,8 @@ method(openai_response_format, ResponseFormat) <- function(response_format) {
 }
 
 method(openai_response_format, JSONResponseFormat) <- function(response_format) {
-    if (length(response_format@json_schema) > 0L)
-        list(type = "json_schema", json_schema = response_format@json_schema)
+    if (length(response_format@schema) > 0L)
+        list(type = "json_schema", json_schema = response_format@schema)
     else list(type = "json_object")
 }
 
@@ -76,11 +76,11 @@ req_capture_stream_openai <- function(req, stream_callback) {
 }
 
 method(chat, OpenAIAPIServer) <- function(object, model, messages, tools,
-                                          output_format, stream_callback, ...)
+                                          format_binding, stream_callback, ...)
 {
     req <- create_request(object) |>
         httr2::req_url_path_append("v1", "chat", "completions") |>
-        openai_req_body_chat(model, messages, tools, output_format,
+        openai_req_body_chat(model, messages, tools, format_binding,
                              stream = !is.null(stream_handler), ...)
     if (!is.null(stream_handler)) {
         req |> req_capture_stream_openai(stream_callback)
@@ -97,8 +97,8 @@ method(req_auth_fun, OpenAIAPIServer) <- function(server) {
 openai_tool_calls <- function(message) {
     tool_calls <- message$tool_calls
     lapply(tool_calls, function(tool_call) {
-        list(id = tool_call$id, tool_name = tool_call$function$name,
-             arguments = fromJSON(tool_call$function$arguments))
+        ToolCall(id = tool_call$id, tool_name = tool_call$function$name,
+                 arguments = fromJSON(tool_call$function$arguments))
     })
 }
 
@@ -111,12 +111,15 @@ method(chat_message, OpenAIAPIResponse) <- function(x) {
 }
 
 openai_encode_message <- function(x) {
+    message <- list(role = x@role, content = openai_encode_content(x@content))
+    ## recapitulate tool calls for the context
     tool_calls <- lapply(x@tool_calls, function(tool_call) {
         list(id = tool_call@id, type = "function",
-             function = list(name = tool_call@tool_name, tool_call@arguments))
+             function = list(name = tool_call@tool_name,
+                             arguments = tool_call@arguments))
     })
-    list(role = x@role, content = openai_encode_content(x@content),
-         tool_calls = tool_calls)
+    message$tool_calls <- if (length(tool_calls) > 0L) tool_calls
+    message
 }
 
 openai_encode_content <- new_generic("openai_encode_content", "x")
@@ -141,18 +144,28 @@ method(openai_encode_content_part, union_raster) <- function(x) {
     list(type = "image_url", image_url = list(url = image_data_uri(x)))
 }
 
-method(openai_encode_content_part, class_list) <- function(x) {
-    list(type = "text", text = toJSON(x))
-}
-
 openai_encode_tool <- new_generic("openai_encode_tool", "x")
 
-method(openai_encode_tool, class_function) <- function(x) {
-    openai_encode_tool(Tool_from_function(x, name = NULL))
+example_descriptions <- function(x) {
+    vapply(of@examples, function(ex) {
+              output <- do.call(of, ex)
+              paste0("Input: ", serialize(ex@input, of@input_format), "\n",
+                     "Output: ", serialize(output, of@output_format))
+    }, character(1L))
 }
 
-method(openai_encode_tool, Tool) <- function(x) {
+openai_tool_description <- function(x) {
+    ex_descs <- example_descriptions(x)
+    paste(c(x@description,
+            if (inherits(x@binding@output, JSONFormat))
+                c("Return value schema:", toJSON(x@binding@output@schema)),
+            if (length(ex_descs) > 0L) c("Example(s):", ex_descs)),
+          collapse = "\n\n")
+}
+
+method(openai_encode_tool, BoundTool) <- function(x) {
+    assert_class(x@binding@input, "JSONFormat")
     list(type = "function",
-         function = list(name = x@name, c(description = x@description),
-                         parameters = arg_schema))
+         function = list(name = x@name, description = openai_tool_description(x),
+                         parameters = x@binding@input@schema))
 }

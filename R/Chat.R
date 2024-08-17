@@ -14,10 +14,6 @@ Chat <- new_class("Chat",
                                            getter = Chat_roles)
                   ))
 
-normalize_messages <- function(x) {
-    set_slots(messages = lapply(x@messages, normalize_chat_message))
-}
-
 method(predict, Chat) <- function(object, input, ...) {
     last_message(chat(object, input, ...))
 }
@@ -58,16 +54,21 @@ append_messages <- function(x, ...) {
 }
 
 append_output <- function(x, output) {
-    output <- convert_output(x@model@output_converter, output)
-    apppend_messages(x, output)
+    object <- deserialize(output, x@model@binding@output)
+    append_messages(x, ChatMessage(role = "assistant", content = output,
+                                   object = object))
 }
 
 handle_tool_calls <- function(x) {
     tool_calls <- last_message(x)@tool_calls
-    tool_content <- lapply(tool_calls, function(tool_call) {
-        do.call(x@model@tools[[tool_call@tool_name]], tool_call@parameters)
+    msgs <- lapply(tool_calls, function(tool_call) {
+        tool <- x@model@tools[[tool_call@tool_name]]
+        value <- do.call(tool, deserialize(tool_call@parameters,
+                                           tool@binding@input))
+        ChatMessage(role = "tool", object = value,
+                    content = serialize(value, tool@binding@output))
     })
-    chat(x, list(tool = tool_content))
+    chat(x, msgs)
 }
 
 handle_output <- function(x, output) {
