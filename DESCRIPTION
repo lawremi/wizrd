@@ -18,7 +18,7 @@ License: MIT
 Imports:
     tools,
     S7,
-    httr,
+    httr2,
     jsonlite,
     checkmate
 Suggests:
