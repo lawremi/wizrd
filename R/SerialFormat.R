@@ -72,7 +72,7 @@ respond_with_csv <- function(x, schema = list(), example = data.frame()) {
 method(output_instructions,
        list(CSVFormat, LanguageModel)) <- function(on, to)
 {
-    prompt <- "Return only CSV, without any explanation or other text.\n",
+    prompt <- "Return only CSV, without any explanation or other text.\n"
     if (length(on@schema) > 0L)
         prompt <- paste0(prompt,
                          "This JSON schema defines the structure of the data:\n",
@@ -89,7 +89,7 @@ method(output_instructions,
 method(input_instructions,
        list(CSVFormat, LanguageModel)) <- function(on, to)
 {
-    prompt <- "The user will send only CSV, without any other text.\n",
+    prompt <- "The user will send only CSV, without any other text.\n"
     if (length(on@schema) > 0L)
         prompt <- paste0(prompt,
                          "This JSON schema defines the structure of the data:\n",
@@ -115,7 +115,7 @@ method(output_instructions,
        list(CodeFormat, LanguageModel)) <- function(on, to)
 {
     prompt <- paste(c("Return only", on@language,
-                      "code in markdown-style blocks,"
+                      "code in markdown-style blocks,",
                       "without any explanation or other text.\n"),
                     collapse = " ")
     if (length(on@example) > 0L)
@@ -128,7 +128,7 @@ method(input_instructions,
        list(CodeFormat, LanguageModel)) <- function(on, to)
 {
     prompt <- paste(c("The user will send only", on@language,
-                      "code in markdown-style blocks,"
+                      "code in markdown-style blocks,",
                       "without any explanation or other text.\n"),
                     collapse = " ")
     if (length(on@example) > 0L)

@@ -75,7 +75,7 @@ method(as_json_schema, S7_class) <- function(from, description = NULL, ...) {
     }
     class_desc <- "The name of the class, potentially qualified by package name"
     schema <- list(type = "object", title = pkg_name,
-                   properties = c(list(.class = list(const = pkg_name
+                   properties = c(list(.class = list(const = pkg_name,
                                                      desc = class_desc)),
                                   prop_schema))
     description <- c(description, if (!is.null(Rd)) Rd_description(Rd))
@@ -100,7 +100,7 @@ as_json_schema_type <- function(from, scalar, named) {
                POSIXct =, Date =, character = "string", "object")
     else switch(from$class, atomic =, logical =, integer =, numeric =,
                 double =, character =, complex =, raw =, expression =,
-                factor =, vector =, list = "array", function = "string",
+                factor =, vector =, list = "array", `function` = "string",
                 "object")
 }
 

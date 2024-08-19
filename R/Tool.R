@@ -20,7 +20,7 @@ validate_Tool <- function(object) {
       
       if (length(extra_example_args))
           paste("@examples contains extra args:",
-                paste(extra_example_args, collapse = ", "))
+                paste(extra_example_args, collapse = ", ")),
       ex_problems
       )
 }

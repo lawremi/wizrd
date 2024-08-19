@@ -3,9 +3,9 @@ Type: Package
 Title: Integration of Large Language Models (LLMs) into R
 Version: 0.1.0
 Authors@R: c(
-    person(given = "Michael", family = "Lawrence", role = c("aut", "cre"),
-           email = "michafla@gene.com")
-)
+		person(given = "Michael", family = "Lawrence",
+		       role = c("aut", "cre"), email = "michafla@gene.com")
+	   )
 Description: Ride the LLM hype llama with an abstraction for creating specialized
 	     agents on top of various LLM backends, commercially hosted or
 	     local. Craft and optimize parameterized prompts. Chat using text

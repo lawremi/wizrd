@@ -2,7 +2,7 @@ LanguageModelServer <- new_class("LanguageModelServer",
                                  properties = list(
                                      url = prop_string,
                                      key_prefix = prop_string_nullable
-                                 )),
+                                 ),
                                  abstract = TRUE)
 
 method(language_model, LanguageModelServer) <- function(x, name) {

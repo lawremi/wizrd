@@ -97,8 +97,8 @@ method(req_auth_fun, OpenAIAPIServer) <- function(server) {
 openai_tool_calls <- function(message) {
     tool_calls <- message$tool_calls
     lapply(tool_calls, function(tool_call) {
-        ToolCall(id = tool_call$id, tool_name = tool_call$function$name,
-                 arguments = fromJSON(tool_call$function$arguments))
+        ToolCall(id = tool_call$id, tool_name = tool_call$`function`$name,
+                 arguments = fromJSON(tool_call$`function`$arguments))
     })
 }
 
@@ -115,8 +115,8 @@ openai_encode_message <- function(x) {
     ## recapitulate tool calls for the context
     tool_calls <- lapply(x@tool_calls, function(tool_call) {
         list(id = tool_call@id, type = "function",
-             function = list(name = tool_call@tool_name,
-                             arguments = tool_call@arguments))
+             `function` = list(name = tool_call@tool_name,
+                               arguments = tool_call@arguments))
     })
     message$tool_calls <- if (length(tool_calls) > 0L) tool_calls
     message
@@ -166,6 +166,7 @@ openai_tool_description <- function(x) {
 method(openai_encode_tool, BoundTool) <- function(x) {
     assert_class(x@binding@input, "JSONFormat")
     list(type = "function",
-         function = list(name = x@name, description = openai_tool_description(x),
-                         parameters = x@binding@input@schema))
+         `function` = list(name = x@name,
+                           description = openai_tool_description(x),
+                           parameters = x@binding@input@schema))
 }
