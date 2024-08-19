@@ -35,3 +35,8 @@ RoxygenNote: 7.1.1
 VignetteBuilder: knitr
 URL: https://github.com/lawremi/wizrd
 BugReports: https://github.com/lawremi/wizrd/issues
+Collate: utils.R ToolCall.R ChatMessage.R SerialFormat.R
+	 FormatBinding.R ToolSignature.R Tool.R LanguageModel.R Chat.R
+	 LanguageModelAgent.R LanguageModelServer.R OpenAIAPIServer.R
+	 LlamaCppServer.R OllamaServer.R RemoteLanguageModel.R openai.R become.R
+	 json_schema.R zzz.R
