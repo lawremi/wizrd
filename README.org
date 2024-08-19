@@ -37,23 +37,26 @@ would benefit from the same features, only more incrementally.
 There are several components to the design:
  * An R interface to something like LLaMA.cpp, so that we can interact
    with models from R,
- * The model itself, which needs to be fine-tuned and/or indexed for
-   this specific use case, and exist on the user's machine,
- * The user-friendly interface to the model, allowing the user to
-   engage in dialog directly from the R console.
+ * The agents built on the models, which need to be adapted for
+   specific use cases,
+ * The user-friendly interface to models and agents, allowing the user
+   to engage in dialog directly from the R console, index the R
+   workspace, as well as develop agent-based programs.
  * IDE integration, probably by extending the Ark LSP by Lionel Henry.
 
 ** Model interface
 
 We will define an abstraction layer for sending prompts to and
-receiving replies from an LLM. The user will instantiate a Model using the
-backend-specific API. That Model will use default prompts and concern
-itself only with communication to the backend. If the user wants to
-customize the prompts to a specific Model, they can define a Model
-subclass that wraps the base Model. Dispatch will then generate
-Model-specific prompts (see below) where desired.
+receiving replies from an LLM. The user will instantiate a Model using
+the backend-specific API. That Model will use default prompts and
+concern itself only with communication to the backend. If the user
+wants to customize the prompts to a specific to a task, they can
+modify the prompt parameters. To optimize support for specific species
+of models, the user can define a Model subclass that wraps the base
+Model. Dispatch will then generate Model-specific prompts (see below)
+where desired.
 
-LLaMA.cpp seems like the ideal basis for an R interface to LLMs,
+LLaMA.cpp seems like the ideal basis for an R interface to local LLMs,
 because it is conveniently implemented in C/C++ and has a strong
 ecosystem around it, including LlamaIndex for RAG, fine-tuning etc,
 although it is only available from Python.
@@ -94,12 +97,23 @@ Python). Related work in R includes:
    into RStudio, but for some reason does not leverage gpttools, even
    though they share authors.
 
-It would be interesting to support tool calling on local models. Some
-models [[https://llama.meta.com/docs/model-cards-and-prompt-formats/llama3_1/][support]] adhoc tool calling via system prompts.
-
 ** Model development
 
-Things we want the model to be able to do:
+The package will enable users to *interactively* specialize models to
+a task. We consider off-line training approaches as out of
+scope. Thus, our focus is on epi-training (specializing on top of the
+model weights), where EPI is an acronym:
+ * Equipping :: making tools available to the model
+ * Prompting :: providing effective instructions to the model
+ * Indexing :: making additional knowledge efficiently accessible to
+   the model.
+
+Agents will perform tasks associated with two different activities:
+software development and data analysis.
+
+*** Software development
+
+Tasks include:
  * Generate code, documentation and reports,
  * Explain, review and annotate code, including type inference,
    suggestions for improvement, etc, potentially by generating an Rmd,
@@ -107,7 +121,7 @@ Things we want the model to be able to do:
    standard R code, improving its reusablility, and
  * Suggest the next steps of an analysis or software project.
    
-We could consider fine-tuning or indexing (RAG) the model using data
+We could consider fine-tuning or indexing (RAG) models using data
 sources like:
  * The CRAN, Bioconductor and GitHub corpuses of vignettes and
    documentation, including artifacts on GitHub that are not packaged,
@@ -115,17 +129,46 @@ sources like:
 
 As a point of reference, GitHub contains ~768k Rmd files.
 
-A good model to start with is the [[https://ollama.com/mannix/deepseek-coder-v2-lite-instruct][4 bit quantization]] of
-=deepseek-coder-v2-lite-instruct=. The full model seems to work as
-well as GPT4o in simple testing. Both seem capable at the above tasks,
-so it is not clear whether fine-tuning will be necessary.
+*** Data Analysis
 
-However, we do want to enable extending the system to new
-models. Besides pointing to the model representation, a model
-extension will also want to provide customized prompts for each type
-of interaction. This behavior will be implemented by extending the
-Model class (see below).
+Tasks include:
+ * Data and results discovery :: Based on context and/or a user query,
+   identify relevant data/results and reference them while explaining
+   their relevance and providing code for importing them.
+ * Data import :: Identify the structure of a data source, like a CSV
+   file, web site, REST API or database, and generate an importer
+   function based on user intent, which could be indicated by a
+   prototype of the imported object, like a data.frame stub.
+ * Data processing :: Identify the structure of the input data,
+   typically a data.frame, and generate a function to map it to
+   another data structure/state, based on user instructions and/or a
+   description of the desired result.
+ * Summary statistics :: Generate code that automatically summarizes
+   the variables in a dataset and their relationships, based on
+   context and/or a query.
+ * Visualization :: Generate code that creates visualizations, based
+   on specific instructions, generic approaches or patterns discovered
+   by numerical means, in order to check for anomalies, explore
+   patterns and perform visual inference.
+ * Statistical modeling :: Generate advice and/or code for testing
+   hypotheses and finding patterns using statistical / ML models.
+ * Report generation :: Generate Rmd reports using an analysis
+   transcript and/or user instructions.
+ * Publishing of results :: Generate code for publishing a result and
+   descriptive metadata, including provenance, to a database or
+   versison control system based on context and/or user instructions.
 
+Some general principles:
+ * Decoupling of code generation and evaluation :: Every task should
+   have a corresponding agent that generates code, ideally in a
+   function, without evaluating it, because there are multiple
+   potential uses of code, such as giving the user the chance to
+   understand, modify and integrate it.
+ * Consistency in input :: Each task should consider direct
+   instructions while also taking into account the broader context,
+   such as the chat history, contents of the global environment and/or
+   the history of the current R session.
+   
 ** User interface
 
 The user interface would represent the agent with a single object
@@ -145,20 +188,11 @@ Office.
 Besides the direct chat interface, the package will provide
 convenience functions for common tasks like generating Rd for a
 function. Each function will perform one or more tasks. Each task will
-be represented by a class, so that we can rely on dispatch to
-customize the generation of prompts for each Task and Model
-combination (and maybe also the target object, which might be
-a function, environment, histry object, etc).
+be represented by a generic, so that we can rely on dispatch to
+adapt the Model to each task based on its type.
 
 The general logic for any task will be:
 1. Use dispatch to determine the optimal prompt given a particular
    Task and Model,
 2. Send the prompt to the Model, which returns the response,
 3. Interpret the response to finalize execution of the task.
-
-The model could request information on an object in the R session
-using a protocol like {R_get X}. A prompt for that might be: "If I ask
-you for help with a function, and you don't know the code, ask for it
-using {R_get X} where X is the name of the function". A more
-transparent alternative would be expecting the user to use a syntax
-like ={R foo}= to inline substitute the result of evaluating =foo=.
