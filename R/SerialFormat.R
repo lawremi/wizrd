@@ -155,9 +155,15 @@ method(serialize, c(union_raster, SerialFormat)) <- function(x, format) x
 
 to_json <- new_generic("to_json", "x")
 
-method(to_json, class_any) <- function(x) {
-    x
+to_json_s3 <- function(x) {
+    list(.s3class = class(x), .data = x)
 }
+
+method(to_json, class_any) <- to_json_s3
+
+method(to_json, class_vector) <- identity
+
+method(to_json, class_complex | class_raw | class_expression) <- to_json_s3
 
 method(to_json, S7_object) <- function(x) {
     prop_to_json <- function(property) {
@@ -177,7 +183,7 @@ method(to_json, S7_object) <- function(x) {
 method(serialize, list(class_list | class_any, JSONFormat)) <- function(x,
                                                                         format)
 {
-    toJSON(to_json(x))
+    toJSON(to_json(x), null = "null")
 }
 
 ## avoid evaluating arbitrary code from the model
@@ -191,13 +197,45 @@ constructor_from_name <- function(name) {
 
 from_json <- new_generic("from_json", "x")
 
-method(from_json, class_list) <- function(x) {
-    if (!is.null(x$.class)) {
-        constructor <- constructor_from_name(x$.class)
-        x$.class <- NULL
-        do.call(constructor, lapply(x, from_json))
-    } else x
+s7_from_json <- function(x) {
+    constructor <- constructor_from_name(x$.class)
+    x$.class <- NULL
+    do.call(constructor, lapply(x, from_json))
 }
+
+parse_json_function <- function(fun) {
+    as.function(parse(text=paste(fun, collapse = "\n"))[-1L], .GlobalEnv)
+}
+
+parse_json_expression <- function(expr) {
+    as.expression(lapply(expr, \(x) parse(text = x)))
+}
+
+s3_from_json <- function(x) {
+    s3class <- x$.s3class
+    x$.s3class <- NULL
+    data <- from_json(x$.data)
+    conv <- switch(s3class, factor = as.factor, Date = as.Date,
+                   POSIXct = as.POSIXct, complex = as.complex,
+                   raw = {
+                       requireNamespace("base64enc")
+                       base64enc::base64decode
+                   }, `function` = parse_json_function,
+                   expression = parse_json_expression)
+    if (!is.null(conv))
+        conv(data)
+    else structure(data, class = s3class)
+}
+
+method(from_json, class_list) <- function(x) {
+    if (!is.null(x$.class))
+        s7_from_json(x)
+    else if (!is.null(x$.s3class))
+        s3_from_json(x)
+    else lapply(x, from_json)
+}
+
+method(from_json, class_any) <- identity
 
 method(deserialize, list(class_character, JSONFormat)) <- function(x, format) {
     deserialize(fromJSON(x))
