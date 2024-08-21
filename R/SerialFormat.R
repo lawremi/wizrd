@@ -21,129 +21,21 @@ respond_with_json <- function(x, schema = list(), example = list()) {
     respond_with_format(x, JSONFormat(schema = schema, example = example))
 }
 
-input_instructions <- new_generic("input_instructions", c("on", "to"))
-
-output_instructions <- new_generic("output_instructions", c("on", "to"))
-
-method(input_instructions,
-       list(SerialFormat, LanguageModel)) <- function(on, to)
-{
-    NULL
-}
-
-method(output_format_prompt,
-       list(SerialFormat, LanguageModel)) <- function(on, to)
-{
-    NULL
-}
-
-method(output_instructions,
-       list(JSONFormat, LanguageModel)) <- function(on, to)
-{
-    prompt <- "Return only JSON, without any explanation or other text.\n"
-    if (length(on@schema) > 0L)
-        prompt <- paste0(prompt,
-                         "The JSON must conform to the following schema:\n\n",
-                         toJSON(on),
-                         "\nEnsure the JSON matches this schema exactly.\n")
-    if (length(on@example) > 0L)
-        prompt <- paste(prompt, "Here is an example:\n\n", toJSON(on@example))
-    prompt
-}
-
-method(input_instructions,
-       list(JSONFormat, LanguageModel)) <- function(on, to)
-{
-    prompt <- "The user will send only JSON, without any other text.\n"
-    if (length(on@schema) > 0L)
-        prompt <- paste0(prompt,
-                         "The JSON will conform to the following schema:\n\n",
-                         toJSON(on),
-                         "\nExpect the JSON to match this schema exactly.\n")
-    if (length(on@example) > 0L)
-        prompt <- paste(prompt, "Here is an example:\n\n", toJSON(on@example))
-    prompt
-}
-
 respond_with_csv <- function(x, schema = list(), example = data.frame()) {
     respond_with_format(x, CSVFormat(schema = schema, example = example))
-}
-
-method(output_instructions,
-       list(CSVFormat, LanguageModel)) <- function(on, to)
-{
-    prompt <- "Return only CSV, without any explanation or other text.\n"
-    if (length(on@schema) > 0L)
-        prompt <- paste0(prompt,
-                         "This JSON schema defines the structure of the data:\n",
-                         toJSON(on),
-                         "\nInterpret the JSON schema to understand ",
-                         "the required columns and data types and produce ",
-                         "the corresponding CSV. ",
-                         "Ensure the CSV matches this schema exactly.\n")
-    if (length(on@example) > 0L)
-        prompt <- paste(prompt, "Here is an example:\n\n", toJSON(on@example))
-    prompt
-}
-
-method(input_instructions,
-       list(CSVFormat, LanguageModel)) <- function(on, to)
-{
-    prompt <- "The user will send only CSV, without any other text.\n"
-    if (length(on@schema) > 0L)
-        prompt <- paste0(prompt,
-                         "This JSON schema defines the structure of the data:\n",
-                         toJSON(on),
-                         "\nInterpret the JSON schema to understand ",
-                         "the expected columns and data types. ",
-                         "Expect the CSV to match this schema exactly.\n")
-    if (length(on@example) > 0L)
-        prompt <- paste(prompt, "Here is an example:\n\n", toJSON(on@example))
-    prompt
 }
 
 respond_with_code <- function(x) {
     respond_with_format(x, CodeFormat())
 }
 
-markdown_code_example <- function(format) {
-    paste(c(paste(c("```", format@language), collapse = ""),
-            deparse(format@example), "```\n"), collapse = "\n")
-}
-
-method(output_instructions,
-       list(CodeFormat, LanguageModel)) <- function(on, to)
-{
-    prompt <- paste(c("Return only", on@language,
-                      "code in markdown-style blocks,",
-                      "without any explanation or other text.\n"),
-                    collapse = " ")
-    if (length(on@example) > 0L)
-        prompt <- paste(prompt, "Here is an example:\n",
-                        markdown_code_example(on))
-    prompt
-}
-
-method(input_instructions,
-       list(CodeFormat, LanguageModel)) <- function(on, to)
-{
-    prompt <- paste(c("The user will send only", on@language,
-                      "code in markdown-style blocks,",
-                      "without any explanation or other text.\n"),
-                    collapse = " ")
-    if (length(on@example) > 0L)
-        prompt <- paste(prompt, "Here is an example:\n",
-                        markdown_code_example(on))
-    prompt
-}
-
 serialize <- new_generic("serialize", c("x", "format"))
 
-method(serialize, c(class_any, SerialFormat)) <- function(x, format) {
+method(serialize, list(class_any, SerialFormat)) <- function(x, format) {
     capture.output(dput(x))
 }
 
-method(serialize, c(class_list, SerialFormat)) <- function(x, format) {
+method(serialize, list(class_list, SerialFormat)) <- function(x, format) {
     lapply(x, serialize, format)
 }
 
@@ -151,7 +43,7 @@ nativeRaster <- new_S3_class("nativeRaster")
 raster <- new_S3_class("raster")
 union_raster <- new_union(nativeRaster, raster)
 
-method(serialize, c(union_raster, SerialFormat)) <- function(x, format) x
+method(serialize, list(union_raster, SerialFormat)) <- function(x, format) x
 
 to_json <- new_generic("to_json", "x")
 
@@ -161,9 +53,10 @@ to_json_s3 <- function(x) {
 
 method(to_json, class_any) <- to_json_s3
 
-method(to_json, class_vector) <- identity
+native_json_classes <- NULL | class_logical | class_integer | class_double |
+    class_character | class_list
 
-method(to_json, class_complex | class_raw | class_expression) <- to_json_s3
+method(to_json, native_json_classes) <- identity
 
 method(to_json, S7_object) <- function(x) {
     prop_to_json <- function(property) {
@@ -237,15 +130,17 @@ method(from_json, class_list) <- function(x) {
 
 method(from_json, class_any) <- identity
 
+deserialize <- new_generic("deserialize", c("x", "format"))
+
 method(deserialize, list(class_character, JSONFormat)) <- function(x, format) {
     deserialize(fromJSON(x))
 }
 
-method(deserialize, c(class_list, JSONFormat)) <- function(x, format) {
+method(deserialize, list(class_list, JSONFormat)) <- function(x, format) {
     from_json(x)
 }
 
-method(deserialize, c(class_any, SerialFormat)) <- identity
+method(deserialize, list(class_any, SerialFormat)) <- function(x, format) x
 
 Example <- new_class("Example",
                      properties = list(

@@ -1,17 +1,17 @@
-validate_Tool <- function(object) {
+validate_Tool <- function(self) {
     ## TODO: validate examples against Signature
-    extra_sig_args <- setdiff(names(object@signature@arguments),
-                              names(formals(object)))
-    extra_example_args <- setdiff(names(unlist(object@examples,
+    extra_sig_args <- setdiff(names(self@signature@arguments),
+                              names(formals(self)))
+    extra_example_args <- setdiff(names(unlist(self@examples,
                                                recursive = FALSE)),
-                                  names(formals(object)))
-    ex_problems <- unlist(lapply(object@examples), function(ex) {
+                                  names(formals(self)))
+    ex_problems <- unlist(lapply(self@examples), function(ex) {
         mapply(function(arg, cls, nm) {
             if (!inherits(arg, cls))
                 paste0("example argument '", nm,
                        "' does not inherit from class '",
                        S7:::S7_class_name(cls), "'")
-        }, ex, object@signature@arguments[names(ex)], names(ex)) 
+        }, ex, self@signature@arguments[names(ex)], names(ex)) 
     })
     
     c(if (length(extra_sig_args))
@@ -38,8 +38,8 @@ Tool <- new_class("Tool", class_function,
 any_signature <- function(args) {
     args <- as.list(args)
     args[] <- class_any
-    if (!is.null(args$...))
-        args$... <- class_list
+    if (!is.null(args$"..."))
+        args$"..." <- class_list
     ToolSignature(arguments = args, value = class_any)
 }
 
@@ -74,38 +74,6 @@ BoundTool <- new_class("BoundTool", Tool,
                            binding = FormatBinding,
                            instructions = prop_string_nullable
                        ))
-
-bind_fun <- function(FUN) {
-    function(args) {
-        do.call(FUN, args)
-    }
-}
-
-bind <- new_generic("bind", c("x", "to"))
-
-method(bind, list(Tool, LanguageModel)) <- function(x, to, instructions = NULL) {
-    assert_string(instructions, null.ok = TRUE)
-    format_binding <- FormatBinding(input = tool_input_format(to, x),
-                                    output = tool_output_format(to, x))
-    do.call(BoundTool, c(bind_fun(x), props(x), binding = format_binding,
-                         instructions = instructions))
-}
-
-method(bind, list(BoundTool, LanguageModel)) <- function(x, to) x
-
-tool_input_format <- new_generic("tool_input_format", "x",
-                                 function(x, tool, ...) S7_dispatch())
-
-method(tool_input_format, LanguageModel) <- function(x, tool) {
-    tool_input_json_format(x, tool)
-}
-
-tool_output_format <- new_generic("tool_output_format", "x",
-                                  function(x, tool, ...) S7_dispatch())
-
-method(tool_output_format, LanguageModel) <- function(x, tool) {
-    tool_output_json_format(x, tool)
-}
 
 tool_input_json_format <- function(tool) {
     Rd <- Rd_for_function(S7_data(tool), tool@name)

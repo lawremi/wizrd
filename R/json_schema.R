@@ -28,12 +28,6 @@ s7_schema <- list(
     description = "An R S7 object."
 )
 
-S7_class <- new_S3_class("S7_class")
-S7_any <- new_S3_class("S7_any")
-S7_base_class <- new_S3_class("S7_base_class")
-S7_union <- new_S3_class("S7_union")
-S7_S3_class <- new_S3_class("S7_S3_class")
-
 S7_property <- new_S3_class("S7_property")
 
 scalar_S7_property <- new_S3_class("scalar_S7_property")

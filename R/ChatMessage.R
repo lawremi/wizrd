@@ -9,7 +9,8 @@ ChatMessage <- new_class("ChatMessage",
                              tool_calls = new_list_property(of = ToolCall)
                          ))
 
-method(convert, list(class_any, ChatMessage)) <- function(from, role = "user",
+method(convert, list(class_any, ChatMessage)) <- function(from, to,
+                                                          role = "user",
                                                           format = SerialFormat)
 {
     ChatMessage(role = role, content = serialize(x, format), object = x)

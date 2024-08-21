@@ -12,16 +12,15 @@ openai_body_tools <- function(tools) {
     lapply(tools, openai_encode_tool)
 }
 
-openai_response_format <- new_generic("openai_response_format",
-                                      "response_format")
+openai_response_format <- new_generic("openai_response_format", "x")
 
-method(openai_response_format, ResponseFormat) <- function(response_format) {
+method(openai_response_format, SerialFormat) <- function(x) {
    NULL 
 }
 
-method(openai_response_format, JSONResponseFormat) <- function(response_format) {
-    if (length(response_format@schema) > 0L)
-        list(type = "json_schema", json_schema = response_format@schema)
+method(openai_response_format, JSONFormat) <- function(x) {
+    if (length(x@schema) > 0L)
+        list(type = "json_schema", json_schema = x@schema)
     else list(type = "json_object")
 }
 
@@ -75,10 +74,10 @@ req_capture_stream_openai <- function(req, stream_callback) {
     ChatMessage(content = paste(content, collapse = ""))
 }
 
-method(chat, OpenAIAPIServer) <- function(object, model, messages, tools,
+method(chat, OpenAIAPIServer) <- function(x, model, messages, tools,
                                           format_binding, stream_callback, ...)
 {
-    req <- create_request(object) |>
+    req <- create_request(x) |>
         httr2::req_url_path_append("v1", "chat", "completions") |>
         openai_req_body_chat(model, messages, tools, format_binding,
                              stream = !is.null(stream_handler), ...)

@@ -37,6 +37,14 @@ method(compile_instructions, LanguageModel) <- function(x) {
             collapse = "\n\n"))
 }
 
+instructions <- new_generic("instructions", c("on", "to"))
+
+method(instructions, list(FormatBinding, LanguageModel)) <- function(on, to) {
+    paste(c(input_instructions(on@input, to),
+            output_instructions(on@output, to)),
+          collapse = "\n\n")
+}
+
 prepare_input <- function(model, input) {
     if (!is.list(input) || is.object(input))
         input <- list(input)
@@ -64,3 +72,143 @@ method(tool_instructions, LanguageModel) <- function(x) {
                           tool@instructions)
            })), collapse = "\n\n"))
 }
+
+input_instructions <- new_generic("input_instructions", c("on", "to"))
+
+output_instructions <- new_generic("output_instructions", c("on", "to"))
+
+method(input_instructions,
+       list(SerialFormat, LanguageModel)) <- function(on, to)
+{
+    NULL
+}
+
+method(output_instructions,
+       list(SerialFormat, LanguageModel)) <- function(on, to)
+{
+    NULL
+}
+
+method(output_instructions,
+       list(JSONFormat, LanguageModel)) <- function(on, to)
+{
+    prompt <- "Return only JSON, without any explanation or other text.\n"
+    if (length(on@schema) > 0L)
+        prompt <- paste0(prompt,
+                         "The JSON must conform to the following schema:\n\n",
+                         toJSON(on),
+                         "\nEnsure the JSON matches this schema exactly.\n")
+    if (length(on@example) > 0L)
+        prompt <- paste(prompt, "Here is an example:\n\n", toJSON(on@example))
+    prompt
+}
+
+method(input_instructions,
+       list(JSONFormat, LanguageModel)) <- function(on, to)
+{
+    prompt <- "The user will send only JSON, without any other text.\n"
+    if (length(on@schema) > 0L)
+        prompt <- paste0(prompt,
+                         "The JSON will conform to the following schema:\n\n",
+                         toJSON(on),
+                         "\nExpect the JSON to match this schema exactly.\n")
+    if (length(on@example) > 0L)
+        prompt <- paste(prompt, "Here is an example:\n\n", toJSON(on@example))
+    prompt
+}
+
+method(output_instructions,
+       list(CSVFormat, LanguageModel)) <- function(on, to)
+{
+    prompt <- "Return only CSV, without any explanation or other text.\n"
+    if (length(on@schema) > 0L)
+        prompt <- paste0(prompt,
+                         "This JSON schema defines the structure of the data:\n",
+                         toJSON(on),
+                         "\nInterpret the JSON schema to understand ",
+                         "the required columns and data types and produce ",
+                         "the corresponding CSV. ",
+                         "Ensure the CSV matches this schema exactly.\n")
+    if (length(on@example) > 0L)
+        prompt <- paste(prompt, "Here is an example:\n\n", toJSON(on@example))
+    prompt
+}
+
+method(input_instructions,
+       list(CSVFormat, LanguageModel)) <- function(on, to)
+{
+    prompt <- "The user will send only CSV, without any other text.\n"
+    if (length(on@schema) > 0L)
+        prompt <- paste0(prompt,
+                         "This JSON schema defines the structure of the data:\n",
+                         toJSON(on),
+                         "\nInterpret the JSON schema to understand ",
+                         "the expected columns and data types. ",
+                         "Expect the CSV to match this schema exactly.\n")
+    if (length(on@example) > 0L)
+        prompt <- paste(prompt, "Here is an example:\n\n", toJSON(on@example))
+    prompt
+}
+
+markdown_code_example <- function(format) {
+    paste(c(paste(c("```", format@language), collapse = ""),
+            deparse(format@example), "```\n"), collapse = "\n")
+}
+
+method(output_instructions,
+       list(CodeFormat, LanguageModel)) <- function(on, to)
+{
+    prompt <- paste(c("Return only", on@language,
+                      "code in markdown-style blocks,",
+                      "without any explanation or other text.\n"),
+                    collapse = " ")
+    if (length(on@example) > 0L)
+        prompt <- paste(prompt, "Here is an example:\n",
+                        markdown_code_example(on))
+    prompt
+}
+
+method(input_instructions,
+       list(CodeFormat, LanguageModel)) <- function(on, to)
+{
+    prompt <- paste(c("The user will send only", on@language,
+                      "code in markdown-style blocks,",
+                      "without any explanation or other text.\n"),
+                    collapse = " ")
+    if (length(on@example) > 0L)
+        prompt <- paste(prompt, "Here is an example:\n",
+                        markdown_code_example(on))
+    prompt
+}
+
+tool_input_format <- new_generic("tool_input_format", "x",
+                                 function(x, tool, ...) S7_dispatch())
+
+method(tool_input_format, LanguageModel) <- function(x, tool) {
+    tool_input_json_format(x, tool)
+}
+
+tool_output_format <- new_generic("tool_output_format", "x",
+                                  function(x, tool, ...) S7_dispatch())
+
+method(tool_output_format, LanguageModel) <- function(x, tool) {
+    tool_output_json_format(x, tool)
+}
+
+bind_fun <- function(FUN) {
+    function(args) {
+        do.call(FUN, args)
+    }
+}
+
+bind <- new_generic("bind", c("x", "to"))
+
+method(bind, list(Tool, LanguageModel)) <- function(x, to, instructions = NULL) {
+    assert_string(instructions, null.ok = TRUE)
+    format_binding <- FormatBinding(input = tool_input_format(to, x),
+                                    output = tool_output_format(to, x))
+    do.call(BoundTool, c(bind_fun(x), props(x), binding = format_binding,
+                         instructions = instructions))
+}
+
+method(bind, list(BoundTool, LanguageModel)) <- function(x, to) x

@@ -26,14 +26,14 @@ agent <- function(x, args = alist(x =), signature = any_signature(args),
                        signature = signature, examples = examples, model = model)
 }
 
-method(bind, list(LanguageModel, Agent)) <- function(x, to)
+method(bind, list(LanguageModel, LanguageModelAgent)) <- function(x, to)
 {
     x@instructions <- instructions(to, x)
     x@binding <- model_format_binding(x, to)
     x
 }
 
-method(instructions, list(Agent, LanguageModel)) <- function(on, to) {
+method(instructions, list(LanguageModel, LanguageModel)) <- function(on, to) {
     paste0(c(
         "You are an agent named '", on@name, "'. ",
         "You are represented by an R function.",

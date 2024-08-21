@@ -18,9 +18,9 @@ method(predict, Chat) <- function(object, input, ...) {
     last_message(chat(object, input, ...))
 }
 
-method(chat, Chat) <- function(object, input, ...) {
+method(chat, Chat) <- function(x, input, ...) {
     assert_string(input)
-    chat(object@model, c(object@messages, list(input)), ...)
+    chat(x@model, c(x@messages, list(input)), ...)
 }
 
 method(print, Chat) <- function(x, full = FALSE, ...) {

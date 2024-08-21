@@ -30,7 +30,7 @@ llama_cpp_model <- function(path, ...)
     if (identical(port, 0L)) {
         port <- find_available_port()
     }
-    assert_int(port, min = 1024L, max = 65535L)
+    assert_int(port, lower = 1024L, upper = 65535L)
     
     args <- make_args(model = model, port = port, ...)
     p <- processx::process$new(path, args)
@@ -58,11 +58,11 @@ start_llama_cpp_server <- function(model,
                                    ...)
 {
     assert_file_exists(model, access = "r")
-    assert_int(threads, min = 1L)
-    assert_int(ctx_size, min = 0L)
-    assert_int(predict, min = -2L)
-    assert_int(batch_size, min = 1L)
-    assert_number(temp, min = 0)
+    assert_int(threads, lower = 1L)
+    assert_int(ctx_size, lower = 0L)
+    assert_int(predict, lower = -2L)
+    assert_int(batch_size, lower = 1L)
+    assert_number(temp, lower = 0)
     assert_flag(flash_attn)
     assert_flag(embedding)
     
@@ -79,7 +79,7 @@ poll_path <- new_generic("poll_path", "server")
 method(poll_path, LlamaCppServer) <- function(server) "health"
 
 wait_until_ready <- function(server, max_seconds) {
-    assert_int(max_seconds, min = 0L)
+    assert_int(max_seconds, lower = 0L)
     create_request(server) |> req_url_path_append(poll_path(server)) |>
         req_retry(max_seconds = max_seconds)
     server

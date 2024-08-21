@@ -19,13 +19,13 @@ new_scalar_property <- function(class, ..., validator = NULL, nullable = FALSE) 
     if (nullable) {
         class <- new_union(class, NULL)
     }
-    prop <- new_property(class, ..., validator = function(prop) {
-        c(if (nullable && is.null(prop))
+    prop <- new_property(class, ..., validator = function(value) {
+        c(if (nullable && is.null(value))
             NULL
-          else if (length(prop) != 1L || is.na(prop))
+          else if (length(value) != 1L || is.na(value))
               "must be of length one and not missing",
           if (!is.null(validator))
-              validator(prop)
+              validator(value)
           )
     })
     class(prop) <- c("scalar_S7_property", class(prop))
@@ -37,12 +37,12 @@ new_string_property <- function(..., validator = NULL, default = "",
 {
     prop <- new_scalar_property(
         class_character,
-        validator = function(prop) {
-            c(if (!is.null(choices) && !all(prop %in% choices))
+        validator = function(value) {
+            c(if (!is.null(choices) && !all(value %in% choices))
                 paste("contains values not in",
                       deparse(choices)),
               if (!is.null(validator))
-                  validator(prop)
+                  validator(value)
               )
         }, default = default)
     prop$choices <- choices
@@ -65,13 +65,13 @@ new_number_property <- function(class = class_numeric, ..., validator = NULL,
                                 default = min(max(min, 0L), max),
                                 min = -Inf, max = Inf)
 {
-    prop <- new_scalar_property(class, ..., validator = function(prop) {
-        c(if (any(prop < min))
+    prop <- new_scalar_property(class, ..., validator = function(value) {
+        c(if (any(value < min))
               paste("must be >=", min),
-          if (any(prop > max))
+          if (any(value > max))
               paste("must be <=", max),
           if (!is.null(valdiator))
-              validator(prop)
+              validator(value)
           )
     })
     prop$min <- min
@@ -89,20 +89,20 @@ new_int_property <- function(..., min = .Machine$integer.min,
 }
 
 prop_int <- new_int_property()
-prop_int_nn <- new_int_property(low = 0L)
-prop_int_pos <- new_int_property(low = 1L)
+prop_int_nn <- new_int_property(min = 0L)
+prop_int_pos <- new_int_property(min = 1L)
 
 new_list_property <- function(..., validator = NULL, of = class_any,
                               named = FALSE)
 {
-    prop <- new_property(class_list, ..., validator = function(prop) {
+    prop <- new_property(class_list, ..., validator = function(value) {
         c(if (!identical(of, class_any) &&
-                  !all(vapply(prop, inherits, logical(1L), of)))
+                  !all(vapply(value, inherits, logical(1L), of)))
             paste("must only contain elements of class", of$name),
-          if (named && is.null(names(prop)))
+          if (named && is.null(names(value)))
               "must have names",
           if (!is.null(validator))
-              valdiator(prop)
+              valdiator(value)
           )
     })
     prop$of <- of
