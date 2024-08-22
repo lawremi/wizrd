@@ -11,7 +11,8 @@ method(language_model, LlamaCppServer) <- function(x) {
 }
 
 stories260K <- function() {
-    llama_cpp_model(system.file("wizrd", "extdata", "stories260K.gguf"))
+    llama_cpp_model(system.file("extdata", "stories260K.gguf",
+                                package = "wizrd"))
 }
 
 llama_cpp_model <- function(path, ...)
@@ -19,20 +20,22 @@ llama_cpp_model <- function(path, ...)
     language_model(start_llama_cpp_server(path, ...))
 }
 
-.run_llamafile <- function(path = system.file("wizrd", "bin", "llamafile"),
-                           model = NULL, port = 0L,
+.run_llamafile <- function(path = system.file("bin", "llamafile",
+                                              package = "wizrd"),
+                           model = NULL, gpu = FALSE, port = 0L,
                            max_seconds = 10L, ...)
 {
     requireNamespace("processx")
     
     assert_file_exists(path, access = "x")
     assert_string(model, null.ok = TRUE)
+    assert_flag(gpu)
     if (identical(port, 0L)) {
         port <- find_available_port()
     }
     assert_int(port, lower = 1024L, upper = 65535L)
     
-    args <- make_args(model = model, port = port, ...)
+    args <- make_args(model = model, port = port, ngl = if (gpu) 9999, ...)
     p <- processx::process$new(path, args)
 
     model_path <- if (!is.null(model)) model else path
@@ -43,18 +46,20 @@ llama_cpp_model <- function(path, ...)
     wait_until_ready(server, max_seconds)
 }
 
-run_llamafile <- function(path = system.file("wizrd", "bin", "llamafile"),
-                          port = 0L, max_seconds = 10L, ...) {
-    .run_llamafile(path, port = port, max_seconds = max_seconds, ...)
+run_llamafile <- function(path = system.file("bin", "llamafile",
+                                             package = "wizrd"),
+                          port = 0L, gpu = FALSE, max_seconds = 10L, ...) {
+    .run_llamafile(path, port = port, gpu = gpu, max_seconds = max_seconds, ...)
 }
 
 start_llama_cpp_server <- function(model,
                                    threads = 8L, ctx_size = 0L,
                                    predict = -1L, batch_size = 2048L,
                                    temp = 0.8, flash_attn = FALSE, port = 0L,
-                                   embedding = FALSE, max_seconds = 10L,
-                                   llamafile = system.file("wizrd", "bin",
-                                                           "llamafile"),
+                                   embedding = FALSE, gpu = FALSE,
+                                   max_seconds = 10L,
+                                   llamafile = system.file("bin", "llamafile",
+                                                           package = "wizrd"),
                                    ...)
 {
     assert_file_exists(model, access = "r")
@@ -69,9 +74,8 @@ start_llama_cpp_server <- function(model,
     .run_llamafile(llamafile, model = model, threads = threads,
                    ctx_size = ctx_size, predict = predict,
                    batch_size = batch_size, temp = temp,
-                   flash_attn = flash_attn, embedding = embedding,
-                   json_schema = json_schema, host = host, port = port,
-                   max_seconds = max_seconds, ...)
+                   flash_attn = flash_attn, embedding = embedding, gpu = gpu,
+                   port = port, max_seconds = max_seconds, ...)
 }
 
 poll_path <- new_generic("poll_path", "server")
