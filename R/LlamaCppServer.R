@@ -84,14 +84,15 @@ method(poll_path, LlamaCppServer) <- function(server) "health"
 
 wait_until_ready <- function(server, max_seconds) {
     assert_int(max_seconds, lower = 0L)
-    create_request(server) |> req_url_path_append(poll_path(server)) |>
-        req_retry(max_seconds = max_seconds)
+    create_request(server) |> httr2::req_url_path_append(poll_path(server)) |>
+        httr2::req_retry(max_seconds = max_seconds)
     server
 }
 
 health <- function(server) {
     assert_class(server, LlamaCppServer)
-    create_request(server) |> req_url_path_append("health") |> req_perform()
+    create_request(server) |> httr2::req_url_path_append("health") |>
+        httr2::req_perform()
 }
 
 find_available_port <- function(start = 8000, end = 8100) {
