@@ -32,9 +32,11 @@ new_scalar_property <- function(class, ..., validator = NULL, nullable = FALSE) 
     prop
 }
 
-new_string_property <- function(..., validator = NULL, default = "",
-                                choices = NULL)
+new_string_property <- function(..., validator = NULL,
+                                default = if (!nullable) "",
+                                nullable = FALSE, choices = NULL)
 {
+    assert_flag(nullable)
     prop <- new_scalar_property(
         class_character,
         validator = function(value) {
@@ -44,7 +46,7 @@ new_string_property <- function(..., validator = NULL, default = "",
               if (!is.null(validator))
                   validator(value)
               )
-        }, default = default)
+        }, default = default, nullable = nullable)
     prop$choices <- choices
     class(prop) <- c("string_S7_property", class(prop))
     prop
@@ -54,17 +56,22 @@ new_string_property <- function(..., validator = NULL, default = "",
 prop_string <- new_string_property()
 prop_string_nullable <- new_string_property(nullable = TRUE)
 
-new_flag_property <- function(..., default = FALSE) {
-    new_scalar_property(class_logical, ..., default = default)
+new_flag_property <- function(..., nullable = FALSE,
+                              default = if (!nullable) FALSE) {
+    assert_flag(nullable)
+    new_scalar_property(class_logical, ..., default = default,
+                        nullable = nullable)
 }
 
 prop_flag <- new_flag_property()
 
 ## TODO: make this handle non-scalars as well
 new_number_property <- function(class = class_numeric, ..., validator = NULL,
-                                default = min(max(min, 0L), max),
+                                nullable = FALSE,
+                                default = if (!nullable) min(max(min, 0L), max),
                                 min = -Inf, max = Inf)
 {
+    assert_flag(nullable)
     prop <- new_scalar_property(class, ..., validator = function(value) {
         c(if (any(value < min))
               paste("must be >=", min),
@@ -73,7 +80,7 @@ new_number_property <- function(class = class_numeric, ..., validator = NULL,
           if (!is.null(valdiator))
               validator(value)
           )
-    })
+    }, nullable = nullable)
     prop$min <- min
     prop$max <- max
     class(prop) <- c("numeric_S7_property", class(prop))
