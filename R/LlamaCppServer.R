@@ -25,7 +25,7 @@ llama_cpp_model <- function(path, ...)
                            model = NULL, gpu = FALSE, port = 0L,
                            max_seconds = 10L, ...)
 {
-    requireNamespace("processx")
+    require_ns("processx", "run llamafile")
     
     assert_file_exists(path, access = "x")
     assert_string(model, null.ok = TRUE)

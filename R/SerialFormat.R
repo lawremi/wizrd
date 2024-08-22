@@ -111,7 +111,7 @@ s3_from_json <- function(x) {
     conv <- switch(s3class, factor = as.factor, Date = as.Date,
                    POSIXct = as.POSIXct, complex = as.complex,
                    raw = {
-                       requireNamespace("base64enc")
+                       require_ns("base64enc", "decode raw vectors from JSON")
                        base64enc::base64decode
                    }, `function` = parse_json_function,
                    expression = parse_json_expression)

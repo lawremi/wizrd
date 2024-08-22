@@ -146,8 +146,8 @@ get_api_key <- function(prefix) {
 }
 
 image_data_uri <- function(x) {
-    if (!requireNamespace("base64enc") || !requireNamespace("png"))
-        stop("Please install 'base64enc' and 'png' packages to encode images")
+    require_ns(c("base64enc", "png"), "encode images")
+    
     if (inherits(x, "nativeRaster")) { # like from dev.capture() or readPNG()
         image <- x
     } else {
@@ -155,6 +155,7 @@ image_data_uri <- function(x) {
         rgb <- col2rgb(m, alpha = TRUE) / 255L
         image <- array(t(rgb), c(dim(m), 4L))
     }
+    
     base64enc::dataURI(png::writePNG(image), mime = "image/png")
 }
 
@@ -220,4 +221,16 @@ find_name <- function(what, env) {
     call$name <- nm
 
     assign(nm, eval(call, parent.frame()), parent.frame())
+}
+
+require_ns <- function(x, to) {
+    assert_character(x)
+    assert_string(to)
+
+    loaded <- vapply(x, requireNamespace, logical(1L), quietly = TRUE)
+    if (any(!loaded))
+        stop("Install package", if (sum(loaded) > 1L) "s" else "", " ",
+             paste0("'", x[!loaded], "'", collapse = " and "), " to ", to, ".")
+
+    invisible(TRUE)
 }

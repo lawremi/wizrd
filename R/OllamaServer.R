@@ -22,7 +22,7 @@ start_ollama_server <- function(server = ollama_server(),
                                 path = Sys.which("ollama"),
                                 max_seconds = 10L)
 {
-    requireNamespace("processx")
+    requireNamespace("processx", "run ollama")
 
     assert_class(server, "OllamaServer")
     if (missing(path) && identical(path, ""))
