@@ -88,7 +88,7 @@ tool_input_json_format <- function(tool) {
         props[] <- TRUE
     }
     
-    props <- mapply(function(prop, default) {
+    props <- Map(function(prop, default) {
         default <- deparse(default)
         if (nzchar(default))
             list(description =
@@ -96,18 +96,18 @@ tool_input_json_format <- function(tool) {
                              default),
                            collapse = " "))
         else prop
-    }, props, formals, SIMPLIFY = FALSE)
+    }, props, formals)
     
     schema <- list(type = "object", properties = props)
 
-    schema$properties[names(args)] <- mapply(function(arg, prop) {
+    schema$properties[names(args)] <- Map(function(arg, prop) {
         arg_schema <- as_json_schema(arg)
         if (is.list(prop))
             arg_schema$description <-
                 paste(c(arg_schema$description, prop$description),
                       collapse = " ")
         arg_schema
-    }, args, schema$properties[names(args)], SIMPLIFY = FALSE)
+    }, args, schema$properties[names(args)])
 
     JSONFormat(format, schema = schema)
 }

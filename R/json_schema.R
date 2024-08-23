@@ -57,8 +57,8 @@ method(as_json_schema, S7_class) <- function(from, description = NULL, ...) {
     Rd <- get_Rd(from@name)
     arg_descriptions <- if (!is.null(Rd)) Rd_args(Rd)
     props <- Filter(Negate(prop_read_only), from@properties)
-    prop_schema <- mapply(as_json_schema, props, arg_descriptions[names(from)],
-                          MoreArgs = list(...), SIMPLIFY = FALSE)
+    prop_schema <- Map(as_json_schema, props, arg_descriptions[names(from)],
+                       MoreArgs = list(...))
     prop_schema <- as_json_schema(props, descriptions = arg_descriptions, ...)
     pkg_name <- S7:::class_dispatch(from)
     base_class <- base_ancestor_class(from)
@@ -79,10 +79,10 @@ method(as_json_schema, S7_class) <- function(from, description = NULL, ...) {
 }
 
 method(as_json_schema, S7_union) <- function(from, descriptions = NULL, ...) {
-    list(anyOf = mapply(as_json_schema,
-                        from$classes,
-                        descriptions[seq_along(from$classes)],
-                        SIMPLIFY = FALSE))
+    list(anyOf = Map(as_json_schema,
+                     from$classes,
+                     descriptions[seq_along(from$classes)],
+                     ))
 }
 
 base_json_schema_type <- function(from, scalar) {
