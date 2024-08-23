@@ -129,12 +129,43 @@ new_as_generic <- function(class) {
     generic
 }
 
-make_args <- function(command, ...) {
-    args <- c(...)
-    names(args) <- sub("_", "-", names(args), fixed = TRUE)
-    logicals <- vapply(args, is.logical, logical(1L))
-    args[logicals] <- lapply(args[logicals], function(x) if (x) "")
-    paste0("--", names(args), " ", args)
+zip <- function(...) {
+    Map(list, ...)
+}
+
+## Base R candidate
+vswitch <- function(EXPR, ...) {
+    stopifnot(is.null(EXPR) || is.atomic(EXPR))
+    choices <- list(...)
+    choice_names <- head(names(choices), -1L)
+    if (length(choices) > 1L &&
+            (is.null(choice_names) || !all(nzchar(choice_names))))
+        stop("all arguments in '...' except for the last must be named")
+    if (!all(lengths(choices) == 1L))
+        stop("all arguments in '...' must be length one") 
+
+    ans <- choices[as.character(EXPR)]
+    ans[is.na(EXPR)] <- NA
+    if (identical(names(choices)[length(choices)], ""))
+        ans[lengths(ans) == 0L] <- choices[[length(choices)]]
+
+    ans <- unlist(ans, use.names = FALSE, recursive = FALSE)
+    if (is.null(ans)) logical() else ans
+}
+
+make_args <- function(...) {
+    args <- Filter(Negate(is.null), list(...))
+    if (length(args) == 0L)
+        return(character())
+    if (is.null(names(args)))
+        names(args) <- rep("", length(args))
+    args <- args[!vapply(args, identical, logical(1L), FALSE)]
+    prefix <- vswitch(nchar(names(args)), `0` = "", `1` = "-", "--")
+    names(args) <- paste0(prefix, sub("_", "-", names(args)))
+    flags <- vapply(args, isTRUE, logical(1L))
+    ans <- unlist(ifelse(flags, names(args), zip(names(args), args)),
+                  use.names = FALSE)
+    ans[nzchar(ans)]
 }
 
 get_api_key <- function(prefix) {
