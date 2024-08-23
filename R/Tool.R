@@ -71,7 +71,7 @@ equip <- function(x, tool, instructions = NULL) {
 
 BoundTool <- new_class("BoundTool", Tool,
                        properties = list(
-                           binding = FormatBinding,
+                           io = IOBinding,
                            instructions = prop_string_nullable
                        ))
 

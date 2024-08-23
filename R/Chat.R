@@ -54,7 +54,7 @@ append_messages <- function(x, ...) {
 }
 
 append_output <- function(x, output) {
-    object <- deserialize(output, x@model@binding@output)
+    object <- deserialize(output, x@model@io@output)
     append_messages(x, ChatMessage(role = "assistant", content = output,
                                    object = object))
 }
@@ -64,9 +64,9 @@ handle_tool_calls <- function(x) {
     msgs <- lapply(tool_calls, function(tool_call) {
         tool <- x@model@tools[[tool_call@tool_name]]
         value <- do.call(tool, deserialize(tool_call@parameters,
-                                           tool@binding@input))
+                                           tool@io@input))
         ChatMessage(role = "tool", object = value,
-                    content = serialize(value, tool@binding@output))
+                    content = serialize(value, tool@io@output))
     })
     chat(x, msgs)
 }

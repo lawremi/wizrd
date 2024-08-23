@@ -159,6 +159,6 @@ output_object <- function(x, class = S7_object, description = NULL,
     schema <- as_json_schema(class, description, ...)
     example <- as_json(example)
     format <- JSONFormat(schema = schema, example = example)
-    x@binding@output <- format
+    x@io@output <- format
     x
 }

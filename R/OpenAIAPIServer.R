@@ -75,11 +75,11 @@ req_capture_stream_openai <- function(req, stream_callback) {
 }
 
 method(chat, OpenAIAPIServer) <- function(x, model, messages, tools,
-                                          format_binding, stream_callback, ...)
+                                          io, stream_callback, ...)
 {
     req <- create_request(x) |>
         httr2::req_url_path_append("v1", "chat", "completions") |>
-        openai_req_body_chat(model, messages, tools, format_binding,
+        openai_req_body_chat(model, messages, tools, io@output,
                              stream = !is.null(stream_handler), ...)
     if (!is.null(stream_handler)) {
         req |> req_capture_stream_openai(stream_callback)
@@ -156,16 +156,16 @@ example_descriptions <- function(x) {
 openai_tool_description <- function(x) {
     ex_descs <- example_descriptions(x)
     paste(c(x@description,
-            if (inherits(x@binding@output, JSONFormat))
-                c("Return value schema:", toJSON(x@binding@output@schema)),
+            if (inherits(x@io@output, JSONFormat))
+                c("Return value schema:", toJSON(x@io@output@schema)),
             if (length(ex_descs) > 0L) c("Example(s):", ex_descs)),
           collapse = "\n\n")
 }
 
 method(openai_encode_tool, BoundTool) <- function(x) {
-    assert_class(x@binding@input, "JSONFormat")
+    assert_class(x@io@input, "JSONFormat")
     list(type = "function",
          `function` = list(name = x@name,
                            description = openai_tool_description(x),
-                           parameters = x@binding@input@schema))
+                           parameters = x@io@input@schema))
 }

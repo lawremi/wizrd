@@ -4,7 +4,7 @@ LanguageModel <- new_class("LanguageModel", abstract = TRUE,
                                instructions = new_string_property(
                                    default = "You are a helpful assistant."
                                ),
-                               binding = FormatBinding,
+                               io = IOBinding,
                                tools = new_list_property(of = BoundTool)
                            ))
 
@@ -32,14 +32,14 @@ compile_instructions <- new_generic("compile_instructions", "x")
 
 method(compile_instructions, LanguageModel) <- function(x) {
     paste(c(x@instructions,
-            instructions(x@binding, x),
+            instructions(x@io, x),
             tool_instructions(x),
             collapse = "\n\n"))
 }
 
 instructions <- new_generic("instructions", c("on", "to"))
 
-method(instructions, list(FormatBinding, LanguageModel)) <- function(on, to) {
+method(instructions, list(IOBinding, LanguageModel)) <- function(on, to) {
     paste(c(input_instructions(on@input, to),
             output_instructions(on@output, to)),
           collapse = "\n\n")
@@ -48,7 +48,7 @@ method(instructions, list(FormatBinding, LanguageModel)) <- function(on, to) {
 prepare_input <- function(model, input) {
     if (!is.list(input) || is.object(input))
         input <- list(input)
-    input <- lapply(input, convert, ChatMessage, format = model@binding@input)
+    input <- lapply(input, convert, ChatMessage, format = model@io@input)
     instructions <- compile_instructions(model)
     input$system <- NULL
     Chat(model, messages = c(system = instructions, input))
@@ -205,9 +205,9 @@ bind <- new_generic("bind", c("x", "to"))
 
 method(bind, list(Tool, LanguageModel)) <- function(x, to, instructions = NULL) {
     assert_string(instructions, null.ok = TRUE)
-    format_binding <- FormatBinding(input = tool_input_format(to, x),
-                                    output = tool_output_format(to, x))
-    do.call(BoundTool, c(bind_fun(x), props(x), binding = format_binding,
+    io_binding <- IOBinding(input = tool_input_format(to, x),
+                            output = tool_output_format(to, x))
+    do.call(BoundTool, c(bind_fun(x), props(x), io = io_binding,
                          instructions = instructions))
 }
 

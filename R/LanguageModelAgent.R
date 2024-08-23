@@ -29,7 +29,7 @@ agent <- function(x, args = alist(x =), signature = any_signature(args),
 method(bind, list(LanguageModel, LanguageModelAgent)) <- function(x, to)
 {
     x@instructions <- instructions(to, x)
-    x@binding <- model_format_binding(x, to)
+    x@io <- agent_io_binding(x, to)
     x
 }
 
@@ -60,9 +60,9 @@ method(agent_output_format, LanguageModel) <- function(x, tool) {
     tool_output_format(tool)
 }
 
-agent_format_binding <- function(x, tool) {
-    FormatBinding(input = agent_input_format(x, tool),
-                  output = agent_output_format(x, tool))
+agent_io_binding <- function(x, tool) {
+    IOBinding(input = agent_input_format(x, tool),
+              output = agent_output_format(x, tool))
 }
 
 become <- function(model, tool) {
