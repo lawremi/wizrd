@@ -95,7 +95,7 @@ method(poll_path, LlamaCppServer) <- function(server) "health"
 wait_until_ready <- function(server, max_seconds) {
     assert_int(max_seconds, lower = 0L)
     create_request(server) |> httr2::req_url_path_append(poll_path(server)) |>
-        httr2::req_retry(max_seconds = max_seconds)
+        httr2::req_retry(max_seconds = max_seconds) |> httr2::perform()
     server
 }
 
