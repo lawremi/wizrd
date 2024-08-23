@@ -15,8 +15,7 @@ stories260K <- function() {
                                 package = "wizrd"))
 }
 
-llama_cpp_model <- function(path, ...)
-{
+llama_cpp_model <- function(path, ...) {
     language_model(start_llama_cpp_server(path, ...))
 }
 
@@ -45,8 +44,8 @@ llamafile_error <- function(stderr) {
     }
     assert_int(port, lower = 1024L, upper = 65535L)
     
-    args <- make_args(server = TRUE, nobrowser = TRUE, model = model,
-                      port = port, ngl = if (gpu) 9999, ...)
+    args <- make_args(server = TRUE, nobrowser = TRUE, log_disable = TRUE,
+                      model = model, port = port, ngl = if (gpu) 9999, ...)
     p <- init_process(path, args, llamafile_ready, llamafile_error)
     
     model_path <- if (!is.null(model)) model else path
