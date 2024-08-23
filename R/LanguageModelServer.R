@@ -18,6 +18,12 @@ create_request <- function(server) {
     else req
 }
 
+method(str, LanguageModelServer) <- function(object, ...) {
+    cat(S7:::obj_desc(object), "")
+    cat(object@url)
+    cat("\n")
+}
+
 ## TODO ([X] done):
 
 ## Commercial: [X] OpenAI, Gemini, Anthropic, Perplexity

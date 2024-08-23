@@ -24,6 +24,19 @@ embed <- new_generic("embed", "x")
 ## - RPostgres (PGVector extension)
 ## - rredis/redux
 
+method(str, LanguageModel) <- function(object, ...) {
+    cat(S7:::obj_desc(object))
+    if (!is.null(object@name)) cat("", object@name)
+    cat("\n")
+    cat(cli::ansi_strtrim(paste("@instructions:", object@instructions)))
+    cat("\n")
+    cat("@io: ")
+    str(object@io)
+    tool_names <- vapply(object@tools, `@`, character(1L), "name")
+    cat(cli::ansi_strtrim(paste("@tools:", paste(tool_names, collapse = ", "))))
+    cat("\n")
+}
+
 method(predict, LanguageModel) <- function(object, input, ...) {
     last_output(chat(object, input, ...))
 }

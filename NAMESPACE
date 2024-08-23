@@ -2,5 +2,6 @@ import(S7)
 import(checkmate)
 importFrom(jsonlite, toJSON, fromJSON)
 importFrom(stats, predict)
+importFrom(utils, str)
 
 export(language_model, stories260K, llama_cpp_model)
