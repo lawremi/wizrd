@@ -20,6 +20,16 @@ llama_cpp_model <- function(path, ...)
     language_model(start_llama_cpp_server(path, ...))
 }
 
+llamafile_ready <- function(stdout) {
+    grepl("llama server listening", stdout)
+}
+
+llamafile_error <- function(stderr) {
+    m <- gregexec("error: (.*?)\n", stderr)
+    msgs <- regmatches(stderr, m)[[1L]][2L,]
+    if (length(msgs) > 0L) tail(msgs, 1L) else stderr
+}
+
 .run_llamafile <- function(path = system.file("bin", "llamafile",
                                               package = "wizrd"),
                            model = NULL, gpu = FALSE, port = 0L,
@@ -35,15 +45,15 @@ llama_cpp_model <- function(path, ...)
     }
     assert_int(port, lower = 1024L, upper = 65535L)
     
-    args <- make_args(model = model, port = port, ngl = if (gpu) 9999, ...)
-    p <- processx::process$new(path, args)
-
+    args <- make_args(server = TRUE, nobrowser = TRUE, model = model,
+                      port = port, ngl = if (gpu) 9999, ...)
+    p <- init_process(path, args, llamafile_ready, llamafile_error)
+    
     model_path <- if (!is.null(model)) model else path
     model_name <- tools::file_path_sans_ext(basename(model_path))
     
-    server <- LlamaCppServer(url = paste0("http://localhost:", port),
-                             model = model_name, process = p)
-    wait_until_ready(server, max_seconds)
+    LlamaCppServer(url = paste0("http://localhost:", port),
+                   model = model_name, process = p)
 }
 
 run_llamafile <- function(path = system.file("bin", "llamafile",

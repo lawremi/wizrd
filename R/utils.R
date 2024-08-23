@@ -234,3 +234,32 @@ require_ns <- function(x, to) {
 
     invisible(TRUE)
 }
+
+init_process <- function(path, args, ready_callback, error_callback,
+                         timeout = 10L)
+{
+    p <- processx::process$new(path, args, stdout = "|", stderr = "|")
+
+    error <- ""
+    output <- ""
+    while(p$is_alive()) {
+        io <- p$poll_io(timeout)
+        if (io["output"] == "ready") {
+            output <- paste0(output, p$read_output())
+            if (isTRUE(ready_callback(output)))
+                return(p)
+        }
+        if (io["error"] == "ready") { # non-error messages can be sent to stderr
+            error <- paste0(error, p$read_error())
+            if (isTRUE(ready_callback(error)))
+                return(p)
+        }
+    }
+
+    if (p$get_exit_status() > 0L) {
+        stop("Failed to run ", path, ": ",
+             error_callback(paste0(error, p$read_error())))
+    }
+
+    invisible(TRUE)
+}
