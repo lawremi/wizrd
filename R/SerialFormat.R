@@ -1,16 +1,18 @@
 SerialFormat <- new_class("SerialFormat",
                           properties = list(example = class_any))
 
-JSONFormat <- new_class("JSONFormat", SerialFormat,
+PlainTextFormat <- new_class("PlainTextFormat", SerialFormat)
+
+JSONFormat <- new_class("JSONFormat", PlainTextFormat,
                         properties = list(schema = class_list,
                                           ## TODO: validate with jsonvalidate
                                           example = class_list))
 
-CSVFormat <- new_class("CSVFormat", SerialFormat,
+CSVFormat <- new_class("CSVFormat", PlainTextFormat,
                        properties = list(schema = class_list,
                                          example = class_data.frame))
 
-CodeFormat <- new_class("CodeFormat", SerialFormat,
+CodeFormat <- new_class("CodeFormat", PlainTextFormat,
                         properties = list(language = prop_string_nullable))
 
 respond_with_format <- function(x, format = SerialFormat()) {
