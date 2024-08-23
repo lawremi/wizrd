@@ -136,21 +136,24 @@ zip <- function(...) {
 ## Base R candidate
 vswitch <- function(EXPR, ...) {
     stopifnot(is.null(EXPR) || is.atomic(EXPR))
-    choices <- list(...)
-    choice_names <- head(names(choices), -1L)
-    if (length(choices) > 1L &&
-            (is.null(choice_names) || !all(nzchar(choice_names))))
+    dots <- list(...)
+    dot_names <- head(names(dots), -1L)
+    if (length(dots) > 1L &&
+            (is.null(dot_names) || !all(nzchar(dot_names))))
         stop("all arguments in '...' except for the last must be named")
-    if (!all(lengths(choices) == 1L))
+    if (!all(lengths(dots) == 1L))
         stop("all arguments in '...' must be length one") 
+    if (anyDuplicated(names(dots)))
+        stop("all arguments in '...' must have unique names")
+    
+    cases <- c(...)
+    if (is.null(cases))
+        cases <- logical()
+    ans <- cases[as.character(EXPR)]
+    if (identical(names(cases)[length(cases)], ""))
+        ans[is.na(names(ans)) & !is.na(EXPR)] <- cases[[length(cases)]]
 
-    ans <- choices[as.character(EXPR)]
-    ans[is.na(EXPR)] <- NA
-    if (identical(names(choices)[length(choices)], ""))
-        ans[lengths(ans) == 0L] <- choices[[length(choices)]]
-
-    ans <- unlist(ans, use.names = FALSE, recursive = FALSE)
-    if (is.null(ans)) logical() else ans
+    ans
 }
 
 make_args <- function(...) {
