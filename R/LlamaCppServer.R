@@ -64,7 +64,7 @@ run_llamafile <- function(path = system.file("bin", "llamafile",
 
 start_llama_cpp_server <- function(model,
                                    threads = 8L, ctx_size = 0L,
-                                   predict = -1L, batch_size = 2048L,
+                                   n_predict = -1L, batch_size = 2048L,
                                    temp = 0.8, flash_attn = FALSE, port = 0L,
                                    embedding = FALSE, gpu = FALSE,
                                    max_seconds = 10L,
@@ -75,14 +75,14 @@ start_llama_cpp_server <- function(model,
     assert_file_exists(model, access = "r")
     assert_int(threads, lower = 1L)
     assert_int(ctx_size, lower = 0L)
-    assert_int(predict, lower = -2L)
+    assert_int(n_predict, lower = -2L)
     assert_int(batch_size, lower = 1L)
     assert_number(temp, lower = 0)
     assert_flag(flash_attn)
     assert_flag(embedding)
     
     .run_llamafile(llamafile, model = model, threads = threads,
-                   ctx_size = ctx_size, predict = predict,
+                   ctx_size = ctx_size, n_predict = n_predict,
                    batch_size = batch_size, temp = temp,
                    flash_attn = flash_attn, embedding = embedding, gpu = gpu,
                    port = port, max_seconds = max_seconds, ...)
