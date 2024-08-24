@@ -52,4 +52,14 @@ ollama_model <- function(name, pull = FALSE, server = ollama_server()) {
     language_model(server, name)
 }
 
+poll_path <- new_generic("poll_path", "server")
+
 method(poll_path, OllamaServer) <- function(server) "tags"
+
+wait_until_ready <- function(server, max_seconds) {
+    assert_int(max_seconds, lower = 0L)
+    create_request(server) |> httr2::req_url_path_append(poll_path(server)) |>
+        httr2::req_retry(max_seconds = max_seconds) |> httr2::perform()
+    server
+}
+
