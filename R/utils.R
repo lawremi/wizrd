@@ -82,15 +82,16 @@ prop_int <- new_int_property()
 prop_int_nn <- new_int_property(min = 0L)
 prop_int_pos <- new_int_property(min = 1L)
 
-new_list_property <- function(..., validator = NULL, of = class_any,
-                              named = FALSE)
+new_list_property <- function(..., validator = NULL, of = class_any, named = NA)
 {
     prop <- new_property(class_list, ..., validator = function(value) {
         c(if (!identical(of, class_any) &&
                   !all(vapply(value, inherits, logical(1L), of)))
             paste("must only contain elements of class", of@name),
-          if (named && is.null(names(value)))
+          if (isTRUE(named) && is.null(names(value)))
               "must have names",
+          if (identical(named, FALSE) && !is.null(names(value)))
+              "must not have names",
           if (!is.null(validator))
               valdiator(value)
           )
