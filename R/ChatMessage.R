@@ -15,12 +15,12 @@ method(convert, list(class_any, ChatMessage)) <- function(from, to,
     ChatMessage(role = role, object = from)
 }
 
-method(serialize, list(ChatMessage, TextFormat)) <- function(x, format) {
-    set_props(x, content = serialize(x@object, format))
+method(textify, list(ChatMessage, TextFormat)) <- function(x, format) {
+    set_props(x, content = textify(x@object, format))
 }
 
-method(deserialize, list(ChatMessage, TextFormat)) <- function(x, format) {
-    set_props(x, object = deserialize(x@content, format))
+method(detextify, list(ChatMessage, TextFormat)) <- function(x, format) {
+    set_props(x, object = detextify(x@content, format))
 }
 
 split_into_blocks <- function(x) {

@@ -157,8 +157,8 @@ openai_encode_tool <- new_generic("openai_encode_tool", "x")
 example_descriptions <- function(x) {
     vapply(of@examples, function(ex) {
               output <- do.call(of, ex)
-              paste0("Input: ", serialize(ex@input, of@input_format), "\n",
-                     "Output: ", serialize(output, of@output_format))
+              paste0("Input: ", textify(ex@input, of@input_format), "\n",
+                     "Output: ", textify(output, of@output_format))
     }, character(1L))
 }
 

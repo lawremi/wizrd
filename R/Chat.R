@@ -60,15 +60,15 @@ handle_tool_calls <- function(x) {
     tool_calls <- last_message(x)@tool_calls
     msgs <- lapply(tool_calls, function(tool_call) {
         tool <- x@model@tools[[tool_call@tool_name]]
-        value <- do.call(tool, deserialize(tool_call@parameters,
+        value <- do.call(tool, detextify(tool_call@parameters,
                                            tool@io@input))
         ChatMessage(role = "tool", object = value,
-                    content = serialize(value, tool@io@output))
+                    content = textify(value, tool@io@output))
     })
     chat(x, msgs)
 }
 
 handle_output <- function(x, output) {
-    append_messages(x, deserialize(output, x@model@io@output)) |>
+    append_messages(x, detextify(output, x@model@io@output)) |>
         handle_tool_calls()
 }

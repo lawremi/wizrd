@@ -31,25 +31,25 @@ respond_with_code <- function(x) {
     respond_with_format(x, CodeFormat())
 }
 
-serialize <- new_generic("serialize", c("x", "format"))
+textify <- new_generic("textify", c("x", "format"))
 
-method(serialize, list(class_any, TextFormat)) <- function(x, format) {
+method(textify, list(class_any, TextFormat)) <- function(x, format) {
     capture.output(dput(x))
 }
 
-method(serialize, list(class_character, TextFormat)) <- function(x, format) {
+method(textify, list(class_character, TextFormat)) <- function(x, format) {
     unname(x)
 }
 
-method(serialize, list(class_list, TextFormat)) <- function(x, format) {
-    lapply(unname(x), serialize, format)
+method(textify, list(class_list, TextFormat)) <- function(x, format) {
+    lapply(unname(x), textify, format)
 }
 
 nativeRaster <- new_S3_class("nativeRaster")
 raster <- new_S3_class("raster")
 union_raster <- new_union(nativeRaster, raster)
 
-method(serialize, list(union_raster, TextFormat)) <- function(x, format) x
+method(textify, list(union_raster, TextFormat)) <- function(x, format) x
 
 to_json <- new_generic("to_json", "x")
 
@@ -79,7 +79,7 @@ method(to_json, S7_object) <- function(x) {
       lapply(S7_class(x)@properties, prop_to_json))
 }
 
-method(serialize, list(class_list | class_any, JSONFormat)) <- function(x,
+method(textify, list(class_list | class_any, JSONFormat)) <- function(x,
                                                                         format)
 {
     toJSON(to_json(x), null = "null")
@@ -136,17 +136,17 @@ method(from_json, class_list) <- function(x) {
 
 method(from_json, class_any) <- identity
 
-deserialize <- new_generic("deserialize", c("x", "format"))
+detextify <- new_generic("detextify", c("x", "format"))
 
-method(deserialize, list(class_character, JSONFormat)) <- function(x, format) {
-    deserialize(fromJSON(x))
+method(detextify, list(class_character, JSONFormat)) <- function(x, format) {
+    detextify(fromJSON(x))
 }
 
-method(deserialize, list(class_list, JSONFormat)) <- function(x, format) {
+method(detextify, list(class_list, JSONFormat)) <- function(x, format) {
     from_json(x)
 }
 
-method(deserialize, list(class_any, TextFormat)) <- function(x, format) x
+method(detextify, list(class_any, TextFormat)) <- function(x, format) x
 
 Example <- new_class("Example",
                      properties = list(
