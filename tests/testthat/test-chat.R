@@ -1,5 +1,7 @@
-test_that("calling predict() generates responses", {
+test_that("calling chat() and friends generates correct responses", {
     model <- stories260K()
 
-    expect_string(predict(model, "Where did R come from?"))
+##    options(wizrd.debug = 3L)
+    expect_class(chat(model, "Tell me a story"), "Chat")
+    expect_string(predict(model, "Tell me a story"))
 })
