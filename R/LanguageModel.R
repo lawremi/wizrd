@@ -92,13 +92,13 @@ input_instructions <- new_generic("input_instructions", c("on", "to"))
 output_instructions <- new_generic("output_instructions", c("on", "to"))
 
 method(input_instructions,
-       list(SerialFormat, LanguageModel)) <- function(on, to)
+       list(TextFormat, LanguageModel)) <- function(on, to)
 {
     NULL
 }
 
 method(output_instructions,
-       list(SerialFormat, LanguageModel)) <- function(on, to)
+       list(TextFormat, LanguageModel)) <- function(on, to)
 {
     NULL
 }

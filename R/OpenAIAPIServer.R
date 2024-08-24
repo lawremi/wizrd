@@ -14,7 +14,7 @@ openai_body_tools <- function(tools) {
 
 openai_response_format <- new_generic("openai_response_format", "x")
 
-method(openai_response_format, SerialFormat) <- function(x) {
+method(openai_response_format, TextFormat) <- function(x) {
    NULL 
 }
 

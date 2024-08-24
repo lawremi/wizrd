@@ -1,5 +1,5 @@
 IOBinding <- new_class("IOBinding",
                        properties = list(
-                           input = SerialFormat,
-                           output = SerialFormat
+                           input = TextFormat,
+                           output = TextFormat
                        ))

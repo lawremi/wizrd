@@ -1,7 +1,7 @@
-SerialFormat <- new_class("SerialFormat",
-                          properties = list(example = class_any))
+TextFormat <- new_class("TextFormat",
+                        properties = list(example = class_any))
 
-PlainTextFormat <- new_class("PlainTextFormat", SerialFormat)
+PlainTextFormat <- new_class("PlainTextFormat", TextFormat)
 
 JSONFormat <- new_class("JSONFormat", PlainTextFormat,
                         properties = list(schema = class_list,
@@ -15,7 +15,7 @@ CSVFormat <- new_class("CSVFormat", PlainTextFormat,
 CodeFormat <- new_class("CodeFormat", PlainTextFormat,
                         properties = list(language = prop_string_nullable))
 
-respond_with_format <- function(x, format = SerialFormat()) {
+respond_with_format <- function(x, format = TextFormat()) {
     set_props(x, response_format = format)
 }
 
@@ -33,19 +33,23 @@ respond_with_code <- function(x) {
 
 serialize <- new_generic("serialize", c("x", "format"))
 
-method(serialize, list(class_any, SerialFormat)) <- function(x, format) {
+method(serialize, list(class_any, TextFormat)) <- function(x, format) {
     capture.output(dput(x))
 }
 
-method(serialize, list(class_list, SerialFormat)) <- function(x, format) {
-    lapply(x, serialize, format)
+method(serialize, list(class_character, TextFormat)) <- function(x, format) {
+    unname(x)
+}
+
+method(serialize, list(class_list, TextFormat)) <- function(x, format) {
+    lapply(unname(x), serialize, format)
 }
 
 nativeRaster <- new_S3_class("nativeRaster")
 raster <- new_S3_class("raster")
 union_raster <- new_union(nativeRaster, raster)
 
-method(serialize, list(union_raster, SerialFormat)) <- function(x, format) x
+method(serialize, list(union_raster, TextFormat)) <- function(x, format) x
 
 to_json <- new_generic("to_json", "x")
 
@@ -142,7 +146,7 @@ method(deserialize, list(class_list, JSONFormat)) <- function(x, format) {
     from_json(x)
 }
 
-method(deserialize, list(class_any, SerialFormat)) <- function(x, format) x
+method(deserialize, list(class_any, TextFormat)) <- function(x, format) x
 
 Example <- new_class("Example",
                      properties = list(
