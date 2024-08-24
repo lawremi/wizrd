@@ -105,7 +105,7 @@ new_list_property <- function(..., validator = NULL, of = class_any,
     prop <- new_property(class_list, ..., validator = function(value) {
         c(if (!identical(of, class_any) &&
                   !all(vapply(value, inherits, logical(1L), of)))
-            paste("must only contain elements of class", of$name),
+            paste("must only contain elements of class", of@name),
           if (named && is.null(names(value)))
               "must have names",
           if (!is.null(validator))

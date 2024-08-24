@@ -13,7 +13,7 @@ method(convert, list(class_any, ChatMessage)) <- function(from, to,
                                                           role = "user",
                                                           format = SerialFormat)
 {
-    ChatMessage(role = role, content = serialize(x, format), object = x)
+    ChatMessage(role = role, content = serialize(from, format), object = from)
 }
 
 split_into_blocks <- function(x) {

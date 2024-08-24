@@ -46,25 +46,26 @@ compile_instructions <- new_generic("compile_instructions", "x")
 method(compile_instructions, LanguageModel) <- function(x) {
     paste(c(x@instructions,
             instructions(x@io, x),
-            tool_instructions(x),
-            collapse = "\n\n"))
+            tool_instructions(x)),
+          collapse = "\n\n")
 }
 
 instructions <- new_generic("instructions", c("on", "to"))
 
 method(instructions, list(IOBinding, LanguageModel)) <- function(on, to) {
-    paste(c(input_instructions(on@input, to),
-            output_instructions(on@output, to)),
-          collapse = "\n\n")
+    instr <- c(input_instructions(on@input, to),
+               output_instructions(on@output, to))
+    if (!is.null(instr)) paste(instr, collapse = "\n\n")
 }
 
 prepare_input <- function(model, input) {
     if (!is.list(input) || is.object(input))
         input <- list(input)
     input <- lapply(input, convert, ChatMessage, format = model@io@input)
-    instructions <- compile_instructions(model)
+    system <- ChatMessage(role = "system",
+                          content = compile_instructions(model))
     input$system <- NULL
-    Chat(model, messages = c(system = instructions, input))
+    Chat(model, messages = c(system = system, input))
 }
 
 tool_instructions <- new_generic("tool_instructions", "x")

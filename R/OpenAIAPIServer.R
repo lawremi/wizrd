@@ -4,7 +4,7 @@ OpenAIAPIResponse <- new_class("OpenAIAPIResponse", class_list)
 
 openai_body_messages <- function(messages) {
     assert_list(messages, "ChatMessage")
-    lapply(messages, openai_encode_message)
+    unname(lapply(messages, openai_encode_message))
 }
 
 openai_body_tools <- function(tools) {
@@ -80,11 +80,12 @@ method(chat, OpenAIAPIServer) <- function(x, model, messages, tools,
     req <- create_request(x) |>
         httr2::req_url_path_append("v1", "chat", "completions") |>
         openai_req_body_chat(model, messages, tools, io@output,
-                             stream = !is.null(stream_handler), ...)
-    if (!is.null(stream_handler)) {
+                             stream = !is.null(stream_callback), ...)
+    if (!is.null(stream_callback)) {
         req |> req_capture_stream_openai(stream_callback)
     } else {
-        req |> httr2::req_perform() |> httr2::resp_body_json() |>
+        req |> httr2::req_perform(verbosity = getOption("wizrd.debug")) |>
+            httr2::resp_body_json() |>
             OpenAIAPIResponse()
     }
 }
