@@ -19,8 +19,11 @@ method(predict, Chat) <- function(object, input, ...) {
 }
 
 method(chat, Chat) <- function(x, input, ...) {
-    assert_string(input)
-    chat(x@model, c(x@messages, list(input)), ...)
+    if (length(input) == 0L)
+        return(x)
+    if (!is.list(input) || is.object(input))
+        input <- list(input)
+    chat(x@model, c(x@messages, input), ...)
 }
 
 method(print, Chat) <- function(x, full = FALSE, ...) {
@@ -50,13 +53,7 @@ last_response <- function(x) last_message(x, "assistant")@content
 last_output <- function(x) last_message(x, "assistant")@object
 
 append_messages <- function(x, ...) {
-    set_props(messages = c(x@messages, list(...)))
-}
-
-append_output <- function(x, output) {
-    object <- deserialize(output, x@model@io@output)
-    append_messages(x, ChatMessage(role = "assistant", content = output,
-                                   object = object))
+    set_props(x, messages = c(x@messages, list(...)))
 }
 
 handle_tool_calls <- function(x) {
@@ -72,5 +69,6 @@ handle_tool_calls <- function(x) {
 }
 
 handle_output <- function(x, output) {
-    append_output(x, output) |> handle_tool_calls()
+    append_messages(x, deserialize(output, x@model@io@output)) |>
+        handle_tool_calls()
 }

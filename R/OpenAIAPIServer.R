@@ -106,12 +106,16 @@ chat_message <- new_generic("chat_message", "x")
 
 method(chat_message, OpenAIAPIResponse) <- function(x) {
     ## TODO: handle multiple choices (via callback?)
-    msg <- response$choices[[1L]]
-    ChatMessage(content = msg$content, tool_calls = openai_tool_calls(msg))
+    msg <- x$choices[[1L]]
+    ChatMessage(content = msg$content, tool_calls = openai_tool_calls(msg),
+                role = "assistant")
 }
 
 openai_encode_message <- function(x) {
-    message <- list(role = x@role, content = openai_encode_content(x@content))
+    content <- openai_encode_content(x@content)
+    stopifnot(test_list(content, names = "unnamed") ||
+                  test_string(content))
+    message <- list(role = x@role, content = content)
     ## recapitulate tool calls for the context
     tool_calls <- lapply(x@tool_calls, function(tool_call) {
         list(id = tool_call@id, type = "function",
@@ -124,14 +128,18 @@ openai_encode_message <- function(x) {
 
 openai_encode_content <- new_generic("openai_encode_content", "x")
 
-method(openai_encode_content, class_character) <- identity
+method(openai_encode_content, class_character) <- function(x) {
+    if (length(x) > 1L)
+        openai_encode_content(as.list(x))
+    else x
+}
 
 method(openai_encode_content, union_raster) <- function(x) {
     list(openai_encode_content_part(x))
 }
 
 method(openai_encode_content, class_list) <- function(x) {
-    lapply(x, openai_encode_content_part)
+    lapply(unname(x), openai_encode_content_part)
 }
 
 openai_encode_content_part <- new_generic("openai_encode_content_part", "x")

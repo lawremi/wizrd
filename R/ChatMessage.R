@@ -10,10 +10,17 @@ ChatMessage <- new_class("ChatMessage",
                          ))
 
 method(convert, list(class_any, ChatMessage)) <- function(from, to,
-                                                          role = "user",
-                                                          format = SerialFormat)
+                                                          role = "user")
 {
-    ChatMessage(role = role, content = serialize(from, format), object = from)
+    ChatMessage(role = role, object = from)
+}
+
+method(serialize, list(ChatMessage, TextFormat)) <- function(x, format) {
+    set_props(x, content = serialize(x@object, format))
+}
+
+method(deserialize, list(ChatMessage, TextFormat)) <- function(x, format) {
+    set_props(x, object = deserialize(x@content, format))
 }
 
 split_into_blocks <- function(x) {
@@ -23,16 +30,16 @@ split_into_blocks <- function(x) {
     Filter(nzchar, setNames(as.list(m[-2L,]), labels))
 }
 
-method(print, ChatMessage) <- function(x, ...)
+method(str, ChatMessage) <- function(object, ...)
 {
     float <- switch(x@role, assistant = "left", user = "right", "center")
-    if (length(x@content > 0L)) {
+    if (length(x@content) > 0L) {
         if (x@role == "assistant")
             cli_text(x@content)
         else boxx(strwrap(x@content, width = console_width() / 2L),
                   float = float)
     }
-    for (tool_call in tool_calls) {
+    for (tool_call in object@tool_calls) {
         boxx(strwrap(capture.output(print(tool_call))), float = float,
              header = "Tool call", border_style = "classic")
     }

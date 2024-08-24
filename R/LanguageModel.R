@@ -61,9 +61,11 @@ method(instructions, list(IOBinding, LanguageModel)) <- function(on, to) {
 prepare_input <- function(model, input) {
     if (!is.list(input) || is.object(input))
         input <- list(input)
-    input <- lapply(input, convert, ChatMessage, format = model@io@input)
+    input <- lapply(input, convert, ChatMessage)
+    input <- lapply(input, serialize, format = model@io@input)
+    instructions <- compile_instructions(model)
     system <- ChatMessage(role = "system",
-                          content = compile_instructions(model))
+                          content = serialize(instructions, TextFormat()))
     input$system <- NULL
     Chat(model, messages = c(system = system, input))
 }
