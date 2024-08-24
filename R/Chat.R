@@ -30,10 +30,10 @@ method(str, Chat) <- function(object, full = FALSE, ...) {
     cat("<Chat>:", length(object@messages), "messages\n")
     if (full) {
         messages <- object@messages
-        cli::cli_h3("Transcript")
     } else {
         messages <- tail(object@messages, 2L)
-        cli::cli_h3("Latest messages")
+        cat(cli::rule(center = "Latest messages", line = " -"))
+        cat("\n")
     }
     for(i in seq_along(messages))
         str(messages[[i]])
