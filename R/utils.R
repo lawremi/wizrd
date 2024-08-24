@@ -1,20 +1,3 @@
-makeValidationFunction <- function(checker) {
-    checker_call <- as.call(c(substitute(checker),
-                              lapply(names(formals(checker)), as.name)))
-    validate <- as.function(c(formals(checker), alist(.var.name = vname(x)),
-                              substitute({
-                                  ans <- checker_call
-                                  if (!isTRUE(ans))
-                                      paste(sQuote(.var.name), "is invalid:",
-                                            ans)
-                              })), envir = parent.frame())
-    validate
-}
-
-validate_string <- makeValidationFunction(check_string)
-validate_flag <- makeValidationFunction(check_flag)
-validate_number <- makeValidationFunction(check_number)
-
 new_scalar_property <- function(class, ..., validator = NULL, nullable = FALSE) {
     if (nullable) {
         class <- new_union(class, NULL)
@@ -116,17 +99,6 @@ new_list_property <- function(..., validator = NULL, of = class_any,
     prop$named <- named
     class(prop) <- c("list_S7_property", class(prop))
     prop
-}
-
-nullable <- function(class) {
-    new_union(NULL, class)
-}
-
-new_as_generic <- function(class) {
-    stopifnot(inherits(class, "S7_class"))
-    generic <- new_generic(paste0("as_", class@name), "from")
-    method(generic, class) <- identity
-    generic
 }
 
 zip <- function(...) {
