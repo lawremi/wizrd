@@ -20,7 +20,8 @@ method(textify, list(ChatMessage, TextFormat)) <- function(x, format) {
 }
 
 method(detextify, list(ChatMessage, TextFormat)) <- function(x, format) {
-    set_props(x, object = detextify(x@content, format))
+    x@object <- detextify(x@content, format)
+    x
 }
 
 split_into_blocks <- function(x) {

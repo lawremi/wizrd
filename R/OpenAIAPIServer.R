@@ -106,7 +106,7 @@ chat_message <- new_generic("chat_message", "x")
 
 method(chat_message, OpenAIAPIResponse) <- function(x) {
     ## TODO: handle multiple choices (via callback?)
-    msg <- x$choices[[1L]]
+    msg <- x$choices[[1L]]$message
     ChatMessage(content = msg$content, tool_calls = openai_tool_calls(msg),
                 role = "assistant")
 }
