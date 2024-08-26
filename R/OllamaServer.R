@@ -2,8 +2,7 @@ OllamaServer <- new_class("OllamaServer", LanguageModelServer,
                           properties = list(
                               url = new_string_property(
                                   default = "http://localhost:11434/api"
-                              ),
-                              process = NULL | class_process
+                              )
                           ))
 
 ollama_url <- function() {
@@ -50,6 +49,12 @@ ollama_model <- function(name, pull = FALSE, server = ollama_server()) {
     if (pull)
         system2("ollama", c("pull", name))
     language_model(server, name)
+}
+
+ollama_weights_path <- function(name) {
+    # TODO
+    # read the manifest to get the hash
+    # generate path to model weights using hash
 }
 
 poll_path <- new_generic("poll_path", "server")

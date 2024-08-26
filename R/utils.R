@@ -270,3 +270,7 @@ init_process <- function(path, args, ready_callback, error_callback,
 
     invisible(TRUE)
 }
+
+assert_port <- function(port) {
+    assert_int(port, lower = 1024L, upper = 65535L)
+}

@@ -1,26 +1,48 @@
 llamafile_version <- "0.8.13"
 
-class_process <- new_S3_class("process")
-
 LlamaCppServer <- new_class("LlamaCppServer", OpenAIAPIServer,
                             properties = list(
                                 model = prop_string,
-                                process = NULL | class_process
+                                embedding = prop_flag
                             ))
 
 method(language_model, LlamaCppServer) <- function(x) {
     RemoteLanguageModel(server = x, name = x@model)
 }
 
+method(chat, LlamaCppServer) <- function(x, ...) {
+    if (x@embedding)
+        stop("llama.cpp server does not chat when started with --embedding")
+    chat(super(x, OpenAIAPIServer), ...)
+}
+
+method(embed, LlamaCppServer) <- function(x, ...) {
+    if (!x@embedding)
+        stop("llama.cpp server does not embed when not started with --embedding")
+    embed(super(x, OpenAIAPIServer), ...)
+}
+
 stories260K <- function(...) {
     path <- system.file("extdata", "stories260K.gguf", package = "wizrd")
-    model <- llama_cpp_model(path, n_predict = 400L, ...)
+    model <- llama_cpp_chat_model(path, n_predict = 400L, ...)
     model@instructions <- "You are a storyteller"
     model
 }
 
-llama_cpp_model <- function(path, ...) {
-    language_model(start_llama_cpp_server(path, ...))
+llama_cpp_chat_model_from_ollama <- function(name, ...) {
+    llama_cpp_chat_model(ollama_weights_path(name), alias = name, ...)
+}
+
+llama_cpp_chat_model <- function(path, ...) {
+    language_model(run_llama_cpp_server(path, ...))
+}
+
+llama_cpp_embedding_model_from_ollama <- function(name, ...) {
+    llama_cpp_embedding_model(ollama_weights_path(name), alias = name, ...)
+}
+
+llama_cpp_embedding_model <- function(path, ...) {
+    language_model(run_llamafiler_server(path, ...))
 }
 
 llamafile_url <- function() {
@@ -70,54 +92,98 @@ prompt_install_llamafile <- function() {
 }
 
 llamafile_ready <- function(stdout) {
-    grepl("llama server listening", stdout)
+    grepl("server listen", stdout)
 }
 
 llamafile_error <- function(stderr) {
-    m <- gregexec("error: (.*?)\n", stderr)
-    msgs <- regmatches(stderr, m)[[1L]][2L,]
+    msgs <- gsub("error: (.*?)\n", "\\1", stderr)
     if (length(msgs) > 0L) tail(msgs, 1L) else stderr
 }
 
-.run_llamafile <- function(path = llamafile_path(),
-                           model = NULL, gpu = FALSE, port = 0L,
-                           max_seconds = 10L, ...)
-{
-    require_ns("processx", "run llamafile")
+llamafiler_error <- function(stderr) {
+    msgs <- gsub("llamafiler: (?:error: )?(.*?)\n", "\\1", stderr)
+    if (length(msgs) > 0L) tail(msgs, 1L) else stderr
+}
 
+llama_cpp_server <- function(model_name, url, embedding = FALSE, process = NULL)
+{
+    assert_string(model_name)
+    assert_string(url)
+    assert_flag(embedding)
+    assert_class(process, "process", null.ok = TRUE)
+
+    LlamaCppServer(url = url, model = model_name, embedding = embedding,
+                   process = process)
+}
+
+.run_llama_cpp_server <- function(path = llamafile_path(),
+                                  model = NULL, alias = NULL, embedding = FALSE,
+                                  gpu = FALSE, port = 0L, ...)
+{
     if (!file.exists(path) && identical(path, llamafile_path()))
         prompt_install_llamafile()
     assert_file_exists(path, access = "x")
+    if (tools::file_ext(path) == "llamafile")
+        assert_null(model)
+    else assert_file_exists(model, "r")
     assert_string(model, null.ok = TRUE)
+    assert_flag(embedding)
     assert_flag(gpu)
     if (identical(port, 0L))
         port <- find_available_port()
-    assert_int(port, lower = 1024L, upper = 65535L)
-    
-    args <- make_args(server = TRUE, nobrowser = TRUE, log_disable = TRUE,
-                      model = model, port = port, ngl = if (gpu) 9999, ...)
+    assert_port(port)
+
+    require_ns("processx", paste("run", basename(path)))
+
+    if (is.null(alias)) {
+        model_path <- if (!is.null(model)) model else path
+        alias <- tools::file_path_sans_ext(basename(model_path))
+    }
+    is_llamafile <- basename(path) == "llamafile" ||
+        tools::file_ext(path) == "llamafile"
+    args <- make_args(server = TRUE, log_disable = TRUE, model = model,
+                      alias = alias, embedding = embedding, port = port,
+                      nobrowser = if (is_llamafile) TRUE,
+                      ngl = if (gpu) 9999, ...)
     p <- init_process(path, args, llamafile_ready, llamafile_error)
     
-    model_path <- if (!is.null(model)) model else path
-    model_name <- tools::file_path_sans_ext(basename(model_path))
+    url <- paste0("http://localhost:", port)
+    llama_cpp_server(alias, url, embedding, process = p)
+}
+
+run_llamafiler <- function(model, port = 0L, path = llamafiler_path(), ...)
+{
+    if (!file.exists(path) && identical(path, llamafiler_path()))
+        prompt_install_llamafile()
+    assert_file_exists(path, access = "x")
+    assert_file_exists(model, "r")
+    if (identical(port, 0L))
+        port <- find_available_port()
+    assert_port(port)
+
+    require_ns("processx", "run llamafiler")
+
+    url <- paste0("http://localhost:", port)
+    args <- make_args(log_disable = TRUE, model = model, listen = url, ...)
+    p <- init_process(path, args, llamafile_ready, llamafiler_error)
     
-    LlamaCppServer(url = paste0("http://localhost:", port),
-                   model = model_name, process = p)
+    model_name <- tools::file_path_sans_ext(basename(model))
+
+    llama_cpp_server(model, url, embedding = TRUE, process = p)
 }
 
-run_llamafile <- function(path = llamafile_path(), port = 0L, gpu = FALSE,
-                          max_seconds = 10L, ...) {
-    .run_llamafile(path, port = port, gpu = gpu, max_seconds = max_seconds, ...)
+run_llamafile <- function(path = llamafile_path(), threads = 8L, port = 0L,
+                          gpu = FALSE, ...) {
+    .run_llama_cpp_server(path, threads = threads, port = port, gpu = gpu, ...)
 }
 
-start_llama_cpp_server <- function(model,
-                                   threads = 8L, ctx_size = 0L,
-                                   n_predict = -1L, batch_size = 2048L,
-                                   temp = 0.8, flash_attn = FALSE, port = 0L,
-                                   embedding = FALSE, gpu = FALSE,
-                                   max_seconds = 10L,
-                                   llamafile = llamafile_path(),
-                                   ...)
+run_llama_cpp_server <- function(model,
+                                 threads = 8L, ctx_size = 0L,
+                                 n_predict = -1L, batch_size = 2048L,
+                                 temp = 0.8, flash_attn = FALSE, port = 0L,
+                                 embedding = FALSE, gpu = FALSE,
+                                 path = llamafile_path(),
+                                 ...)
 {
     assert_file_exists(model, access = "r")
     assert_int(threads, lower = 1L)
@@ -128,11 +194,11 @@ start_llama_cpp_server <- function(model,
     assert_flag(flash_attn)
     assert_flag(embedding)
     
-    .run_llamafile(llamafile, model = model, threads = threads,
-                   ctx_size = ctx_size, n_predict = n_predict,
-                   batch_size = batch_size, temp = temp,
-                   flash_attn = flash_attn, embedding = embedding, gpu = gpu,
-                   port = port, max_seconds = max_seconds, ...)
+    .run_llama_cpp_server(path, model = model, threads = threads,
+                          ctx_size = ctx_size, n_predict = n_predict,
+                          batch_size = batch_size, temp = temp,
+                          flash_attn = flash_attn, embedding = embedding,
+                          gpu = gpu, port = port, ...)
 }
 
 find_available_port <- function(start = 8000, end = 8100) {
