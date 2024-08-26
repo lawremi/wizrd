@@ -41,9 +41,13 @@ method(str, Chat) <- function(object, full = FALSE, ...) {
 
 last_message <- function(x, role = NULL) {
     assert_string(role, null.ok = TRUE)
-    if (is.null(role))
-        x@messages[[length(x@messages)]]
-    else Find(function(m) m@role == role, x@messages, right = TRUE)
+    msg <- if (is.null(role))
+               x@messages[[length(x@messages)]]
+           else Find(function(m) m@role == role, x@messages, right = TRUE)
+    if (is.null(msg))
+        stop("No message found",
+             if (!is.null(role)) paste0(" for role '", role, "'"))
+    msg
 }
 
 last_prompt <- function(x) last_message(x, "user")@content
