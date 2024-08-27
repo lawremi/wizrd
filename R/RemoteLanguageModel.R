@@ -8,8 +8,8 @@ method(chat, RemoteLanguageModel) <- function(x, input,
     chat <- prepare_input(x, input)
   
     response <- chat(x@server, x@name, chat@messages,
-                     x@tools, x@io,
-                     stream_callback, ...)
+                     x@tools, x@io, set_props(x@params, ...),
+                     stream_callback)
 
     handle_output(chat, chat_message(response))
 }

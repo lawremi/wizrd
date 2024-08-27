@@ -6,9 +6,11 @@ LlamaCppServer <- new_class("LlamaCppServer", OpenAIAPIServer,
                                 embedding = prop_flag
                             ))
 
-method(language_model, LlamaCppServer) <- function(x) {
-    RemoteLanguageModel(server = x, name = x@model)
-}
+method(language_model, LlamaCppServer) <-
+    function(x, ..., params = language_model_params(...))
+    {
+        RemoteLanguageModel(server = x, name = x@model, params = params)
+    }
 
 method(chat, LlamaCppServer) <- function(x, ...) {
     if (x@embedding)
@@ -22,19 +24,12 @@ method(embed, LlamaCppServer) <- function(x, ...) {
     embed(super(x, OpenAIAPIServer), ...)
 }
 
-stories260K <- function(...) {
-    path <- system.file("extdata", "stories260K.gguf", package = "wizrd")
-    model <- llama_cpp_chat_model(path, n_predict = 400L, ...)
-    model@instructions <- "You are a storyteller"
-    model
-}
-
 llama_cpp_chat_model_from_ollama <- function(name, ...) {
     llama_cpp_chat_model(ollama_weights_path(name), alias = name, ...)
 }
 
 llama_cpp_chat_model <- function(path, ...) {
-    language_model(run_llama_cpp_server(path, ...))
+    language_model(run_llama_cpp_server(path), ...)
 }
 
 llama_cpp_embedding_model_from_ollama <- function(name, ...) {
@@ -42,7 +37,7 @@ llama_cpp_embedding_model_from_ollama <- function(name, ...) {
 }
 
 llama_cpp_embedding_model <- function(path, ...) {
-    language_model(run_llamafiler_server(path, ...))
+    language_model(run_llamafiler_server(path), ...)
 }
 
 llamafile_url <- function() {

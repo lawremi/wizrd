@@ -6,9 +6,10 @@ LanguageModelServer <- new_class("LanguageModelServer",
                                  ),
                                  abstract = TRUE)
 
-method(language_model, LanguageModelServer) <- function(x, name) {
-    RemoteLanguageModel(server = x, name = name)
-}
+method(language_model, LanguageModelServer) <-
+    function(x, name, ..., params = language_model_params(...)) {
+        RemoteLanguageModel(server = x, name = name, params = params)
+    }
 
 req_auth_fun <- new_generic("req_auth_fun", "server")
 
