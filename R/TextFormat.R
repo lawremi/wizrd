@@ -13,7 +13,7 @@ CSVFormat <- new_class("CSVFormat", PlainTextFormat,
                                          example = class_data.frame))
 
 CodeFormat <- new_class("CodeFormat", PlainTextFormat,
-                        properties = list(language = prop_string_nullable))
+                        properties = list(language = nullable(prop_string)))
 
 respond_with_format <- function(x, format = TextFormat()) {
     set_props(x, response_format = format)

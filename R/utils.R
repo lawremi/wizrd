@@ -1,12 +1,15 @@
-new_scalar_property <- function(class, ..., validator = NULL, nullable = FALSE) {
-    if (nullable) {
-        class <- new_union(class, NULL)
-    }
+nullable <- function(prop) {
+    prop$class <- new_union(NULL, prop$class)
+    prop["default"] <- list(NULL)
+    prop
+}
+
+new_scalar_property <- function(class, ..., validator = NULL) {
     prop <- new_property(class, ..., validator = function(value) {
-        c(if (nullable && is.null(value))
-            NULL
-          else if (length(value) != 1L || is.na(value))
-              "must be of length one and not missing",
+        if (is.null(value))
+            return(NULL)
+        c(if (length(value) != 1L || is.na(value))
+            "must be of length one and not missing",
           if (!is.null(validator))
               validator(value)
           )
@@ -16,10 +19,9 @@ new_scalar_property <- function(class, ..., validator = NULL, nullable = FALSE) 
 }
 
 new_string_property <- function(..., validator = NULL,
-                                default = if (!nullable) "",
-                                nullable = FALSE, choices = NULL)
+                                default = "", choices = NULL)
 {
-    assert_flag(nullable)
+    assert_string(default)
     prop <- new_scalar_property(
         class_character,
         validator = function(value) {
@@ -29,7 +31,7 @@ new_string_property <- function(..., validator = NULL,
               if (!is.null(validator))
                   validator(value)
               )
-        }, default = default, nullable = nullable)
+        }, default = default)
     prop$choices <- choices
     class(prop) <- c("string_S7_property", class(prop))
     prop
@@ -37,24 +39,20 @@ new_string_property <- function(..., validator = NULL,
 
 ## sensible pattern?
 prop_string <- new_string_property()
-prop_string_nullable <- new_string_property(nullable = TRUE)
 
-new_flag_property <- function(..., nullable = FALSE,
-                              default = if (!nullable) FALSE) {
-    assert_flag(nullable)
-    new_scalar_property(class_logical, ..., default = default,
-                        nullable = nullable)
+new_flag_property <- function(..., default = FALSE) {
+    assert_flag(default)
+    new_scalar_property(class_logical, ..., default = default)
 }
 
 prop_flag <- new_flag_property()
 
 ## TODO: make this handle non-scalars as well
 new_number_property <- function(class = class_numeric, ..., validator = NULL,
-                                nullable = FALSE,
-                                default = if (!nullable) min(max(min, 0L), max),
+                                default = min(max(min, 0), max),
                                 min = -Inf, max = Inf)
 {
-    assert_flag(nullable)
+    assert_number(default)
     prop <- new_scalar_property(class, ..., validator = function(value) {
         c(if (any(value < min))
               paste("must be >=", min),
@@ -63,7 +61,7 @@ new_number_property <- function(class = class_numeric, ..., validator = NULL,
           if (!is.null(valdiator))
               validator(value)
           )
-    }, nullable = nullable)
+    })
     prop$min <- min
     prop$max <- max
     class(prop) <- c("numeric_S7_property", class(prop))
@@ -71,10 +69,14 @@ new_number_property <- function(class = class_numeric, ..., validator = NULL,
 }
 
 prop_number <- new_number_property()
+prop_number_nn <- new_number_property(min = 0)
+prop_prob <- new_number_property(min = 0, max = 1)
 
-new_int_property <- function(..., min = .Machine$integer.min,
+new_int_property <- function(..., default = min(max(min, 0L), max),
+                             min = .Machine$integer.min,
                              max = .Machine$integer.max)
 {
+    assert_int(default)
     new_number_property(class_integer, ..., min = min, max = max)
 }
 

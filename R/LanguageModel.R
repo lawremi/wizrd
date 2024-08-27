@@ -1,11 +1,12 @@
 LanguageModel <- new_class("LanguageModel", abstract = TRUE,
                            properties = list(
-                               name = prop_string_nullable,
+                               name = nullable(prop_string),
                                instructions = new_string_property(
                                    default = "You are a helpful assistant."
                                ),
                                io = IOBinding,
-                               tools = new_list_property(of = BoundTool)
+                               tools = new_list_property(of = BoundTool),
+                               params = LanguageModelParams
                            ))
 
 language_model <- new_generic("language_model", "x")

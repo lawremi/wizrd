@@ -28,7 +28,7 @@ validate_Tool <- function(self) {
 Tool <- new_class("Tool", class_function,
                   properties = list(
                       name = prop_string,
-                      description = prop_string_nullable,
+                      description = nullable(prop_string),
                       signature = ToolSignature,
                       examples = new_list_property(of = class_list,
                                                    named = TRUE)
@@ -72,7 +72,7 @@ equip <- function(x, tool, instructions = NULL) {
 BoundTool <- new_class("BoundTool", Tool,
                        properties = list(
                            io = IOBinding,
-                           instructions = prop_string_nullable
+                           instructions = nullable(prop_string)
                        ))
 
 tool_input_json_format <- function(tool) {
