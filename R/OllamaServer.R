@@ -1,4 +1,4 @@
-OllamaServer <- new_class("OllamaServer", LanguageModelServer,
+OllamaServer <- new_class("OllamaServer", OpenAIAPIServer,
                           properties = list(
                               url = new_string_property(
                                   default = "http://localhost:11434/api"
@@ -10,15 +10,14 @@ ollama_url <- function() {
     paste0("http://", host, "/api")
 }
 
-ollama_server <- function(...) {
-    server <- OllamaServer(url = ollama_url())
+ollama_server <- function(url = ollama_url(), ...) {
+    server <- OllamaServer(url = url)
     if (!ollama_is_running(server))
         start_ollama_server(server, ...)
     else server
 }
 
-start_ollama_server <- function(server = ollama_server(),
-                                path = Sys.which("ollama"),
+start_ollama_server <- function(server, path = Sys.which("ollama"),
                                 max_seconds = 10L)
 {
     requireNamespace("processx", "run ollama")
@@ -44,27 +43,53 @@ ollama_list <- function(server = ollama_server()) {
         httr2::req_perform() |> httr2::resp_body_json() |> fromJSON()
 }
 
-ollama_model <- function(name, pull = FALSE, server = ollama_server()) {
-    assert_flag(pull)
+ollama_pull <- function(name, server = ollama_server()) {
+    assert_class(server, "OllamaServer")
+    system2("ollama", c("pull", name))
+}
+
+maybe_ollama_pull <- function(pull, name, server = ollama_server()) {
+    assert_flag(pull, na.ok = TRUE)
+    assert_string(name)
+        
+    pull <- if (is.na(pull)) {
+        installed <- name %in% ollama_list(server)$name
+        if (!installed) {
+            if (interactive())
+                utils::askYesNo(paste0("Pull ", name, "?"))
+            else TRUE
+        } else FALSE
+    }
     if (pull)
-        system2("ollama", c("pull", name))
-    language_model(server, name)
+        ollama_pull(name, server)
+
+    pull
+}
+
+ollama_model <- function(name, pull = NA, server = ollama_server(), ...) {
+    maybe_ollama_pull(pull, name, server)
+    language_model(server, name, ...)
 }
 
 ollama_weights_path <- function(name) {
     # TODO
+    assert_string(name)
+    lib <- path.expand("~/.ollama/models/manifests/registry.ollama.ai/library/")
+    manifest <- file.path(lib, sub(":", .Platform$file.sep, name, fixed = TRUE))
+    if (!file.exists(manifest))
+        stop("no manifest found for ", name)
     # read the manifest to get the hash
+    blobs <- path.expand("~/.ollama/models/blobs")
     # generate path to model weights using hash
 }
 
-poll_path <- new_generic("poll_path", "server")
-
-method(poll_path, OllamaServer) <- function(server) "tags"
-
 wait_until_ready <- function(server, max_seconds) {
     assert_int(max_seconds, lower = 0L)
-    create_request(server) |> httr2::req_url_path_append(poll_path(server)) |>
+    create_request(server) |> httr2::req_url_path_append("tags") |>
         httr2::req_retry(max_seconds = max_seconds) |> httr2::perform()
     server
 }
 
+llama3 <- function() {
+    ollama_model("llama3.1:8b-instruct-q4_K_M", temperature = 0)
+}

@@ -1,5 +1,5 @@
 test_that("calling chat() and friends generates correct responses", {
-    model <- stories260K()
+    model <- llama3()
 
     ##    options(wizrd.debug = 3L)
     chat <- chat(model, "Tell me a story")
