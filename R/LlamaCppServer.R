@@ -174,8 +174,8 @@ run_llamafile <- function(path = llamafile_path(), threads = 8L, port = 0L,
 }
 
 run_llama_cpp_server <- function(model,
-                                 threads = 8L, ctx_size = 0L,
-                                 n_predict = -1L, batch_size = 2048L,
+                                 threads = 8L, ctx_size = 512L,
+                                 n_predict = -1L, batch_size = 512L,
                                  temp = 0.8, flash_attn = FALSE, port = 0L,
                                  embedding = FALSE, gpu = FALSE,
                                  path = llamafile_path(),
