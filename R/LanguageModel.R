@@ -36,6 +36,10 @@ method(str, LanguageModel) <- function(object, ...) {
     tool_names <- vapply(object@tools, `@`, character(1L), "name")
     cat(cli::ansi_strtrim(paste("@tools:", paste(tool_names, collapse = ", "))))
     cat("\n")
+    params <- unlist(props(object@params))
+    param_str <- paste(names(params), "=", params, collapse = ", ")
+    cat(cli::ansi_strtrim(paste("@params:", param_str)))
+    cat("\n")
 }
 
 method(predict, LanguageModel) <- function(object, input, ...) {
