@@ -78,15 +78,17 @@ ollama_model <- function(name, pull = NA, server = ollama_server(), ...) {
 }
 
 ollama_weights_path <- function(name) {
-    # TODO
     assert_string(name)
     lib <- path.expand("~/.ollama/models/manifests/registry.ollama.ai/library/")
-    manifest <- file.path(lib, sub(":", .Platform$file.sep, name, fixed = TRUE))
-    if (!file.exists(manifest))
+    manifest_path <- file.path(lib, sub(":", .Platform$file.sep, name))
+    if (!file.exists(manifest_path))
         stop("no manifest found for ", name)
-    # read the manifest to get the hash
+    manifest <- fromJSON(manifest_path)
+    digest <- manifest$layers$digest[manifest$layers$mediaType ==
+                                         "application/vnd.ollama.image.model"]
+    stopifnot(length(digest) == 1L)
     blobs <- path.expand("~/.ollama/models/blobs")
-    # generate path to model weights using hash
+    file.path(blobs, sub(":", "-", digest))
 }
 
 wait_until_ready <- function(server, max_seconds) {
