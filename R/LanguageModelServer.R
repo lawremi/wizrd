@@ -29,5 +29,5 @@ method(str, LanguageModelServer) <- function(object, ...) {
 ## TODO ([X] done):
 
 ## Commercial: [X] OpenAI, Gemini, Anthropic, Perplexity
-## Local / open-source: [X] LlamaCpp (server, llamafile), Ollama
+## Local / open-source: [X] LlamaCpp (server, llamafile), [X] Ollama
 ## Third party hosts: Hugging Face, Bedrock, Azure, Vertex AI

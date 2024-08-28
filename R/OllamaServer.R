@@ -1,13 +1,13 @@
 OllamaServer <- new_class("OllamaServer", OpenAIAPIServer,
                           properties = list(
                               url = new_string_property(
-                                  default = "http://localhost:11434/api"
+                                  default = "http://localhost:11434"
                               )
                           ))
 
 ollama_url <- function() {
     host <- Sys.getenv("OLLAMA_HOST", "127.0.0.1:11434")
-    paste0("http://", host, "/api")
+    paste0("http://", host)
 }
 
 ollama_server <- function(url = ollama_url(), ...) {
@@ -45,7 +45,7 @@ ollama_list <- function(server = ollama_server()) {
             as.data.frame(m)
         }))
     }
-    httr2::request(server@url) |> httr2::req_url_path_append("tags") |>
+    httr2::request(server@url) |> httr2::req_url_path_append("api", "tags") |>
         httr2::req_perform() |> httr2::resp_body_json() |> to_df()
 }
 
@@ -93,11 +93,11 @@ ollama_weights_path <- function(name) {
 
 wait_until_ready <- function(server, max_seconds) {
     assert_int(max_seconds, lower = 0L)
-    create_request(server) |> httr2::req_url_path_append("tags") |>
+    create_request(server) |> httr2::req_url_path_append("api", "tags") |>
         httr2::req_retry(max_seconds = max_seconds) |> httr2::req_perform()
     server
 }
 
-llama3 <- function() {
-    ollama_model("llama3.1:8b-instruct-q4_K_M", temperature = 0)
+llama3 <- function(temperature = 0, ...) {
+    ollama_model("llama3.1:8b-instruct-q4_K_M", temperature = temperature, ...)
 }
