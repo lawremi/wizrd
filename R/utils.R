@@ -245,14 +245,15 @@ require_ns <- function(x, to) {
 }
 
 init_process <- function(path, args, ready_callback, error_callback,
-                         timeout = 10L)
+                         process_timeout = 10L, poll_timeout = 10L)
 {
     p <- processx::process$new(path, args, stdout = "|", stderr = "|")
 
     error <- ""
     output <- ""
-    while(p$is_alive()) {
-        io <- p$poll_io(timeout)
+    start_time <- Sys.time()
+    while(p$is_alive() && (Sys.time() - start_time) < process_timeout) {
+        io <- p$poll_io(poll_timeout)
         if (io["output"] == "ready") {
             output <- paste0(output, p$read_output())
             if (isTRUE(ready_callback(output)))
@@ -270,7 +271,7 @@ init_process <- function(path, args, ready_callback, error_callback,
              error_callback(paste0(error, p$read_error())))
     }
 
-    invisible(TRUE)
+    p
 }
 
 assert_port <- function(port) {

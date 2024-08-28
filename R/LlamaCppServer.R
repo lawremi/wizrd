@@ -24,20 +24,21 @@ method(embed, LlamaCppServer) <- function(x, ...) {
     embed(super(x, OpenAIAPIServer), ...)
 }
 
-llama_cpp_chat_model_from_ollama <- function(name, ...) {
-    llama_cpp_chat_model(ollama_weights_path(name), alias = name, ...)
+llama_cpp_model_from_ollama <- function(name, ...) {
+    llama_cpp_model(ollama_weights_path(name), alias = name, ...)
 }
 
-llama_cpp_chat_model <- function(path, ...) {
-    language_model(run_llama_cpp_server(path), ...)
-}
-
-llama_cpp_embedding_model_from_ollama <- function(name, ...) {
-    llama_cpp_embedding_model(ollama_weights_path(name), alias = name, ...)
-}
-
-llama_cpp_embedding_model <- function(path, ...) {
-    language_model(run_llamafiler_server(path), ...)
+llama_cpp_model <- function(path, mode = c("chat", "embedding"), alias = NULL,
+                            ...)
+{
+    mode <- match.arg(mode)
+    if (mode == "chat")
+        server <- run_llama_cpp_server(path, alias = alias)
+    else {
+        server <- run_llamafiler_server(path)
+        server@model <- alias
+    }
+    language_model(server, ...)
 }
 
 llamafile_url <- function() {
