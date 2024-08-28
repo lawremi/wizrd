@@ -58,7 +58,7 @@ new_number_property <- function(class = class_numeric, ..., validator = NULL,
               paste("must be >=", min),
           if (any(value > max))
               paste("must be <=", max),
-          if (!is.null(valdiator))
+          if (!is.null(validator))
               validator(value)
           )
     })

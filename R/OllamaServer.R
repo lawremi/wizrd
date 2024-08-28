@@ -20,7 +20,7 @@ ollama_server <- function(url = ollama_url(), ...) {
 start_ollama_server <- function(server, path = Sys.which("ollama"),
                                 max_seconds = 10L)
 {
-    requireNamespace("processx", "run ollama")
+    require_ns("processx", "run ollama")
 
     assert_class(server, "OllamaServer")
     if (missing(path) && identical(path, ""))
@@ -39,8 +39,14 @@ ollama_is_running <- function(server = ollama_server()) {
 
 ollama_list <- function(server = ollama_server()) {
     assert_class(server, "OllamaServer")
+    to_df <- function(x) {
+        do.call(rbind, lapply(x$models, \(m) {
+            m$details$families <- I(m$details$families)
+            as.data.frame(m)
+        }))
+    }
     httr2::request(server@url) |> httr2::req_url_path_append("tags") |>
-        httr2::req_perform() |> httr2::resp_body_json() |> fromJSON()
+        httr2::req_perform() |> httr2::resp_body_json() |> to_df()
 }
 
 ollama_pull <- function(name, server = ollama_server()) {
@@ -86,7 +92,7 @@ ollama_weights_path <- function(name) {
 wait_until_ready <- function(server, max_seconds) {
     assert_int(max_seconds, lower = 0L)
     create_request(server) |> httr2::req_url_path_append("tags") |>
-        httr2::req_retry(max_seconds = max_seconds) |> httr2::perform()
+        httr2::req_retry(max_seconds = max_seconds) |> httr2::req_perform()
     server
 }
 
