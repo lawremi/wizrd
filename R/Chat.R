@@ -15,7 +15,7 @@ Chat <- new_class("Chat",
                   ))
 
 method(predict, Chat) <- function(object, input, ...) {
-    last_message(chat(object, input, ...))
+    last_output(chat(object, input, ...))
 }
 
 method(chat, Chat) <- function(x, input, ...) {
