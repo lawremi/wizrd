@@ -34,7 +34,7 @@ respond_with_code <- function(x) {
 textify <- new_generic("textify", c("x", "format"))
 
 method(textify, list(class_any, TextFormat)) <- function(x, format) {
-    capture.output(dput(x))
+    paste(capture.output(dput(x)), collapse = "\n")
 }
 
 method(textify, list(class_character, TextFormat)) <- function(x, format) {
