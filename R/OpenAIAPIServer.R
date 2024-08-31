@@ -25,17 +25,16 @@ method(openai_response_format, JSONFormat) <- function(x) {
     else list(type = "json_object")
 }
 
-openai_req_body_chat <- function(req, model, messages, tools, output_format,
-                                 params, ...)
+openai_chat_body <- function(model, messages, tools, output_format, params, ...)
 {
     assert_string(model)
     
-    body <- list(model = model, messages = openai_body_messages(messages),
-                 tools = openai_body_tools(tools), ...)
+    body <- list(model = model, messages = openai_body_messages(messages), ...)
     body <- openai_add_params(body, params)
+    body$tools <- openai_body_tools(tools)
     body$response_format <- openai_response_format(output_format)
     
-    req |> httr2::req_body_json(body)
+    body
 }
 
 openai_add_params <- function(body, params) {
@@ -86,10 +85,15 @@ req_capture_stream_openai <- function(req, stream_callback) {
 method(chat, OpenAIAPIServer) <- function(x, model, messages, tools,
                                           io, params, stream_callback, ...)
 {
+    body <- openai_chat_body(model, messages, tools, io@output, params,
+                             stream = !is.null(stream_callback), ...)
+    chat_message(perform_chat(x, body, stream_callback))
+}
+
+method(perform_chat, OpenAIAPIServer) <- function(x, body, stream_callback) {
     req <- create_request(x) |>
         httr2::req_url_path_append("v1", "chat", "completions") |>
-        openai_req_body_chat(model, messages, tools, io@output, params,
-                             stream = !is.null(stream_callback), ...)
+        httr2::req_body_json(body)
     if (!is.null(stream_callback)) {
         req |> req_capture_stream_openai(stream_callback)
     } else {

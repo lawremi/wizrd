@@ -7,11 +7,11 @@ method(chat, RemoteLanguageModel) <- function(x, input,
 {
     chat <- prepare_input(x, input)
   
-    response <- chat(x@server, x@name, chat@messages,
-                     x@tools, x@io, set_props(x@params, ...),
-                     stream_callback)
+    output <- chat(x@server, x@name, chat@messages,
+                   x@tools, x@io, set_props(x@params, ...),
+                   stream_callback)
 
-    handle_output(chat, chat_message(response))
+    handle_output(chat, output)
 }
 
 method(str, RemoteLanguageModel) <- function(object, ...) {
