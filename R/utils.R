@@ -1,10 +1,25 @@
+assert_scalar <- function(scalar, class, arg = deparse(substitute(scalar)))
+{
+    if (length(scalar) != 1 || !S7:::class_inherits(scalar, class)) {
+        type_name <- if (identical(class, class_numeric)) "numeric"
+                     else class$class
+        msg <- sprintf("`%s` must be a single %s value", arg, type_name)
+        stop(msg, call. = FALSE)
+    }
+    if (is.na(scalar)) {
+        msg <- sprintf("`%s` must not be NA", arg)
+        stop(msg, call. = FALSE)
+    }
+}
+
 nullable <- function(prop) {
     prop$class <- new_union(NULL, prop$class)
     prop["default"] <- list(NULL)
     prop
 }
 
-new_scalar_property <- function(class, ..., validator = NULL) {
+new_scalar_property <- function(class, ..., validator = NULL, default) {
+    assert_scalar(default, class)
     prop <- new_property(class, ..., validator = function(value) {
         if (is.null(value))
             return(NULL)
@@ -13,7 +28,7 @@ new_scalar_property <- function(class, ..., validator = NULL) {
           if (!is.null(validator))
               validator(value)
           )
-    })
+    }, default = default)
     class(prop) <- c("scalar_S7_property", class(prop))
     prop
 }
@@ -21,9 +36,8 @@ new_scalar_property <- function(class, ..., validator = NULL) {
 new_string_property <- function(..., validator = NULL,
                                 default = "", choices = NULL)
 {
-    assert_string(default)
     prop <- new_scalar_property(
-        class_character,
+        class_character, ...,
         validator = function(value) {
             c(if (!is.null(choices) && !all(value %in% choices))
                 paste("contains values not in",
@@ -31,28 +45,24 @@ new_string_property <- function(..., validator = NULL,
               if (!is.null(validator))
                   validator(value)
               )
-        }, default = default)
+        }, default = default
+    )
     prop$choices <- choices
     class(prop) <- c("string_S7_property", class(prop))
     prop
 }
 
 ## sensible pattern?
-prop_string <- new_string_property()
 
 new_flag_property <- function(..., default = FALSE) {
-    assert_flag(default)
     new_scalar_property(class_logical, ..., default = default)
 }
-
-prop_flag <- new_flag_property()
 
 ## TODO: make this handle non-scalars as well
 new_number_property <- function(class = class_numeric, ..., validator = NULL,
                                 default = min(max(min, 0), max),
                                 min = -Inf, max = Inf)
 {
-    assert_number(default)
     prop <- new_scalar_property(class, ..., validator = function(value) {
         c(if (any(value < min))
               paste("must be >=", min),
@@ -61,25 +71,26 @@ new_number_property <- function(class = class_numeric, ..., validator = NULL,
           if (!is.null(validator))
               validator(value)
           )
-    })
+    }, default = default)
     prop$min <- min
     prop$max <- max
     class(prop) <- c("numeric_S7_property", class(prop))
     prop
 }
 
-prop_number <- new_number_property()
-prop_number_nn <- new_number_property(min = 0)
-prop_prob <- new_number_property(min = 0, max = 1)
-
 new_int_property <- function(..., default = min(max(min, 0L), max),
                              min = .Machine$integer.min,
                              max = .Machine$integer.max)
 {
-    assert_int(default)
-    new_number_property(class_integer, ..., min = min, max = max)
+    new_number_property(class_integer, ..., default = default, min = min,
+                        max = max)
 }
 
+prop_string <- new_string_property()
+prop_flag <- new_flag_property()
+prop_number <- new_number_property()
+prop_number_nn <- new_number_property(min = 0)
+prop_prob <- new_number_property(min = 0, max = 1)
 prop_int <- new_int_property()
 prop_int_nn <- new_int_property(min = 0L)
 prop_int_pos <- new_int_property(min = 1L)
@@ -95,7 +106,7 @@ new_list_property <- function(..., validator = NULL, of = class_any, named = NA)
           if (identical(named, FALSE) && !is.null(names(value)))
               "must not have names",
           if (!is.null(validator))
-              valdiator(value)
+              validator(value)
           )
     })
     prop$of <- of
