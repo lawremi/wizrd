@@ -9,7 +9,8 @@ openai_body_messages <- function(messages) {
 
 openai_body_tools <- function(tools) {
     assert_list(tools, "BoundTool")
-    lapply(tools, openai_encode_tool)
+    if (length(tools) > 0L)
+        lapply(tools, openai_encode_tool)
 }
 
 openai_response_format <- new_generic("openai_response_format", "x")
