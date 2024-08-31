@@ -51,7 +51,7 @@ method(str, ChatMessage) <- function(object, ...)
     }
     if (length(object@object) > 0L &&
             !identical(object@object, object@content)) {
-        cat(cli::boxx(capture.output(print(object@content,
+        cat(cli::boxx(capture.output(print(object@object,
                                            width = cli::console_width() / 2L)),
                       float = float, header = "Object",
                       border_style = "classic"))
