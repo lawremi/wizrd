@@ -72,7 +72,14 @@ maybe_ollama_pull <- function(pull, name, server = ollama_server()) {
     pull
 }
 
+maybe_add_latest <- function(name) {
+    if (!grepl(":", name))
+        paste0(name, ":latest")
+    else name
+}
+
 ollama_model <- function(name, pull = NA, server = ollama_server(), ...) {
+    name <- maybe_add_latest(name)
     maybe_ollama_pull(pull, name, server)
     language_model(server, name, ...)
 }
@@ -100,4 +107,8 @@ wait_until_ready <- function(server, max_seconds) {
 
 llama3 <- function(temperature = 0, ...) {
     ollama_model("llama3.1:8b-instruct-q4_K_M", temperature = temperature, ...)
+}
+
+llava <- function(temperature = 0, ...) {
+    ollama_model("llava", temperature = temperature, ...)
 }

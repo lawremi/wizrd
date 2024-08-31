@@ -5,5 +5,5 @@ importFrom(stats, predict)
 importFrom(utils, str)
 
 export(language_model, ollama_model, llama_cpp_model, openai_model)
-export(chat)
-export(llama3, last_output)
+export(chat, last_output)
+export(llama3, llava)
