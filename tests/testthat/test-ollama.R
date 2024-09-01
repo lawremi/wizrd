@@ -26,7 +26,13 @@ test_that("chat() and predict() work for images", {
     unlink(temp_png)
 
     model@instructions <- "When you receive an image, describe it in words"
-    ##options(wizrd.debug = 3L)
+    options(wizrd.debug = 0L)
     chat <- chat(model, raster)
     expect_match(last_output(chat), "scatter.*plot")
+    msgs <- list(raster,
+                 "Is there positive correlation in this plot? Answer yes or no.")
+    chat <- chat(model, msgs) # as two separate messages
+    expect_match(last_output(chat), "Yes")
+    chat <- chat(model, list(msgs)) # as a single, multi-part message
+    expect_match(last_output(chat), "Yes")
 })
