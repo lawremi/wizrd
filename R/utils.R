@@ -95,11 +95,15 @@ prop_int <- new_int_property()
 prop_int_nn <- new_int_property(min = 0L)
 prop_int_pos <- new_int_property(min = 1L)
 
-new_list_property <- function(..., validator = NULL, of = class_any, named = NA)
+new_list_property <- function(..., validator = NULL,
+                              default = setNames(
+                                  list(),
+                                  if (isTRUE(named)) character()),
+                              of = class_any, named = NA)
 {
     prop <- new_property(class_list, ..., validator = function(value) {
         c(if (!identical(of, class_any) &&
-                  !all(vapply(value, inherits, logical(1L), of)))
+                  !all(vapply(value, S7:::class_inherits, logical(1L), of)))
             paste("must only contain elements of class", of@name),
           if (isTRUE(named) && is.null(names(value)))
               "must have names",
@@ -108,7 +112,7 @@ new_list_property <- function(..., validator = NULL, of = class_any, named = NA)
           if (!is.null(validator))
               validator(value)
           )
-    })
+    }, default = default)
     prop$of <- of
     prop$named <- named
     class(prop) <- c("list_S7_property", class(prop))
@@ -187,9 +191,7 @@ get_Rd <- function(topic, package = NULL) {
         return(NULL)
     filename <- paste0(basename(files), ".Rd")
     package <- basename(dirname(dirname(files)))
-    Rd <- tools::Rd_db(package)[[filename]]
-    text <- capture.output(print(Rd))
-    paste(text, collapse = "\n")
+    tools::Rd_db(package)[[filename]]
 }
 
 Rd_args <- function(Rd) {
@@ -214,7 +216,7 @@ Rd_value <- function(Rd) {
 
 Rd_for_function <- function(FUN, name = deparse(substitute(FUN))) {
     if (isNamespace(environment(FUN))) {
-        package <- getNamespaceName(environment(fun))
+        package <- getNamespaceName(environment(FUN))
         Rd <- tryCatch(get_Rd(name, package), error = NULL)
         if (is.null(Rd)) {
             name <- find_name(FUN, environment(FUN))
@@ -226,7 +228,7 @@ Rd_for_function <- function(FUN, name = deparse(substitute(FUN))) {
 
 find_name <- function(what, env) {
     objs <- as.list(env)
-    pos <- Position(identical, objs, what)
+    pos <- Position(\(x) identical(x, what), objs)
     if (!is.na(pos))
         names(objs)[pos]
 }

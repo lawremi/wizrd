@@ -5,14 +5,14 @@ validate_Tool <- function(self) {
     extra_example_args <- setdiff(names(unlist(self@examples,
                                                recursive = FALSE)),
                                   names(formals(self)))
-    ex_problems <- unlist(lapply(self@examples), function(ex) {
+    ex_problems <- unlist(lapply(self@examples, function(ex) {
         mapply(function(arg, cls, nm) {
             if (!inherits(arg, cls))
                 paste0("example argument '", nm,
                        "' does not inherit from class '",
                        S7:::S7_class_name(cls), "'")
         }, ex, self@signature@arguments[names(ex)], names(ex)) 
-    })
+    }))
     
     c(if (length(extra_sig_args))
         paste("@signature@arguments contains extra args:",
@@ -30,14 +30,27 @@ Tool <- new_class("Tool", class_function,
                       name = prop_string,
                       description = nullable(prop_string),
                       signature = ToolSignature,
-                      examples = new_list_property(of = class_list,
-                                                   named = TRUE)
+                      examples = new_list_property(of = class_list)
                   ),
                   validator = validate_Tool)
 
+method(print, Tool) <- function(x, ...) {
+    str(x, ...)
+    invisible(x)
+}
+
+method(str, Tool) <- function(object, ...) {
+    cat(S7:::obj_desc(object))
+    cat("", object@name)
+    cat(str(object@signature))
+    cat("\n")
+    cat(cli::ansi_strtrim(paste("@description:", object@description)))
+    cat("\n")
+}
+
 any_signature <- function(args) {
     args <- as.list(args)
-    args[] <- class_any
+    args[] <- list(class_any)
     if (!is.null(args$"..."))
         args$"..." <- class_list
     ToolSignature(arguments = args, value = class_any)
@@ -53,6 +66,7 @@ tool <- function(FUN, signature = any_signature(formals(FUN)),
                  name = deparse(substitute(FUN)),
                  description = NULL, examples = list())
 {
+    force(name)
     FUN <- match.fun(FUN)
     if (is.null(description)) {
         Rd <- Rd_for_function(FUN, name)

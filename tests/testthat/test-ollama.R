@@ -36,3 +36,20 @@ test_that("chat() and predict() work for images", {
     chat <- chat(model, list(msgs)) # as a single, multi-part message
     expect_match(last_output(chat), "Yes")
 })
+
+test_that("models can call R functions as tools", {
+    model <- llama3()
+    
+    get_mean <- function(name) mean(get(name))
+    model <- equip(model, tool(get_mean))
+    model@instructions <- "Use the tools at your disposal. Return only numbers."
+    var <- 1:10
+    output <- predict(model, "What is the mean of var?")
+    expect_equal(as.numeric(output), mean(var)) 
+    
+    sig <- tool_signature(class_data.frame, x = class_formula,
+                          data = class_name, FUN = class_name,
+                          subset = class_call)
+    aggregate_tool <- tool(aggregate.data.frame, sig)
+    
+})

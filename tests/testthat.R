@@ -7,7 +7,7 @@
 # * https://testthat.r-lib.org/reference/test_package.html#special-files
 
 library(testthat)
-library(checkmate)
+library(S7)
 library(wizrd)
 
 test_check("wizrd")
