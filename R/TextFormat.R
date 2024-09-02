@@ -1,16 +1,19 @@
 TextFormat <- new_class("TextFormat",
-                        properties = list(example = class_any))
+                        properties = list(
+                            examples = new_list_property(named = TRUE)
+                        ))
 
 PlainTextFormat <- new_class("PlainTextFormat", TextFormat)
 
 JSONFormat <- new_class("JSONFormat", PlainTextFormat,
-                        properties = list(schema = class_list,
-                                          ## TODO: validate with jsonvalidate
-                                          example = class_list))
+                        properties = list(schema = class_list))
 
 CSVFormat <- new_class("CSVFormat", PlainTextFormat,
                        properties = list(schema = class_list,
-                                         example = class_data.frame))
+                                         examples = new_list_property(
+                                             of = class_data.frame,
+                                             named = TRUE
+                                         )))
 
 CodeFormat <- new_class("CodeFormat", PlainTextFormat,
                         properties = list(language = nullable(prop_string)))
@@ -19,12 +22,12 @@ respond_with_format <- function(x, format = TextFormat()) {
     set_props(x, response_format = format)
 }
 
-respond_with_json <- function(x, schema = list(), example = list()) {
-    respond_with_format(x, JSONFormat(schema = schema, example = example))
+respond_with_json <- function(x, schema = list(), examples = list()) {
+    respond_with_format(x, JSONFormat(schema = schema, examples = examples))
 }
 
-respond_with_csv <- function(x, schema = list(), example = data.frame()) {
-    respond_with_format(x, CSVFormat(schema = schema, example = example))
+respond_with_csv <- function(x, schema = list(), examples = list()) {
+    respond_with_format(x, CSVFormat(schema = schema, examples = examples))
 }
 
 respond_with_code <- function(x) {
@@ -79,8 +82,7 @@ method(to_json, S7_object) <- function(x) {
       lapply(S7_class(x)@properties, prop_to_json))
 }
 
-method(textify, list(class_list | class_any, JSONFormat)) <- function(x,
-                                                                        format)
+method(textify, list(class_list | class_any, JSONFormat)) <- function(x, format)
 {
     toJSON(to_json(x), null = "null")
 }
@@ -120,7 +122,7 @@ s3_from_json <- function(x) {
                        require_ns("base64enc", "decode raw vectors from JSON")
                        base64enc::base64decode
                    }, `function` = parse_json_function,
-                   expression = parse_json_expression)
+                   expression = parse_json_expression, formula = as.formula)
     if (!is.null(conv))
         conv(data)
     else structure(data, class = s3class)
@@ -157,14 +159,29 @@ Example <- new_class("Example",
                          property3 = new_property(class_logical,
                                                   default = TRUE)))
 
+default_example <- function(class) {
+    ex <- if (identical(class, S7_object))
+        Example()
+    else class()
+    desc <- paste0("An object with this structure:\n", capture.output(str(ex)))
+    setNames(list(ex), desc)
+}
+
 output_object <- function(x, class = S7_object, description = NULL,
-                          example = if (identical(class, S7_object))
-                              Example() else class(), ...)
+                          example = NULL, ...)
 {
-    stopifnot(is.null(example) || inherits(example, class))
+    if (is.null(example))
+        example <- default_example(class)
+    stopifnot(is.list(examples),
+              all(vapply(examples, inherits, logical(1L), class)))
     schema <- as_json_schema(class, description, ...)
     example <- as_json(example)
     format <- JSONFormat(schema = schema, example = example)
     x@io@output <- format
     x
+}
+
+method(textify, list(class_any, CodeFormat)) <- function(x, format) {
+    paste(c(paste(c("```", format@language), collapse = ""),
+            deparse(x), "```\n"), collapse = "\n")
 }

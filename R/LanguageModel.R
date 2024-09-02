@@ -114,6 +114,15 @@ method(output_instructions,
     NULL
 }
 
+append_examples <- function(prompt, on) {
+    ex <- lapply(on@examples, textify)
+    if (length(ex) > 0L)
+        paste0(prompt, "Example(s):\n\n",
+               paste0(names(ex), "\nwould be encoded as:\n", ex,
+                      collapse = "\n\n"))
+    else prompt
+}
+
 method(output_instructions,
        list(JSONFormat, LanguageModel)) <- function(on, to)
 {
@@ -123,9 +132,7 @@ method(output_instructions,
                          "The JSON must conform to the following schema:\n\n",
                          toJSON(on),
                          "\nEnsure the JSON matches this schema exactly.\n")
-    if (length(on@example) > 0L)
-        prompt <- paste(prompt, "Here is an example:\n\n", toJSON(on@example))
-    prompt
+    append_examples(prompt, on)
 }
 
 method(input_instructions,
@@ -137,9 +144,7 @@ method(input_instructions,
                          "The JSON will conform to the following schema:\n\n",
                          toJSON(on),
                          "\nExpect the JSON to match this schema exactly.\n")
-    if (length(on@example) > 0L)
-        prompt <- paste(prompt, "Here is an example:\n\n", toJSON(on@example))
-    prompt
+    append_examples(prompt, on)
 }
 
 method(output_instructions,
@@ -154,9 +159,7 @@ method(output_instructions,
                          "the required columns and data types and produce ",
                          "the corresponding CSV. ",
                          "Ensure the CSV matches this schema exactly.\n")
-    if (length(on@example) > 0L)
-        prompt <- paste(prompt, "Here is an example:\n\n", toJSON(on@example))
-    prompt
+    append_examples(prompt, on)
 }
 
 method(input_instructions,
@@ -170,14 +173,7 @@ method(input_instructions,
                          "\nInterpret the JSON schema to understand ",
                          "the expected columns and data types. ",
                          "Expect the CSV to match this schema exactly.\n")
-    if (length(on@example) > 0L)
-        prompt <- paste(prompt, "Here is an example:\n\n", toJSON(on@example))
-    prompt
-}
-
-markdown_code_example <- function(format) {
-    paste(c(paste(c("```", format@language), collapse = ""),
-            deparse(format@example), "```\n"), collapse = "\n")
+    append_examples(prompt, on)
 }
 
 method(output_instructions,
@@ -187,10 +183,7 @@ method(output_instructions,
                       "code in markdown-style blocks,",
                       "without any explanation or other text.\n"),
                     collapse = " ")
-    if (length(on@example) > 0L)
-        prompt <- paste(prompt, "Here is an example:\n",
-                        markdown_code_example(on))
-    prompt
+    append_examples(prompt, on)
 }
 
 method(input_instructions,
@@ -200,24 +193,21 @@ method(input_instructions,
                       "code in markdown-style blocks,",
                       "without any explanation or other text.\n"),
                     collapse = " ")
-    if (length(on@example) > 0L)
-        prompt <- paste(prompt, "Here is an example:\n",
-                        markdown_code_example(on))
-    prompt
+    append_examples(prompt, on)
 }
 
 tool_input_format <- new_generic("tool_input_format", "x",
                                  function(x, tool, ...) S7_dispatch())
 
 method(tool_input_format, LanguageModel) <- function(x, tool) {
-    tool_input_json_format(x, tool)
+    tool_input_json_format(tool)
 }
 
 tool_output_format <- new_generic("tool_output_format", "x",
                                   function(x, tool, ...) S7_dispatch())
 
 method(tool_output_format, LanguageModel) <- function(x, tool) {
-    tool_output_json_format(x, tool)
+    tool_output_json_format(tool)
 }
 
 bind_fun <- function(FUN) {
