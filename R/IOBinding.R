@@ -4,9 +4,9 @@ IOBinding <- new_class("IOBinding",
                            output = TextFormat
                        ))
 
-method(str, IOBinding) <- function(object, ...) {
-    cat(S7:::obj_desc(object@input),
+method(print, IOBinding) <- function(x, ...) {
+    cat(S7:::obj_desc(x@input),
         cli::symbol$arrow_right, cli::symbol$arrow_left,
-        S7:::obj_desc(object@output))
+        S7:::obj_desc(x@output))
     cat("\n")
 }

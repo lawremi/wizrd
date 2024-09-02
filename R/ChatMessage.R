@@ -31,27 +31,27 @@ split_into_blocks <- function(x) {
     Filter(nzchar, setNames(as.list(m[-2L,]), labels))
 }
 
-method(str, ChatMessage) <- function(object, ...)
+method(print, ChatMessage) <- function(x, ...)
 {
-    float <- switch(object@role, assistant = "left", user = "right", "center")
-    border_style <- switch(object@role, user = "single", system = "double")
-    if (length(object@content) > 0L) {
-        if (object@role == "assistant")
-            cli::cli_text(object@content)
+    float <- switch(x@role, assistant = "left", user = "right", "center")
+    border_style <- switch(x@role, user = "single", system = "double")
+    if (length(x@content) > 0L) {
+        if (x@role == "assistant")
+            cli::cli_text(x@content)
         else {
-            cat(cli::boxx(strwrap(object@content,
+            cat(cli::boxx(strwrap(x@content,
                                   width = cli::console_width() / 2L),
                           float = float, border_style = border_style))
             cat("\n")
         }
     }
-    for (tool_call in object@tool_calls) {
+    for (tool_call in x@tool_calls) {
         cat(cli::boxx(strwrap(capture.output(print(tool_call))), float = float,
                       header = "Tool call", border_style = "classic"))
     }
-    if (length(object@object) > 0L &&
-            !identical(object@object, object@content)) {
-        cat(cli::boxx(capture.output(print(object@object,
+    if (length(x@object) > 0L &&
+            !identical(x@object, x@content)) {
+        cat(cli::boxx(capture.output(print(x@object,
                                            width = cli::console_width() / 2L)),
                       float = float, header = "Object",
                       border_style = "classic"))

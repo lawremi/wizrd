@@ -22,9 +22,9 @@ create_request <- function(server) {
     else req
 }
 
-method(str, LanguageModelServer) <- function(object, ...) {
-    cat(S7:::obj_desc(object), "")
-    cat(object@url)
+method(print, LanguageModelServer) <- function(x, ...) {
+    cat(S7:::obj_desc(x), "")
+    cat(x@url)
     cat("\n")
 }
 

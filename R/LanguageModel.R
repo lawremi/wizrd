@@ -25,18 +25,18 @@ embed <- new_generic("embed", "x")
 ## - RPostgres (PGVector extension)
 ## - rredis/redux
 
-method(str, LanguageModel) <- function(object, ...) {
-    cat(S7:::obj_desc(object))
-    if (!is.null(object@name)) cat("", object@name)
+method(print, LanguageModel) <- function(x, ...) {
+    cat(S7:::obj_desc(x))
+    if (!is.null(x@name)) cat("", x@name)
     cat("\n")
-    cat(cli::ansi_strtrim(paste("@instructions:", object@instructions)))
+    cat(cli::ansi_strtrim(paste("@instructions:", x@instructions)))
     cat("\n")
     cat("@io: ")
-    str(object@io)
-    tool_names <- vapply(object@tools, `@`, character(1L), "name")
+    print(x@io)
+    tool_names <- vapply(x@tools, `@`, character(1L), "name")
     cat(cli::ansi_strtrim(paste("@tools:", paste(tool_names, collapse = ", "))))
     cat("\n")
-    params <- unlist(props(object@params))
+    params <- unlist(props(x@params))
     param_str <- paste(names(params), "=", params, collapse = ", ")
     cat(cli::ansi_strtrim(paste("@params:", param_str)))
     cat("\n")
@@ -44,6 +44,10 @@ method(str, LanguageModel) <- function(object, ...) {
 
 method(predict, LanguageModel) <- function(object, input, ...) {
     last_output(chat(object, input, ...))
+}
+
+instruct <- function(x, ...) {
+    set_props(x, instructions = paste(c(...), collapse = "\n\n"))
 }
 
 compile_instructions <- new_generic("compile_instructions", "x")

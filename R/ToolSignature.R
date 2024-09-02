@@ -16,10 +16,10 @@ ToolSignature <- new_class("ToolSignature",
                                value = union_classes
                            ))
 
-method(str, ToolSignature) <- function(object, ...) {
-    classes <- vapply(object@arguments, S7:::class_desc, character(1L))
-    paste0("(", paste0(names(object@arguments), ": ", classes, collapse = ", "),
-           "): ", S7:::class_desc(object@value))
+method(print, ToolSignature) <- function(x, ...) {
+    classes <- vapply(x@arguments, S7:::class_desc, character(1L))
+    cat("(", paste0(names(x@arguments), ": ", classes, collapse = ", "),
+        "): ", S7:::class_desc(x@value), "\n", sep = "")
 }
 
 tool_signature <- function(`_value`, ...) {

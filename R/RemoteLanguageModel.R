@@ -14,9 +14,8 @@ method(chat, RemoteLanguageModel) <- function(x, input,
     handle_output(chat, output)
 }
 
-method(str, RemoteLanguageModel) <- function(object, ...) {
+method(print, RemoteLanguageModel) <- function(x, ...) {
     NextMethod()
     cat("@server: ")
-    str(object@server)
-    cat("\n")
+    print(x@server)
 }

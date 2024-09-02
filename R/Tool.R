@@ -35,16 +35,10 @@ Tool <- new_class("Tool", class_function,
                   validator = validate_Tool)
 
 method(print, Tool) <- function(x, ...) {
-    str(x, ...)
-    invisible(x)
-}
-
-method(str, Tool) <- function(object, ...) {
-    cat(S7:::obj_desc(object))
-    cat("", object@name)
-    cat(str(object@signature))
-    cat("\n")
-    cat(cli::ansi_strtrim(paste("@description:", object@description)))
+    cat(S7:::obj_desc(x))
+    cat("", x@name)
+    print(x@signature)
+    cat(cli::ansi_strtrim(paste("@description:", x@description)))
     cat("\n")
 }
 

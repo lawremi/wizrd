@@ -26,17 +26,17 @@ method(chat, Chat) <- function(x, input, ...) {
     chat(x@model, c(x@messages, input), ...)
 }
 
-method(str, Chat) <- function(object, full = FALSE, ...) {
-    cat("<Chat>:", length(object@messages), "messages\n")
+method(print, Chat) <- function(x, full = FALSE, ...) {
+    cat("<Chat>:", length(x@messages), "messages\n")
     if (full) {
-        messages <- object@messages
+        messages <- x@messages
     } else {
-        messages <- tail(object@messages, 2L)
+        messages <- tail(x@messages, 2L)
         cat(cli::rule(center = "Latest messages", line = " -"))
         cat("\n")
     }
     for(i in seq_along(messages))
-        str(messages[[i]])
+        print(messages[[i]])
 }
 
 last_message <- function(x, role = NULL) {
