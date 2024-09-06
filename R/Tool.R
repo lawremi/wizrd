@@ -84,6 +84,14 @@ ToolBinding <- new_class("ToolBinding",
                              instructions = nullable(prop_string)
                          ))
 
+method(print, ToolBinding) <- function(x, ...) {
+    cat(S7:::obj_desc(x))
+    cat("\n@tool:", x@tool@name)
+    cat("\n@io: "); print(x@io, ...)
+    cat(cli::ansi_strtrim(paste("@instructions:", x@instructions)))
+    cat("\n")
+}
+
 tool_input_json_format <- function(tool) {
     Rd <- Rd_for_function(S7_data(tool), tool@name)
     args <- tool@signature@arguments
