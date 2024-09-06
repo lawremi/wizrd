@@ -54,39 +54,39 @@ union_raster <- new_union(nativeRaster, raster)
 
 method(textify, list(union_raster, TextFormat)) <- function(x, format) x
 
-to_json <- new_generic("to_json", "x")
+jsonify <- new_generic("jsonify", "x")
 
-to_json_s3 <- function(x) {
+jsonify_s3 <- function(x) {
     list(.s3class = class(x), .data = x)
 }
 
-method(to_json, class_any) <- to_json_s3
+method(jsonify, class_any) <- jsonify_s3
 
 native_json_classes <- NULL | class_logical | class_integer | class_double |
     class_character | class_data.frame
 
-method(to_json, native_json_classes) <- identity
+method(jsonify, native_json_classes) <- identity
 
-method(to_json, class_list) <- function(x) lapply(x, to_json)
+method(jsonify, class_list) <- function(x) lapply(x, jsonify)
 
-method(to_json, S7_object) <- function(x) {
-    prop_to_json <- function(property) {
+method(jsonify, S7_object) <- function(x) {
+    prop_jsonify <- function(property) {
         val <- prop(x, property$name)
         if (inherits(property, scalar_S7_property))
             val <- unbox(val)
         else if (is.object(val))
-            to_json(val)
+            jsonify(val)
         else val
     }
     .data <- S7_data(x)
     c(.class = S7:::S7_class_name(S7_class(x)),
       if (typeof(.data) != "object") list(.data = .data),
-      lapply(S7_class(x)@properties, prop_to_json))
+      lapply(S7_class(x)@properties, prop_jsonify))
 }
 
 method(textify, list(class_list | class_any, JSONFormat)) <- function(x, format)
 {
-    toJSON(to_json(x), null = "null")
+    toJSON(jsonify(x), null = "null")
 }
 
 ## avoid evaluating arbitrary code from the model
@@ -98,12 +98,12 @@ constructor_from_name <- function(name) {
     get(tokens[2L], env, mode = "function")
 }
 
-from_json <- new_generic("from_json", "x")
+dejsonify <- new_generic("dejsonify", "x")
 
-s7_from_json <- function(x) {
+s7_dejsonify <- function(x) {
     constructor <- constructor_from_name(x$.class)
     x$.class <- NULL
-    do.call(constructor, lapply(x, from_json))
+    do.call(constructor, lapply(x, dejsonify))
 }
 
 parse_json_function <- function(fun) {
@@ -114,10 +114,10 @@ parse_json_expression <- function(expr) {
     as.expression(lapply(expr, \(x) parse(text = x)))
 }
 
-s3_from_json <- function(x) {
+s3_dejsonify <- function(x) {
     s3class <- x$.s3class
     x$.s3class <- NULL
-    data <- from_json(x$.data)
+    data <- dejsonify(x$.data)
     conv <- switch(s3class, factor = as.factor, Date = as.Date,
                    POSIXct = as.POSIXct, complex = as.complex,
                    raw = {
@@ -130,15 +130,15 @@ s3_from_json <- function(x) {
     else structure(data, class = s3class)
 }
 
-method(from_json, class_list) <- function(x) {
+method(dejsonify, class_list) <- function(x) {
     if (!is.null(x$.class))
-        s7_from_json(x)
+        s7_dejsonify(x)
     else if (!is.null(x$.s3class))
-        s3_from_json(x)
-    else lapply(x, from_json)
+        s3_dejsonify(x)
+    else lapply(x, dejsonify)
 }
 
-method(from_json, class_any) <- identity
+method(dejsonify, class_any) <- identity
 
 detextify <- new_generic("detextify", c("x", "format"))
 
@@ -147,7 +147,7 @@ method(detextify, list(class_character, JSONFormat)) <- function(x, format) {
 }
 
 method(detextify, list(class_list, JSONFormat)) <- function(x, format) {
-    from_json(x)
+    dejsonify(x)
 }
 
 method(detextify, list(class_any, TextFormat)) <- function(x, format) x
