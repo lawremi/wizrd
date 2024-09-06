@@ -6,14 +6,16 @@ Authors@R: c(
 		person(given = "Michael", family = "Lawrence",
 		       role = c("aut", "cre"), email = "michafla@gene.com")
 	   )
-Description: Ride the LLM hype llama with an abstraction for creating specialized
-	     agents on top of various LLM backends, commercially hosted or
-	     local. Craft and optimize parameterized prompts. Chat using text
-	     and images. Stream chat responses. Generate embeddings and realize
-	     the RAG to riches dream. Implement tools using R functions and
-	     instruct the model to call them. Construct an agent by wrapping a
-	     model in an R function. Use cases include generating code, guiding
-	     data exploration, and creating documentation. Powered by S7.
+Description: Ride the LLM hype llama with an abstraction for creating
+	     specialized agents on top of various LLM backends,
+	     commercially hosted or local. Craft and optimize
+	     parameterized prompts. Chat using text and images. Stream
+	     chat responses. Generate embeddings and realize the RAG
+	     to riches dream. Implement tools using R functions and
+	     instruct the model to call them. Construct an agent by
+	     wrapping a model in an R function. Use cases include
+	     generating code, guiding data exploration, and creating
+	     documentation. Powered by S7.
 License: MIT
 Imports:
     tools,
