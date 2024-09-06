@@ -118,7 +118,7 @@ tool_input_json_format <- function(tool) {
         arg_schema
     }, args, schema$properties[names(args)])
 
-    JSONFormat(format, schema = schema)
+    JSONFormat(schema = schema)
 }
 
 tool_output_json_format <- function(tool) {
@@ -129,5 +129,5 @@ tool_output_json_format <- function(tool) {
     schema$description <- paste(c(Rd_description, schema$description),
                                 collapse = " ")
     
-    schema
+    JSONFormat(schema = schema)
 }
