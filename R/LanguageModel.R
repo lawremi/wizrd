@@ -4,7 +4,7 @@ LanguageModel <- new_class("LanguageModel", abstract = TRUE,
                                instructions = new_string_property(
                                    default = "You are a helpful assistant."
                                ),
-                               io = IOBinding,
+                               io = TextProtocol,
                                tools = new_list_property(of = ToolBinding),
                                params = LanguageModelParams
                            ))
@@ -61,7 +61,7 @@ method(compile_instructions, LanguageModel) <- function(x) {
 
 instructions <- new_generic("instructions", c("on", "to"))
 
-method(instructions, list(IOBinding, LanguageModel)) <- function(on, to) {
+method(instructions, list(TextProtocol, LanguageModel)) <- function(on, to) {
     instr <- c(input_instructions(on@input, to),
                output_instructions(on@output, to))
     if (!is.null(instr)) paste(instr, collapse = "\n\n")
@@ -214,7 +214,7 @@ bind <- new_generic("bind", c("x", "to"))
 
 method(bind, list(Tool, LanguageModel)) <- function(x, to, instructions = NULL) {
     assert_string(instructions, null.ok = TRUE)
-    io_binding <- IOBinding(input = tool_input_format(to, x),
-                            output = tool_output_format(to, x))
+    io_binding <- TextProtocol(input = tool_input_format(to, x),
+                               output = tool_output_format(to, x))
     ToolBinding(tool = x, io = io_binding, instructions = instructions)
 }

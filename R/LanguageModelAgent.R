@@ -61,8 +61,8 @@ method(agent_output_format, LanguageModel) <- function(x, tool) {
 }
 
 agent_io_binding <- function(x, tool) {
-    IOBinding(input = agent_input_format(x, tool),
-              output = agent_output_format(x, tool))
+    TextProtocol(input = agent_input_format(x, tool),
+                 output = agent_output_format(x, tool))
 }
 
 become <- function(model, tool) {

@@ -80,7 +80,7 @@ equip <- function(x, tool, instructions = NULL) {
 ToolBinding <- new_class("ToolBinding",
                          properties = list(
                              tool = Tool,
-                             io = IOBinding,
+                             io = TextProtocol,
                              instructions = nullable(prop_string)
                          ))
 
