@@ -16,7 +16,7 @@ method(language_model, LanguageModelServer) <-
 req_auth_fun <- new_generic("req_auth_fun", "server")
 
 create_request <- function(server) {
-    req <- httr2::request(server@url)
+    req <- httr2::request(server@url) |> req_retry(max_tries = 10L)
     if (nzchar(server@key_prefix))
         req_auth_fun(server)(req, get_api_key(server@key_prefix))
     else req
