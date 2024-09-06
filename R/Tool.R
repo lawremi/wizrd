@@ -73,15 +73,16 @@ tool <- function(FUN, signature = any_signature(formals(FUN)),
 }
 
 equip <- function(x, tool, instructions = NULL) {
-    x@tools[[tool@name]] <- bind_tool(tool, x, instructions)
+    x@tools[[tool@name]] <- bind(tool, x, instructions)
     x
 }
 
-BoundTool <- new_class("BoundTool", Tool,
-                       properties = list(
-                           io = IOBinding,
-                           instructions = nullable(prop_string)
-                       ))
+ToolBinding <- new_class("ToolBinding",
+                         properties = list(
+                             tool = Tool,
+                             io = IOBinding,
+                             instructions = nullable(prop_string)
+                         ))
 
 tool_input_json_format <- function(tool) {
     Rd <- Rd_for_function(S7_data(tool), tool@name)

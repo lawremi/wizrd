@@ -8,7 +8,7 @@ openai_body_messages <- function(messages) {
 }
 
 openai_body_tools <- function(tools) {
-    assert_list(tools, "BoundTool")
+    assert_list(tools, "ToolBinding")
     if (length(tools) > 0L)
         lapply(tools, openai_encode_tool)
 }
@@ -168,26 +168,26 @@ method(openai_encode_content_part, union_raster) <- function(x) {
 openai_encode_tool <- new_generic("openai_encode_tool", "x")
 
 example_descriptions <- function(x) {
-    vapply(of@examples, function(ex) {
-              output <- do.call(of, ex)
-              paste0("Input: ", textify(ex@input, of@input_format), "\n",
-                     "Output: ", textify(output, of@output_format))
+    vapply(x@tool@examples, function(ex) {
+              output <- do.call(x, ex)
+              paste0("Input: ", textify(ex, x@io@input), "\n",
+                     "Output: ", textify(output, x@io@output))
     }, character(1L))
 }
 
 openai_tool_description <- function(x) {
     ex_descs <- example_descriptions(x)
-    paste(c(x@description,
+    paste(c(x@tool@description,
             if (inherits(x@io@output, JSONFormat))
                 c("Return value schema:", toJSON(x@io@output@schema)),
             if (length(ex_descs) > 0L) c("Example(s):", ex_descs)),
           collapse = "\n\n")
 }
 
-method(openai_encode_tool, BoundTool) <- function(x) {
+method(openai_encode_tool, ToolBinding) <- function(x) {
     assert_class(x@io@input, "JSONFormat")
     list(type = "function",
-         `function` = list(name = x@name,
+         `function` = list(name = x@tool@name,
                            description = openai_tool_description(x),
                            parameters = x@io@input@schema))
 }

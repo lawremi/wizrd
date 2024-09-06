@@ -5,7 +5,7 @@ LanguageModel <- new_class("LanguageModel", abstract = TRUE,
                                    default = "You are a helpful assistant."
                                ),
                                io = IOBinding,
-                               tools = new_list_property(of = BoundTool),
+                               tools = new_list_property(of = ToolBinding),
                                params = LanguageModelParams
                            ))
 
@@ -210,20 +210,11 @@ method(tool_output_format, LanguageModel) <- function(x, tool) {
     tool_output_json_format(tool)
 }
 
-bind_fun <- function(FUN) {
-    function(args) {
-        do.call(FUN, args)
-    }
-}
-
 bind <- new_generic("bind", c("x", "to"))
 
 method(bind, list(Tool, LanguageModel)) <- function(x, to, instructions = NULL) {
     assert_string(instructions, null.ok = TRUE)
     io_binding <- IOBinding(input = tool_input_format(to, x),
                             output = tool_output_format(to, x))
-    do.call(BoundTool, c(bind_fun(x), props(x), io = io_binding,
-                         instructions = instructions))
+    ToolBinding(tool = x, io = io_binding, instructions = instructions)
 }
-
-method(bind, list(BoundTool, LanguageModel)) <- function(x, to) x

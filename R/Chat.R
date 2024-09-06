@@ -64,8 +64,7 @@ handle_tool_calls <- function(x) {
     tool_calls <- last_message(x)@tool_calls
     msgs <- lapply(tool_calls, function(tool_call) {
         tool <- x@model@tools[[tool_call@tool_name]]
-        value <- do.call(tool, detextify(tool_call@parameters,
-                                           tool@io@input))
+        value <- do.call(tool, detextify(tool_call@parameters, tool@io@input))
         ChatMessage(role = "tool", object = value,
                     content = textify(value, tool@io@output))
     })
