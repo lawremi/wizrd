@@ -63,9 +63,11 @@ to_json_s3 <- function(x) {
 method(to_json, class_any) <- to_json_s3
 
 native_json_classes <- NULL | class_logical | class_integer | class_double |
-    class_character | class_list
+    class_character | class_data.frame
 
 method(to_json, native_json_classes) <- identity
+
+method(to_json, class_list) <- function(x) lapply(x, to_json)
 
 method(to_json, S7_object) <- function(x) {
     prop_to_json <- function(property) {
