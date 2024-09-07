@@ -73,6 +73,8 @@ tool <- function(FUN, signature = any_signature(formals(FUN)),
 }
 
 equip <- function(x, tool, instructions = NULL) {
+    if (!inherits(tool, Tool) && is.function(tool))
+        tool <- eval(as.call(c(wizrd::tool, substitute(tool))))
     x@tools[[tool@name]] <- bind(tool, x, instructions)
     x
 }
