@@ -195,10 +195,14 @@ get_Rd <- function(topic, package = NULL) {
 }
 
 Rd_args <- function(Rd) {
-    args <- Find(function(x) attr(x, "Rd_tag") == "\\arguments", Rd)
-    items <- Filter(function(x) attr(x, "Rd_tag") == "\\item", args)
-    ans <- lapply(items, function(x) paste(unlist(x[[2L]]), collapse = ""))
-    ans_names <- lapply(items, function(x) unlist(x[[1L]]))
+    args <- Find(\(x) attr(x, "Rd_tag") == "\\arguments", Rd)
+    items <- Filter(\(x) attr(x, "Rd_tag") == "\\item", args)
+    ans <- lapply(items, \(x) paste(unlist(x[[2L]]), collapse = ""))
+    ans_names <- vapply(items, \(x) {
+        dots <- Find(\(xi) attr(xi, "Rd_tag") == "\\dots", x[[1L]])
+        paste(c(unlist(x[[1L]]), if (!is.null(dots)) "..."),
+              collapse = "")
+    }, character(1L))
     ans_names_split <- strsplit(ans_names, ",", fixed = TRUE)
     setNames(rep(ans, lengths(ans_names_split)),
              trimws(unlist(ans_names_split)))
@@ -218,7 +222,7 @@ Rd_for_function <- function(FUN, name = deparse(substitute(FUN))) {
     if (isNamespace(environment(FUN))) {
         package <- getNamespaceName(environment(FUN))
         Rd <- tryCatch(get_Rd(name, package), error = NULL)
-        if (is.null(Rd)) {
+        Rd %||% {
             name <- find_name(FUN, environment(FUN))
             if (!is.null(name))
                 get_Rd(name, package)

@@ -121,13 +121,13 @@ tool_input_json_format <- function(tool) {
 
     schema$properties[names(args)] <- Map(function(arg, prop) {
         arg_schema <- as_json_schema(arg)
-        if (length(arg_schema) == 0L)
-            # workaround bug in Ollama that requires a 'description'
-            arg_schema <- list(description = "")
-        else if (is.list(prop))
+        if (is.list(prop))
             arg_schema$description <-
                 paste(c(arg_schema$description, prop$description),
                       collapse = " ")
+        if (length(arg_schema) == 0L)
+            # workaround bug in Ollama that requires a 'description'
+            arg_schema <- list(description = "")
         arg_schema
     }, args, schema$properties[names(args)])
 

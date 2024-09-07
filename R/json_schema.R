@@ -107,7 +107,9 @@ s3_json_schema_type <- function(from, scalar) {
 base_json_schema <- function(from, description = NULL, scalar = FALSE,
                              named = FALSE, type_mapper = base_json_schema_type)
 {
-    type <- type_mapper(from, scalar, named)
+    type <- type_mapper(from, scalar)
+    if (is.null(type))
+        return(TRUE)
     if (type == "boxed")
         return(s3_as_json_schema(from, description, scalar, named))
     if (named)
@@ -116,7 +118,7 @@ base_json_schema <- function(from, description = NULL, scalar = FALSE,
     if (type == "array")
         schema$items <- base_json_schema(from, scalar = TRUE,
                                          type_mapper = type_mapper)
-    else if (type == "object")
+    else if (named)
         schema$patternProperties$"^.*$" <-
             base_json_schema(from, scalar = TRUE, type_mapper = type_mapper)
     
@@ -150,7 +152,8 @@ s3_as_json_schema <- function(from, description, scalar = FALSE, named = FALSE) 
                              paste(from$class, collapse = ", "))
     list(type = "object",
          properties = list(
-             .data = base_json_schema(from, description, scalar, named),
+             .data = base_json_schema(from, description, scalar, named,
+                                      s3_json_schema_type),
              .s3class = list(const = from$class,
                              description = "The name of the S3 class"),
              description = paste("A boxed S3 object of class",
