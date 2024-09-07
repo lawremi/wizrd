@@ -7,5 +7,5 @@ ToolCall <- new_class("ToolCall",
 
 method(print, ToolCall) <- function(x, ...) {
     cat("<ToolCall> ", x@id, ":", sep = "")
-    print(call(x@tool_name, x@arguments)) 
+    print(do.call(call, c(x@tool_name, x@arguments)))
 }

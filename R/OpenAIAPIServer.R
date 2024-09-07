@@ -10,7 +10,7 @@ openai_body_messages <- function(messages) {
 openai_body_tools <- function(tools) {
     assert_list(tools, "ToolBinding")
     if (length(tools) > 0L)
-        lapply(tools, openai_encode_tool)
+        lapply(unname(tools), openai_encode_tool)
 }
 
 openai_response_format <- new_generic("openai_response_format", "x")
@@ -129,11 +129,16 @@ openai_encode_message <- function(x) {
     stopifnot(test_list(content, names = "unnamed") ||
                   test_string(content))
     message <- list(role = x@role, content = content)
+    if (x@role == "tool")
+        message$tool_call_id <- x@participant
+    else message$name <- x@participant
     ## recapitulate tool calls for the context
     tool_calls <- lapply(x@tool_calls, function(tool_call) {
         list(id = tool_call@id, type = "function",
-             `function` = list(name = tool_call@tool_name,
-                               arguments = tool_call@arguments))
+             `function` = list(
+                 name = tool_call@tool_name,
+                 arguments = toJSON(tool_call@arguments, auto_unbox = TRUE)
+             ))
     })
     message$tool_calls <- if (length(tool_calls) > 0L) tool_calls
     message
@@ -178,8 +183,10 @@ example_descriptions <- function(x) {
 openai_tool_description <- function(x) {
     ex_descs <- example_descriptions(x)
     paste(c(x@tool@description,
-            if (inherits(x@io@output, JSONFormat))
-                c("Return value schema:", toJSON(x@io@output@schema)),
+            if (inherits(x@io@output, JSONFormat) &&
+                    length(x@io@output@schema) > 0L)
+                c("Return value schema:",
+                  toJSON(x@io@output@schema, auto_unbox = TRUE)),
             if (length(ex_descs) > 0L) c("Example(s):", ex_descs)),
           collapse = "\n\n")
 }

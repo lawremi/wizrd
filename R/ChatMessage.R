@@ -6,7 +6,8 @@ ChatMessage <- new_class("ChatMessage",
                              ),
                              content = class_any,
                              object = class_any,
-                             tool_calls = new_list_property(of = ToolCall)
+                             tool_calls = new_list_property(of = ToolCall),
+                             participant = nullable(prop_string)
                          ))
 
 method(convert, list(class_any, ChatMessage)) <- function(from, to,
@@ -34,14 +35,15 @@ split_into_blocks <- function(x) {
 method(print, ChatMessage) <- function(x, ...)
 {
     float <- switch(x@role, assistant = "left", user = "right", "center")
-    border_style <- switch(x@role, user = "single", system = "double")
     if (length(x@content) > 0L) {
         if (x@role == "assistant")
             cli::cli_text(x@content)
-        else {
+        else if (x@role %in% c("user", "system")) {
+            border_style <- switch(x@role, user = "single", system = "double")
             cat(cli::boxx(strwrap(x@content,
                                   width = cli::console_width() / 2L),
-                          float = float, border_style = border_style))
+                          float = float, border_style = border_style,
+                          header = x@participant %||% ""))
             cat("\n")
         }
     }
@@ -53,7 +55,7 @@ method(print, ChatMessage) <- function(x, ...)
             !identical(x@object, x@content)) {
         cat(cli::boxx(capture.output(print(x@object,
                                            width = cli::console_width() / 2L)),
-                      float = float, header = "Object",
+                      float = float, header = x@participant %||% "",
                       border_style = "classic"))
     }
 }

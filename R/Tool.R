@@ -119,7 +119,10 @@ tool_input_json_format <- function(tool) {
 
     schema$properties[names(args)] <- Map(function(arg, prop) {
         arg_schema <- as_json_schema(arg)
-        if (is.list(prop))
+        if (length(arg_schema) == 0L)
+            # workaround bug in Ollama that requires a 'description'
+            arg_schema <- list(description = "")
+        else if (is.list(prop))
             arg_schema$description <-
                 paste(c(arg_schema$description, prop$description),
                       collapse = " ")
@@ -134,8 +137,9 @@ tool_output_json_format <- function(tool) {
     Rd_description <- if (!is.null(Rd)) Rd_value(Rd)
 
     schema <- as_json_schema(tool@signature@value)
-    schema$description <- paste(c(Rd_description, schema$description),
-                                collapse = " ")
+    desc <- c(Rd_description, schema$description)
+    if (!is.null(desc))
+        schema$description <- paste(desc, collapse = " ")
     
     JSONFormat(schema = schema)
 }

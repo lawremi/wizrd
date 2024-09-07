@@ -33,7 +33,7 @@ method(print, LanguageModel) <- function(x, ...) {
     cat("\n")
     cat("@io: ")
     print(x@io)
-    tool_names <- vapply(x@tools, `@`, character(1L), "name")
+    tool_names <- vapply(x@tools, \(binding) binding@tool@name, character(1L))
     cat(cli::ansi_strtrim(paste("@tools:", paste(tool_names, collapse = ", "))))
     cat("\n")
     params <- unlist(props(x@params))
@@ -91,10 +91,10 @@ method(tool_instructions, LanguageModel) <- function(x) {
            "prioritize generating responses without them unless ",
            "the user explicitly requests or ",
            "the task requires precise computation or external data.\n\n",
-           paste(unlist(lapply(x@tools, \(tool) {
-               if (!is.null(tool@instructions))
-                   paste0("Specific instructions for '", tool@name, "':\n",
-                          tool@instructions)
+           paste(unlist(lapply(x@tools, \(binding) {
+               if (!is.null(binding@instructions))
+                   paste0("Specific instructions for '", binding@tool@name,
+                          "':\n", binding@instructions)
            })), collapse = "\n\n"))
 }
 
