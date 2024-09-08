@@ -22,6 +22,6 @@ method(print, ToolSignature) <- function(x, ...) {
         "): ", S7:::class_desc(x@value), "\n", sep = "")
 }
 
-tool_signature <- function(`_value`, ...) {
+tool_signature <- function(`_value` = class_any, ...) {
     ToolSignature(value = `_value`, arguments = list(...))
 }

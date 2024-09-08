@@ -37,7 +37,8 @@ method(print, LanguageModel) <- function(x, ...) {
     cat(cli::ansi_strtrim(paste("@tools:", paste(tool_names, collapse = ", "))))
     cat("\n")
     params <- unlist(props(x@params))
-    param_str <- paste(names(params), "=", params, collapse = ", ")
+    param_str <- paste(names(params), rep("=", length(params)), params,
+                       collapse = ", ")
     cat(cli::ansi_strtrim(paste("@params:", param_str)))
     cat("\n")
 }
@@ -217,4 +218,11 @@ method(bind, list(Tool, LanguageModel)) <- function(x, to, instructions = NULL) 
     io_binding <- TextProtocol(input = tool_input_format(to, x),
                                output = tool_output_format(to, x))
     ToolBinding(tool = x, io = io_binding, instructions = instructions)
+}
+
+## Idea for unambiguously communicating references to R
+## variables. Small models struggle to interpret this correctly.
+interpret_symbols <-function(x) {
+    x@instructions <- "You are an assistant embedded in an R session, where users will reference variables using backticks (``). When responding to user requests and calling tools, always preserve these backticks around variable names to correctly identify them as R variables. Do not remove the backticks when passing variable names to tools or functions, as the backticks identify them as R variables. Do not wrap other types of strings in backticks. If backticks are present around a word, treat it as a variable name, and use it as-is when calling tools."
+    x
 }

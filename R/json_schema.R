@@ -81,7 +81,7 @@ method(as_json_schema, S7_class) <- function(from, description = NULL, ...) {
 method(as_json_schema, S7_union) <- function(from, descriptions = NULL, ...) {
     list(anyOf = Map(as_json_schema,
                      from$classes,
-                     descriptions[seq_along(from$classes)],
+                     as.list(descriptions)[seq_along(from$classes)]
                      ))
 }
 
@@ -109,7 +109,7 @@ base_json_schema <- function(from, description = NULL, scalar = FALSE,
 {
     type <- type_mapper(from, scalar)
     if (is.null(type))
-        return(TRUE)
+        return(setNames(list(), character()))
     if (type == "boxed")
         return(s3_as_json_schema(from, description, scalar, named))
     if (named)
@@ -155,11 +155,11 @@ s3_as_json_schema <- function(from, description, scalar = FALSE, named = FALSE) 
              .data = base_json_schema(from, description, scalar, named,
                                       s3_json_schema_type),
              .s3class = list(const = from$class,
-                             description = "The name of the S3 class"),
-             description = paste("A boxed S3 object of class",
+                             description = "The name of the S3 class")
+         ),
+         description = paste("A boxed S3 object of class",
                                  paste(from$class, collapse = ", "),
-                                 "with its data in .data")
-         ))
+                                 "with its data in .data"))
 }
 
 method(as_json_schema, S7_S3_class) <- function(from, description = NULL) {
