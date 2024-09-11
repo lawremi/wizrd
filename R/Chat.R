@@ -1,6 +1,6 @@
-Chat_contents <- function(self) lapply(self@messages, `@`, "content")
-Chat_objects <- function(self) lapply(self@messages, `@`, "object")
-Chat_roles <- function(self) vapply(self@messages, `@`, character(1L), "role")
+Chat_contents <- function(self) lapply(self@messages, prop, "content")
+Chat_objects <- function(self) lapply(self@messages, prop, "object")
+Chat_roles <- function(self) vapply(self@messages, prop, character(1L), "role")
 
 Chat <- new_class("Chat",
                   properties = list(
