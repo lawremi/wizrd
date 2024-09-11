@@ -43,8 +43,10 @@ method(print, LanguageModel) <- function(x, ...) {
     cat("\n")
 }
 
-method(predict, LanguageModel) <- function(object, input, ...) {
-    last_output(chat(object, input, ...))
+method(predict, LanguageModel) <- function(object, input, env = parent.frame(),
+                                           ...)
+{
+    last_output(chat(object, input, env, ...))
 }
 
 instruct <- function(x, ...) {
@@ -68,7 +70,7 @@ method(instructions, list(TextProtocol, LanguageModel)) <- function(on, to) {
     if (!is.null(instr)) paste(instr, collapse = "\n\n")
 }
 
-prepare_input <- function(model, input) {
+prepare_input <- function(model, input, env) {
     if (!is.list(input) || is.object(input))
         input <- list(input)
     input <- lapply(input, convert, ChatMessage)
@@ -77,7 +79,7 @@ prepare_input <- function(model, input) {
     system <- ChatMessage(role = "system",
                           content = textify(instructions, TextFormat()))
     input$system <- NULL
-    Chat(model, messages = c(system = system, input))
+    Chat(model, messages = c(system, input), env = env)
 }
 
 tool_instructions <- new_generic("tool_instructions", "x")

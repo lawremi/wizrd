@@ -11,7 +11,8 @@ Chat <- new_class("Chat",
                       objects = new_property(class_list,
                                              getter = Chat_objects),
                       roles = new_property(class_list,
-                                           getter = Chat_roles)
+                                           getter = Chat_roles),
+                      env = class_environment
                   ))
 
 method(predict, Chat) <- function(object, input, ...) {
@@ -23,7 +24,7 @@ method(chat, Chat) <- function(x, input, ...) {
         return(x)
     if (!is.list(input) || is.object(input))
         input <- list(input)
-    chat(x@model, c(x@messages, input), ...)
+    chat(x@model, c(x@messages, input), env = x@env, ...)
 }
 
 method(print, Chat) <- function(x, full = FALSE, ...) {
@@ -60,12 +61,28 @@ append_messages <- function(x, ...) {
     set_props(x, messages = c(x@messages, list(...)))
 }
 
+backticked_strings <- function(x) {
+    cnt <- unlist(Filter(is.character, x@contents[x@roles == "user"]))
+    m <- do.call(cbind, regmatches(cnt, regexec("`([^`]*?)`", cnt)))
+    unique(matrix(m, 2)[2,])
+}
+
+backticked_strings_as_names <- function(args, chat) {
+    bt_strs <- backticked_strings(chat)
+    lapply(args, \(arg) {
+        if (is.character(arg) && length(arg) == 1L && arg %in% bt_strs)
+            as.name(arg)
+        else arg
+    })
+}
+
 handle_tool_calls <- function(x) {
     tool_calls <- last_message(x)@tool_calls
     msgs <- lapply(tool_calls, function(tool_call) {
         binding <- x@model@tools[[tool_call@tool_name]]
-        value <- do.call(binding@tool,
-                         detextify(tool_call@arguments, binding@io@input))
+        args <- detextify(tool_call@arguments, binding@io@input) |>
+            quote_backticked_strings(x)
+        value <- do.call(binding@tool, args, envir = x@env)
         ChatMessage(role = "tool", object = value,
                     content = textify(value, binding@io@output),
                     participant = tool_call@id)
