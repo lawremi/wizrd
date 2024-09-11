@@ -8,11 +8,6 @@ method(as_json_schema, class_logical | class_list) <- function(from, ...) {
 s7_schema <- list(
     type = "object",
     properties = list(
-        ".class" = list(
-            type = "string",
-            const = TRUE,
-            description = "The class name in the format package:class"
-        ),
         ".data" = list(
             type = c("string", "number", "boolean", "array", "object", "null"),
             description = "Base R object representing the S7 object. Omit if the object does not inherit from a base class."
@@ -24,7 +19,6 @@ s7_schema <- list(
             description = "The S7 object's properties."
         )
     ),
-    required = c(".class"),
     description = "An R S7 object."
 )
 
@@ -59,22 +53,17 @@ method(as_json_schema, S7_class) <- function(from, description = NULL, ...) {
     props <- Filter(Negate(prop_read_only), from@properties)
     prop_schema <- Map(as_json_schema, props, arg_descriptions[names(from)],
                        MoreArgs = list(...))
-    prop_schema <- as_json_schema(props, descriptions = arg_descriptions, ...)
-    pkg_name <- S7:::class_dispatch(from)
     base_class <- base_ancestor_class(from)
     if (!is.null(base_class)) {
         desc <- "Base R object representing instances of the class"
         prop_schema$.data <-
             as_json_schema(base_class, description = desc)
     }
-    class_desc <- "The name of the class, potentially qualified by package name"
-    schema <- list(type = "object", title = pkg_name,
-                   properties = c(list(.class = list(const = pkg_name,
-                                                     description = class_desc)),
-                                  prop_schema))
+    schema <- list(type = "object", title = from@name,
+                   properties = prop_schema)
     description <- c(description, if (!is.null(Rd)) Rd_description(Rd))
     schema$description <- paste(description, collapse = " ")
-    schema$required <- names(Filter(Negate(valid_by_default), from@properties))
+    schema$required <- names(Filter(Negate(valid_by_default), props))
     schema
 }
 
@@ -89,15 +78,15 @@ base_json_schema_type <- function(from, scalar) {
     if (scalar)
         switch(from$class, logical = "boolean",
                integer = "integer", double = "number",
-               complex =, raw = "boxed", character = "string")
+               complex =, raw =, character = "string")
     else switch(from$class, logical =, integer =,
-                double =, character =, list = "array",
-                complex =, raw =, expression =, `function` = "boxed")
+                double =, character =, list =, complex =, raw =,
+                expression =, environment = "array",
+                name =, call =, `function` = "string")
 }
 
 s3_json_schema_type <- function(from, scalar) {
-    string_classes <- c("Date", "factor", "POSIXct", "complex", "raw",
-                        "expression", "function")
+    string_classes <- c("Date", "factor", "POSIXt", "formula")
     if (any(string_classes %in% from$class)) {
         if (scalar) "string" else "array"
     } else if ("data.frame" %in% from$class)
@@ -109,9 +98,7 @@ base_json_schema <- function(from, description = NULL, scalar = FALSE,
 {
     type <- type_mapper(from, scalar)
     if (is.null(type))
-        return(setNames(list(), character()))
-    if (type == "boxed")
-        return(s3_as_json_schema(from, description, scalar, named))
+        return(setNames(c(list(), description), character()))
     if (named)
         type <- "object"
     schema <- list(type = type)
@@ -126,7 +113,7 @@ base_json_schema <- function(from, description = NULL, scalar = FALSE,
     
     schema$format <- if ("Date" %in% from$class)
                          "date"
-                     else if ("POSIXct" %in% from$class)
+                     else if ("POSIXt" %in% from$class)
                          "date-time"
 
     schema
@@ -146,24 +133,11 @@ method(as_json_schema, S7_any) <- function(from, description = NULL) {
     c(list(), description = description)
 }
 
-s3_as_json_schema <- function(from, description, scalar = FALSE, named = FALSE) {
+method(as_json_schema, S7_S3_class) <- function(from, description = NULL) {
     if (is.null(description))
         description <- paste("S3 object of class",
                              paste(from$class, collapse = ", "))
-    list(type = "object",
-         properties = list(
-             .data = base_json_schema(from, description, scalar, named,
-                                      s3_json_schema_type),
-             .s3class = list(const = from$class,
-                             description = "The name of the S3 class")
-         ),
-         description = paste("A boxed S3 object of class",
-                                 paste(from$class, collapse = ", "),
-                                 "with its data in .data"))
-}
-
-method(as_json_schema, S7_S3_class) <- function(from, description = NULL) {
-    s3_as_json_schema(from, description)
+    base_json_schema(from, description, type_mapper = s3_json_schema_type)
 }
 
 method(as_json_schema, S7_property) <- function(from, description = NULL, ...) {

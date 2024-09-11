@@ -294,3 +294,43 @@ init_process <- function(path, args, ready_callback, error_callback,
 assert_port <- function(port) {
     assert_int(port, lower = 1024L, upper = 65535L)
 }
+
+## Destined for S7?
+
+method(convert, list(class_any, class_logical)) <-
+    function(from, to, ...) as.logical(from, ...)
+method(convert, list(class_any, class_integer)) <-
+    function(from, to, ...) as.integer(from, ...)
+method(convert, list(class_any, class_double)) <-
+    function(from, to, ...) as.double(from, ...)
+method(convert, list(class_any, class_complex)) <-
+    function(from, to, ...) as.complex(from, ...)
+method(convert, list(class_any, class_character)) <-
+    function(from, to, ...) as.character(from, ...)
+method(convert, list(class_any, class_raw)) <-
+    function(from, to, ...) as.raw(from, ...)
+method(convert, list(class_any, class_list)) <-
+    function(from, to, ...) as.list(from, ...)
+method(convert, list(class_any, class_expression)) <-
+    function(from, to, ...) as.expression(from, ...)
+method(convert, list(class_any, class_function)) <-
+    function(from, to, ...) as.function(from, ...)
+method(convert, list(class_any, class_environment)) <-
+    function(from, to, ...) as.environment(from, ...)
+method(convert, list(class_any, class_name)) <-
+    function(from, to, ...) as.name(from, ...)
+method(convert, list(class_any, class_call)) <-
+    function(from, to, ...) as.call(from, ...)
+
+method(convert, list(class_any, class_data.frame)) <-
+    function(from, to, ...) as.data.frame(from, ...)
+method(convert, list(class_any, class_Date)) <-
+    function(from, to, ...) as.Date(from, ...)
+method(convert, list(class_any, class_factor)) <-
+    function(from, to, ...) as.factor(from, ...)
+method(convert, list(class_any, class_POSIXct)) <-
+    function(from, to, ...) as.POSIXct(from, ...)
+method(convert, list(class_any, class_POSIXlt)) <-
+    function(from, to, ...) as.POSIXlt(from, ...)
+method(convert, list(class_any, class_formula)) <-
+    function(from, to, ...) as.formula(from, ...)

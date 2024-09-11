@@ -6,7 +6,8 @@ TextFormat <- new_class("TextFormat",
 PlainTextFormat <- new_class("PlainTextFormat", TextFormat)
 
 JSONFormat <- new_class("JSONFormat", PlainTextFormat,
-                        properties = list(schema = class_list))
+                        properties = list(schema = class_list,
+                                          schema_class = union_classes))
 
 CSVFormat <- new_class("CSVFormat", PlainTextFormat,
                        properties = list(schema = class_list,
@@ -56,18 +57,14 @@ method(textify, list(union_raster, TextFormat)) <- function(x, format) x
 
 jsonify <- new_generic("jsonify", "x")
 
-jsonify_s3 <- function(x) {
-    list(.s3class = class(x), .data = x)
-}
+method(jsonify, class_any) <- identity
 
-method(jsonify, class_any) <- jsonify_s3
+method(jsonify, class_expression | class_list) <- function(x) lapply(x, jsonify)
 
-native_json_classes <- NULL | class_logical | class_integer | class_double |
-    class_character | class_data.frame
+method(jsonify, class_environment) <- function(x) jsonify(as.list(x))
 
-method(jsonify, native_json_classes) <- identity
-
-method(jsonify, class_list) <- function(x) lapply(x, jsonify)
+method(jsonify, class_name | class_call | class_formula) <-
+    function(x) deparse(x)
 
 method(jsonify, S7_object) <- function(x) {
     prop_jsonify <- function(property) {
@@ -79,8 +76,7 @@ method(jsonify, S7_object) <- function(x) {
         else val
     }
     .data <- S7_data(x)
-    c(.class = S7:::S7_class_name(S7_class(x)),
-      if (typeof(.data) != "object") list(.data = .data),
+    c(if (typeof(.data) != "object") list(.data = .data),
       lapply(S7_class(x)@properties, prop_jsonify))
 }
 
@@ -89,56 +85,60 @@ method(textify, list(class_list | class_any, JSONFormat)) <- function(x, format)
     toJSON(jsonify(x), null = "null")
 }
 
-## avoid evaluating arbitrary code from the model
-constructor_from_name <- function(name) {
-    tokens <- strsplit(name, "::", fixed = TRUE)[[1L]]
-    if (length(tokens) == 1L)
-        env <- .GlobalEnv
-    env <- as.environment(paste0("package:", tokens[1L]))
-    get(tokens[2L], env, mode = "function")
+## Could this be done with S7?
+json <- function(x) structure(x, class = "json")
+class_json <- new_S3_class("json")
+
+dejsonify <- new_generic("dejsonify", "spec", function(x, spec) S7_dispatch())
+
+method(dejsonify, S7_class) <- function(x, spec) {
+    do.call(spec, Map(dejsonify, x, spec$properties[names(x)]))
 }
 
-dejsonify <- new_generic("dejsonify", "x")
-
-s7_dejsonify <- function(x) {
-    constructor <- constructor_from_name(x$.class)
-    x$.class <- NULL
-    do.call(constructor, lapply(x, dejsonify))
+method(dejsonify, S7_property) <- function(x, spec) {
+    dejsonify(x, spec$class)
 }
 
-parse_json_function <- function(fun) {
-    as.function(parse(text=paste(fun, collapse = "\n"))[-1L], .GlobalEnv)
+method(dejsonify, list_S7_property) <- function(x, spec) {
+    lapply(x, dejsonify, spec$of)
 }
 
-parse_json_expression <- function(expr) {
-    as.expression(lapply(expr, \(x) parse(text = x)))
+method(convert, list(class_json, class_raw)) <- function(from, to) {
+    require_ns("base64enc", "decode raw vectors from JSON")
+    base64enc::base64decode(from)
 }
 
-s3_dejsonify <- function(x) {
-    s3class <- x$.s3class
-    x$.s3class <- NULL
-    data <- dejsonify(x$.data)
-    conv <- switch(s3class, factor = as.factor, Date = as.Date,
-                   POSIXct = as.POSIXct, complex = as.complex,
-                   raw = {
-                       require_ns("base64enc", "decode raw vectors from JSON")
-                       base64enc::base64decode
-                   }, `function` = parse_json_function,
-                   expression = parse_json_expression, formula = as.formula)
-    if (!is.null(conv))
-        conv(data)
-    else structure(data, class = s3class)
+method(convert, list(class_json, class_function)) <- function(from, to) {
+    p <- parse(text=from)[[1L]]
+    as.function(c(p[[2L]], p[[3L]]), .GlobalEnv)
 }
 
-method(dejsonify, class_list) <- function(x) {
-    if (!is.null(x$.class))
-        s7_dejsonify(x)
-    else if (!is.null(x$.s3class))
-        s3_dejsonify(x)
-    else lapply(x, dejsonify)
+method(convert, list(class_json, class_call)) <- function(from, to) {
+    parse(text=from)[[1L]]
 }
 
-method(dejsonify, class_any) <- identity
+method(dejsonify, S7_S3_class | S7_base_class) <- function(x, spec) {
+    if (identical(spec, class_numeric))
+        return(as.numeric(x))
+    if (identical(spec, class_atomic))
+        return(unlist(x))
+    if (identical(spec, class_vector))
+        return(as.vector(x))
+    if (identical(spec, class_language))
+        return(parse(text=x)[[1L]])
+    convert(json(x), spec)
+}
+
+method(dejsonify, S7_union) <- function(x, spec) {
+    for(class in spec$classes) {
+        ans <- try(dejsonify(x, class), silent = TRUE)
+        if (!inherits(ans, "try-error"))
+            return(ans)
+    }
+    stop("failed to convert to ", capture.output(print(x)))
+}
+
+method(dejsonify, S7_any) <- function(x, spec) x
 
 detextify <- new_generic("detextify", c("x", "format"))
 
@@ -147,7 +147,7 @@ method(detextify, list(class_character, JSONFormat)) <- function(x, format) {
 }
 
 method(detextify, list(class_list, JSONFormat)) <- function(x, format) {
-    dejsonify(x)
+    dejsonify(x, format@schema_class)
 }
 
 method(detextify, list(class_any, TextFormat)) <- function(x, format) x
@@ -169,8 +169,8 @@ default_example <- function(class) {
     setNames(list(ex), desc)
 }
 
-output_object <- function(x, class = S7_object, description = NULL,
-                          example = NULL, ...)
+output_as <- function(x, class = S7_object, description = NULL,
+                      example = NULL, ...)
 {
     if (is.null(example))
         example <- default_example(class)
@@ -178,7 +178,8 @@ output_object <- function(x, class = S7_object, description = NULL,
               all(vapply(examples, inherits, logical(1L), class)))
     schema <- as_json_schema(class, description, ...)
     example <- as_json(example)
-    format <- JSONFormat(schema = schema, example = example)
+    format <- JSONFormat(schema = schema, schema_class = class,
+                         example = example)
     x@io@output <- format
     x
 }
