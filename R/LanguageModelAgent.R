@@ -1,11 +1,6 @@
 LanguageModelAgent <- new_class("LanguageModelAgent", Tool,
                                 properties = list(
-                                    model = new_property(
-                                        LanguageModel,
-                                        getter = \(self) bind(self@model, self),
-                                        setter = \(self, value)
-                                            set_props(self, model = value)
-                                    )
+                                    model = LanguageModel
                                 ))
 
 agent_fun <- function(args) {
@@ -13,7 +8,7 @@ agent_fun <- function(args) {
         self <- sys.function(-1L)
         if (!inherits(self, LanguageModelAgent))
             stop("agent function must be a LanguageModelAgent")
-        predict(self@model, mget(names(args)))
+        predict(bind(self@model, self), mget(names(args)))
     })
     as.function(c(list(body), args))
 }
@@ -33,7 +28,8 @@ method(bind, list(LanguageModel, LanguageModelAgent)) <- function(x, to)
     x
 }
 
-method(instructions, list(LanguageModel, LanguageModel)) <- function(on, to) {
+method(instructions, list(LanguageModelAgent, LanguageModel)) <- function(on, to)
+{
     paste0(c(
         "You are an agent named '", on@name, "'. ",
         "You are represented by an R function.",
