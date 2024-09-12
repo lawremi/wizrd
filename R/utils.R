@@ -334,3 +334,18 @@ method(convert, list(class_any, class_POSIXlt)) <-
     function(from, to, ...) as.POSIXlt(from, ...)
 method(convert, list(class_any, class_formula)) <-
     function(from, to, ...) as.formula(from, ...)
+
+S7_class <- new_S3_class("S7_class")
+S7_any <- new_S3_class("S7_any")
+S7_base_class <- new_S3_class("S7_base_class")
+S7_union <- new_S3_class("S7_union")
+S7_S3_class <- new_S3_class("S7_S3_class")
+
+union_classes <- S7_any | NULL | S7_class | S7_base_class | S7_union |
+    S7_S3_class | getClass("classRepresentation")
+
+S7_property <- new_S3_class("S7_property")
+scalar_S7_property <- new_S3_class(c("scalar_S7_property", "S7_property"))
+string_S7_property <- new_S3_class(c("string_S7_property", "S7_property"))
+list_S7_property <- new_S3_class(c("list_S7_property", "S7_property"))
+numeric_S7_property <- new_S3_class(c("numeric_S7_property", "S7_property"))

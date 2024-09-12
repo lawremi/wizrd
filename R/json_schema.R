@@ -22,13 +22,6 @@ s7_schema <- list(
     description = "An R S7 object."
 )
 
-S7_property <- new_S3_class("S7_property")
-
-scalar_S7_property <- new_S3_class("scalar_S7_property")
-string_S7_property <- new_S3_class("string_S7_property")
-list_S7_property <- new_S3_class("list_S7_property")
-numeric_S7_property <- new_S3_class("numeric_S7_property")
-
 valid_by_default <- function(prop) {
     is.null(prop$validator) || is.null(prop$validator(S7:::prop_default(prop)))
 }

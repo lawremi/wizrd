@@ -89,17 +89,17 @@ method(textify, list(class_list | class_any, JSONFormat)) <- function(x, format)
 json <- function(x) structure(x, class = "json")
 class_json <- new_S3_class("json")
 
-dejsonify <- new_generic("dejsonify", "spec", function(x, spec) S7_dispatch())
+dejsonify <- new_generic("dejsonify", c("x", "spec"))
 
-method(dejsonify, S7_class) <- function(x, spec) {
+method(dejsonify, list(class_list, S7_class)) <- function(x, spec) {
     do.call(spec, Map(dejsonify, x, spec$properties[names(x)]))
 }
 
-method(dejsonify, S7_property) <- function(x, spec) {
+method(dejsonify, list(class_any, S7_property)) <- function(x, spec) {
     dejsonify(x, spec$class)
 }
 
-method(dejsonify, list_S7_property) <- function(x, spec) {
+method(dejsonify, list(class_any, list_S7_property)) <- function(x, spec) {
     lapply(x, dejsonify, spec$of)
 }
 
@@ -117,7 +117,10 @@ method(convert, list(class_json, class_call)) <- function(from, to) {
     parse(text=from)[[1L]]
 }
 
-method(dejsonify, S7_S3_class | S7_base_class) <- function(x, spec) {
+method(dejsonify, list(class_any, S7_S3_class | S7_base_class)) <- function(x,
+                                                                            spec)
+{
+    ## cannot target unions with convert()
     if (identical(spec, class_numeric))
         return(as.numeric(x))
     if (identical(spec, class_atomic))
@@ -129,7 +132,7 @@ method(dejsonify, S7_S3_class | S7_base_class) <- function(x, spec) {
     convert(json(x), spec)
 }
 
-method(dejsonify, S7_union) <- function(x, spec) {
+method(dejsonify, list(class_any, S7_union)) <- function(x, spec) {
     for(class in spec$classes) {
         ans <- try(dejsonify(x, class), silent = TRUE)
         if (!inherits(ans, "try-error"))
@@ -138,7 +141,7 @@ method(dejsonify, S7_union) <- function(x, spec) {
     stop("failed to convert to ", capture.output(print(x)))
 }
 
-method(dejsonify, S7_any) <- function(x, spec) x
+method(dejsonify, list(class_any, S7_any)) <- function(x, spec) x
 
 detextify <- new_generic("detextify", c("x", "format"))
 

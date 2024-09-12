@@ -1,27 +1,16 @@
-S7_class <- new_S3_class("S7_class")
-S7_any <- new_S3_class("S7_any")
-S7_base_class <- new_S3_class("S7_base_class")
-S7_union <- new_S3_class("S7_union")
-S7_S3_class <- new_S3_class("S7_S3_class")
-
-union_classes <- NULL | S7_class | S7_base_class | S7_union | S7_any |
-    S7_S3_class | getClass("classRepresentation")
-
 ToolSignature <- new_class("ToolSignature",
                            properties = list(
-                               arguments = new_list_property(
-                                   of = union_classes,
-                                   named = TRUE
-                               ),
+                               parameters = S7_class,
                                value = union_classes
                            ))
 
 method(print, ToolSignature) <- function(x, ...) {
-    classes <- vapply(x@arguments, S7:::class_desc, character(1L))
-    cat("(", paste0(names(x@arguments), ": ", classes, collapse = ", "),
+    classes <- vapply(props(x@parameters), S7:::class_desc, character(1L))
+    cat("(", paste0(names(props(x@parameters)), ": ", classes, collapse = ", "),
         "): ", S7:::class_desc(x@value), "\n", sep = "")
 }
 
 tool_signature <- function(`_value` = class_any, ...) {
-    ToolSignature(value = `_value`, arguments = list(...))
+    parameters <- new_class("parameters", properties = list(...)) 
+    ToolSignature(value = `_value`, parameters = parameters)
 }

@@ -1,6 +1,6 @@
 validate_Tool <- function(self) {
     ## TODO: validate examples against Signature
-    extra_sig_args <- setdiff(names(self@signature@arguments),
+    extra_sig_args <- setdiff(names(self@signature@parameters),
                               names(formals(self)))
     extra_example_args <- setdiff(names(unlist(self@examples,
                                                recursive = FALSE)),
@@ -11,11 +11,11 @@ validate_Tool <- function(self) {
                 paste0("example argument '", nm,
                        "' does not inherit from class '",
                        S7:::S7_class_name(cls), "'")
-        }, ex, self@signature@arguments[names(ex)], names(ex)) 
+        }, ex, self@signature@parameters[names(ex)], names(ex)) 
     }))
     
     c(if (length(extra_sig_args))
-        paste("@signature@arguments contains extra args:",
+        paste("@signature@parameters contains extra args:",
               paste(extra_sig_args, collapse = ", ")),
       
       if (length(extra_example_args))
@@ -47,7 +47,7 @@ any_signature <- function(args) {
     args[] <- list(class_any)
     if (!is.null(args$"..."))
         args$"..." <- class_list
-    ToolSignature(arguments = args, value = class_any)
+    ToolSignature(parameters = args, value = class_any)
 }
 
 norm_examples <- function(examples, FUN) {
@@ -96,11 +96,11 @@ method(print, ToolBinding) <- function(x, ...) {
 
 tool_input_json_format <- function(tool) {
     Rd <- Rd_for_function(S7_data(tool), tool@name)
-    args <- tool@signature@arguments
-    formals <- formals(tool)
+    args <- tool@signature@parameters
+    formals <- formals(tool)[names(args)]
     
     if (!is.null(Rd))
-        props <- lapply(Rd_args(Rd)[names(formals)],
+        props <- lapply(Rd_args(Rd)[names(args)],
                         function(x) list(description = x))
     else {
         props <- as.list(formals)
@@ -117,10 +117,9 @@ tool_input_json_format <- function(tool) {
         else prop
     }, props, formals)
     
-    schema <- list(type = "object", properties = props)
-
-    schema$properties[names(args)] <- Map(function(arg, prop) {
-        arg_schema <- as_json_schema(arg)
+    schema <- as_json_schema(args)
+    
+    schema$properties <- Map(function(arg_schema, prop) {
         if (is.list(prop))
             arg_schema$description <-
                 paste(c(arg_schema$description, prop$description),
@@ -129,7 +128,7 @@ tool_input_json_format <- function(tool) {
             # workaround bug in Ollama that requires a 'description'
             arg_schema <- list(description = "")
         arg_schema
-    }, args, schema$properties[names(args)])
+    }, schema$properties, props)
 
     JSONFormat(schema = schema)
 }
