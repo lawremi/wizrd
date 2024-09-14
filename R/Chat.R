@@ -80,8 +80,8 @@ handle_tool_calls <- function(x) {
     tool_calls <- last_message(x)@tool_calls
     msgs <- lapply(tool_calls, function(tool_call) {
         binding <- x@model@tools[[tool_call@tool_name]]
-        args <- detextify(tool_call@arguments, binding@io@input) |>
-            quote_backticked_strings(x)
+        args <- props(detextify(tool_call@arguments, binding@io@input)) |>
+            backticked_strings_as_names(x)
         value <- do.call(binding@tool, args, envir = x@env)
         ChatMessage(role = "tool", object = value,
                     content = textify(value, binding@io@output),

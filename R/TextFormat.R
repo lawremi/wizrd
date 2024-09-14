@@ -92,7 +92,8 @@ class_json <- new_S3_class("json")
 dejsonify <- new_generic("dejsonify", c("x", "spec"))
 
 method(dejsonify, list(class_list, S7_class)) <- function(x, spec) {
-    do.call(spec, Map(dejsonify, x, spec$properties[names(x)]))
+    keep <- intersect(names(x), names(spec@properties))
+    do.call(spec, Map(dejsonify, x[keep], spec@properties[keep]), quote = TRUE)
 }
 
 method(dejsonify, list(class_any, S7_property)) <- function(x, spec) {

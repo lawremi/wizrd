@@ -46,7 +46,7 @@ method(print, LanguageModel) <- function(x, ...) {
 method(predict, LanguageModel) <- function(object, input, env = parent.frame(),
                                            ...)
 {
-    last_output(chat(object, input, env, ...))
+    last_output(chat(object, input, env = env, ...))
 }
 
 instruct <- function(x, ...) {

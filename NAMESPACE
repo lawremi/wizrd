@@ -8,8 +8,11 @@ export(language_model, ollama_model, llama_cpp_model, openai_model)
 # other constructors
 export(chat, tool, tool_signature)
 # builders
-export(equip)
+export(equip, unequip)
 # accessors
 export(last_output)
 # convenience models
 export(llama3, llava)
+
+# S3 methods
+S3method(nameOfClass, S7_S3_class)

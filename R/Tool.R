@@ -43,11 +43,11 @@ method(print, Tool) <- function(x, ...) {
 }
 
 any_signature <- function(args) {
-    args <- as.list(args)
-    args[] <- list(class_any)
-    if (!is.null(args$"..."))
-        args$"..." <- class_list
-    ToolSignature(parameters = args, value = class_any)
+    params <- as.list(args)
+    params[] <- list(class_any)
+    if (!is.null(params$"..."))
+        params$"..." <- class_list
+    tool_signature(class_any, params)
 }
 
 norm_examples <- function(examples, FUN) {
@@ -79,6 +79,11 @@ equip <- function(x, tool, instructions = NULL) {
     x
 }
 
+unequip <- function(x, name) {
+    x@tools[[name]] <- NULL
+    x
+}
+
 ToolBinding <- new_class("ToolBinding",
                          properties = list(
                              tool = Tool,
@@ -96,12 +101,11 @@ method(print, ToolBinding) <- function(x, ...) {
 
 tool_input_json_format <- function(tool) {
     Rd <- Rd_for_function(S7_data(tool), tool@name)
-    args <- tool@signature@parameters
-    formals <- formals(tool)[names(args)]
+    params <- tool@signature@parameters
+    formals <- formals(tool)[names(params@properties)]
     
     if (!is.null(Rd))
-        props <- lapply(Rd_args(Rd)[names(args)],
-                        function(x) list(description = x))
+        props <- lapply(Rd_args(Rd)[names(formals)], \(x) list(description = x))
     else {
         props <- as.list(formals)
         props[] <- TRUE
@@ -117,7 +121,7 @@ tool_input_json_format <- function(tool) {
         else prop
     }, props, formals)
     
-    schema <- as_json_schema(args)
+    schema <- as_json_schema(params)
     
     schema$properties <- Map(function(arg_schema, prop) {
         if (is.list(prop))
@@ -130,7 +134,7 @@ tool_input_json_format <- function(tool) {
         arg_schema
     }, schema$properties, props)
 
-    JSONFormat(schema = schema)
+    JSONFormat(schema = schema, schema_class = params)
 }
 
 tool_output_json_format <- function(tool) {

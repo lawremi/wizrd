@@ -5,12 +5,15 @@ ToolSignature <- new_class("ToolSignature",
                            ))
 
 method(print, ToolSignature) <- function(x, ...) {
-    classes <- vapply(props(x@parameters), S7:::class_desc, character(1L))
-    cat("(", paste0(names(props(x@parameters)), ": ", classes, collapse = ", "),
+    classes <- vapply(x@parameters@properties, \(p) S7:::class_desc(p$class),
+                      character(1L))
+    cat("(", paste0(names(x@parameters@properties), ": ",
+                    classes, collapse = ", "),
         "): ", S7:::class_desc(x@value), "\n", sep = "")
 }
 
-tool_signature <- function(`_value` = class_any, ...) {
-    parameters <- new_class("parameters", properties = list(...)) 
+tool_signature <- function(`_value` = class_any, `_parameters` = list(...), ...)
+{
+    parameters <- new_class("parameters", properties = `_parameters`) 
     ToolSignature(value = `_value`, parameters = parameters)
 }
