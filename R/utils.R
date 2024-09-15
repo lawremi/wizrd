@@ -197,7 +197,8 @@ get_Rd <- function(topic, package = NULL) {
 Rd_args <- function(Rd) {
     args <- Find(\(x) attr(x, "Rd_tag") == "\\arguments", Rd)
     items <- Filter(\(x) attr(x, "Rd_tag") == "\\item", args)
-    ans <- lapply(items, \(x) paste(unlist(x[[2L]]), collapse = ""))
+    ans <- vapply(items, \(x) paste(unlist(x[[2L]]), collapse = ""),
+                  character(1L))
     ans_names <- vapply(items, \(x) {
         dots <- Find(\(xi) attr(xi, "Rd_tag") == "\\dots", x[[1L]])
         paste(c(unlist(x[[1L]]), if (!is.null(dots)) "..."),
