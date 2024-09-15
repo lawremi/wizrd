@@ -56,7 +56,9 @@ method(as_json_schema, S7_class) <- function(from, description = NULL, ...) {
                    properties = prop_schema)
     description <- c(description, if (!is.null(Rd)) Rd_description(Rd))
     schema$description <- paste(description, collapse = " ")
-    schema$required <- names(Filter(Negate(valid_by_default), props))
+    required <- names(Filter(Negate(valid_by_default), props))
+    if (length(required) > 0L)
+        schema$required <- required
     schema
 }
 
