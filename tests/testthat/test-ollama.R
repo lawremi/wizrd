@@ -26,7 +26,7 @@ test_that("chat() and predict() work for images", {
     unlink(temp_png)
 
     model@instructions <- "When you receive an image, describe it in words"
-    options(wizrd.debug = 0L)
+
     chat <- chat(model, raster)
     expect_match(last_output(chat), "scatter.*plot")
     msgs <- list(raster,
@@ -41,15 +41,29 @@ test_that("models can call R functions as tools", {
     model <- llama3()
     
     get_mean <- function(name) mean(get(name))
-    model <- equip(model, tool(get_mean))
-    model@instructions <- "Use the tools at your disposal. Return only numbers."
+    model <- equip(model, get_mean, "Use to get the mean of an R variable")
     var <- 1:10
+    model@instructions <-
+        "Only respond with JSON, not in markdown. No sentences."
     output <- predict(model, "What is the mean of var?")
-    expect_equal(as.numeric(output), mean(var)) 
+    expect_equal(jsonlite::fromJSON(output)$mean, mean(var))
+
+    sig <- tool_signature(x = class_name)
+    model <- model |> unequip("get_mean") |> equip(tool(mean, signature = sig))
+    options(wizrd.debug = 0L)
+    output <- predict(model, "What is the mean of var?")
+    expect_equal(jsonlite::fromJSON(output)$mean, mean(var))
+
+    model <- equip(model, tool(mean) |> add_Rd())
+    output <- predict(model, "What is the mean of `var`?")
+    expect_equal(jsonlite::fromJSON(output)$mean, mean(var))
     
     sig <- tool_signature(class_data.frame, x = class_formula,
                           data = class_name, FUN = class_name,
                           subset = class_call)
-    aggregate_tool <- tool(aggregate.data.frame, sig)
-    
+    aggregate_tool <- tool(method(aggregate, class_formula), sig, "aggregate")
+    model <- equip(model, aggregate_tool)
+    model@instructions <- "Use the tools at your disposal. Return only numbers."
+    output <- predict(model, "Mean of MPG.city for Audis in the Cars93 dataset")
+    expect_equal(as.numeric(output), mean(var))
 })
