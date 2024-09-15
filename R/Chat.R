@@ -76,12 +76,18 @@ backticked_strings_as_names <- function(args, chat) {
     })
 }
 
+expand_dots <- function(args) {
+    args <- c(args, args$`_dots`)
+    args$`_dots` <- NULL
+    args
+}
+
 handle_tool_calls <- function(x) {
     tool_calls <- last_message(x)@tool_calls
     msgs <- lapply(tool_calls, function(tool_call) {
         binding <- x@model@tools[[tool_call@tool_name]]
         args <- props(detextify(tool_call@arguments, binding@io@input)) |>
-            backticked_strings_as_names(x)
+            backticked_strings_as_names(x) |> expand_dots()
         value <- do.call(binding@tool, args, envir = x@env)
         ChatMessage(role = "tool", object = value,
                     content = textify(value, binding@io@output),

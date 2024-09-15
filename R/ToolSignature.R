@@ -12,8 +12,13 @@ method(print, ToolSignature) <- function(x, ...) {
         "): ", S7:::class_desc(x@value), "\n", sep = "")
 }
 
+dodge_dots <- function(x) {
+    names(x)[names(x) == "..."] <- "_dots"
+    x
+}
+
 tool_signature <- function(`_value` = class_any, `_parameters` = list(...), ...)
 {
-    parameters <- new_class("parameters", properties = `_parameters`) 
+    parameters <- new_class("parameters", properties = dodge_dots(`_parameters`))
     ToolSignature(value = `_value`, parameters = parameters)
 }
