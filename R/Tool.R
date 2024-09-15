@@ -1,23 +1,25 @@
 validate_Tool <- function(self) {
-    ## TODO: validate examples against Signature
-    extra_sig_args <- setdiff(names(self@signature@parameters),
-                              names(formals(self)))
-    extra_example_args <- setdiff(names(unlist(self@examples,
-                                               recursive = FALSE)),
-                                  names(formals(self)))
-    ex_problems <- unlist(lapply(self@examples, function(ex) {
-        mapply(function(arg, cls, nm) {
-            if (!inherits(arg, cls))
-                paste0("example argument '", nm,
-                       "' does not inherit from class '",
-                       S7:::S7_class_name(cls), "'")
-        }, ex, self@signature@parameters[names(ex)], names(ex)) 
-    }))
+    formal_names <- names(formals(self) |> dodge_dots())
+    extra_sig_args <- setdiff(names(self@signature@parameters@properties),
+                              formal_names)
+    extra_example_args <-
+        if (!"..." %in% names(formals(self)))
+            setdiff(names(unlist(self@examples, recursive = FALSE)),
+                    names(formals(self)))
+        else character()
+    extra_param_descs <- setdiff(names(self@param_descriptions), formal_names)
+
+    ex_problems <- unique(unlist(lapply(self@examples, \(ex) {
+        if (!inherits(ex, self@signature@parameters))
+            "examples must be instances of @signature@parameters"
+    })))
     
     c(if (length(extra_sig_args))
         paste("@signature@parameters contains extra args:",
               paste(extra_sig_args, collapse = ", ")),
-      
+      if (length(extra_param_descs))
+        paste("@param_descriptions contains extra args:",
+              paste(extra_param_descs, collapse = ", ")),
       if (length(extra_example_args))
           paste("@examples contains extra args:",
                 paste(extra_example_args, collapse = ", ")),
@@ -30,7 +32,15 @@ Tool <- new_class("Tool", class_function,
                       name = prop_string,
                       description = nullable(prop_string),
                       signature = ToolSignature,
-                      examples = new_list_property(of = class_list)
+                      param_descriptions = new_property(
+                          class_character,
+                          validator = \(value) {
+                              if (is.null(names(value)))
+                                  "must have names"
+                          }
+                      ),
+                      value_description = nullable(prop_string),
+                      examples = new_list_property(of = S7_object)
                   ),
                   validator = validate_Tool)
 
@@ -50,25 +60,59 @@ any_signature <- function(args) {
     tool_signature(class_any, params)
 }
 
-norm_examples <- function(examples, FUN) {
-    lapply(examples, function(example) {
-        as.list(match.call(FUN, as.call(c(list(FUN), example))))[-1L]
+norm_examples <- function(examples, signature) {
+    lapply(examples, \(example) {
+        do.call(signature@parameters, example)
     })
+}
+
+norm_param_descriptions <- function(descs, signature) {
+    if (length(descs) == 0L)
+        names(descs) <- character()
+    if (is.null(names(descs))) {
+        sig_names <- names(signature@parameters@properties)
+        if (length(descs) != length(sig_names))
+            stop("if 'param_descriptions' is unnamed, it must be parallel to ",
+                 "'signature'")
+        names(descs) <- sig_names
+    }
+    descs |> dodge_dots()
+}
+
+add_Rd <- function(tool) {
+    params_to_describe <- setdiff(names(tool@signature@parameters@properties),
+                                  names(tool@param_descriptions))
+    fully_described <- !is.null(tool@description) &&
+        !is.null(tool@value_description) && length(params_to_describe) == 0L
+    if (fully_described)
+        return(tool)
+    
+    Rd <- Rd_for_function(S7_data(tool), tool@name)
+    if (is.null(Rd))
+        return(tool)
+
+    if (is.null(tool@description))
+        tool@description <- Rd_description(Rd)
+    args <- Rd_args(Rd) |> dodge_dots() |> as.character()
+    tool@param_descriptions[params_to_describe] <- args[params_to_describe]
+    if (is.null(tool@value_description))
+        tool@value_description <- Rd_value(Rd)
+
+    tool
 }
 
 tool <- function(FUN, signature = any_signature(formals(FUN)),
                  name = deparse(substitute(FUN)),
-                 description = NULL, examples = list())
+                 description = NULL, param_descriptions = character(),
+                 value_description = NULL, examples = list())
 {
     force(name)
     FUN <- match.fun(FUN)
-    if (is.null(description)) {
-        Rd <- Rd_for_function(FUN, name)
-        if (!is.null(Rd))
-            description <- Rd_description(Rd)
-    }
-    examples <- norm_examples(examples, FUN)
+    examples <- norm_examples(examples, signature)
+    param_descriptions <- norm_param_descriptions(param_descriptions, signature)
     Tool(FUN, name = name, description = description, signature = signature,
+         param_descriptions = param_descriptions,
+         value_description = value_description,
          examples = examples)
 }
 
@@ -99,50 +143,54 @@ method(print, ToolBinding) <- function(x, ...) {
     cat("\n")
 }
 
-tool_input_json_format <- function(tool) {
-    Rd <- Rd_for_function(S7_data(tool), tool@name)
-    params <- tool@signature@parameters
-    formals <- formals(tool)[names(params@properties)]
-    
-    if (!is.null(Rd))
-        props <- lapply(Rd_args(Rd)[names(formals)], \(x) list(description = x))
-    else {
-        props <- as.list(formals)
-        props[] <- TRUE
-    }
-    
-    props <- Map(function(prop, default) {
+json_schema_add_defaults <- function(params, formals) {
+    Map(function(param, default) {
         default <- deparse(default)
         if (nzchar(default))
             list(description =
-                     paste(c(if (is.list(prop)) prop$description, "default:",
+                     paste(c(if (is.list(param)) param$description, "default:",
                              default),
                            collapse = " "))
-        else prop
-    }, props, formals)
-    
-    schema <- as_json_schema(params)
-    
-    schema$properties <- Map(function(arg_schema, prop) {
-        if (is.list(prop))
-            arg_schema$description <-
-                paste(c(arg_schema$description, prop$description),
-                      collapse = " ")
-        if (length(arg_schema) == 0L)
-            # workaround bug in Ollama that requires a 'description'
-            arg_schema <- list(description = "")
-        arg_schema
-    }, schema$properties, props)
+        else param
+    }, params, formals)
+}
 
-    JSONFormat(schema = schema, schema_class = params)
+json_schema_param_descs <- function(tool) {
+    formals <- dodge_dots(formals(tool))
+    lapply(tool@param_descriptions[names(formals)], \(desc) {
+        if (!is.na(desc))
+            list(description = desc)
+        else TRUE
+    }) |> json_schema_add_defaults(formals)
+}
+
+tool_input_json_schema <- function(sig_params, param_descs) {
+    schema <- as_json_schema(sig_params)
+    schema$properties <- Map(function(param_schema, param_desc) {
+        if (is.list(param_desc))
+            param_schema$description <-
+                paste(c(param_schema$description, param_desc$description),
+                      collapse = " ")
+        if (length(param_schema) == 0L)
+            # workaround bug in Ollama that requires a 'description'
+            param_schema <- list(description = "")
+        param_schema
+    }, schema$properties, param_descs)
+    schema
+}
+
+tool_input_json_format <- function(tool) {
+    sig_params <- tool@signature@parameters
+    param_descs <- json_schema_param_descs(tool)[names(sig_params@properties)]
+
+    schema <- tool_input_json_schema(sig_params, param_descs)
+    
+    JSONFormat(schema = schema, schema_class = sig_params)
 }
 
 tool_output_json_format <- function(tool) {
-    Rd <- Rd_for_function(S7_data(tool), tool@name)
-    Rd_description <- if (!is.null(Rd)) Rd_value(Rd)
-
     schema <- as_json_schema(tool@signature@value)
-    desc <- c(Rd_description, schema$description)
+    desc <- c(tool@value_description, schema$description)
     if (!is.null(desc))
         schema$description <- paste(desc, collapse = " ")
     
