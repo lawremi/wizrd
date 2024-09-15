@@ -113,7 +113,7 @@ tool <- function(FUN, signature = any_signature(formals(FUN)),
     Tool(FUN, name = name, description = description, signature = signature,
          param_descriptions = param_descriptions,
          value_description = value_description,
-         examples = examples)
+         examples = examples) |> add_Rd()
 }
 
 equip <- function(x, tool, instructions = NULL) {

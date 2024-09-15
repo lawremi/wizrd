@@ -54,7 +54,7 @@ test_that("models can call R functions as tools", {
     output <- predict(model, "What is the mean of var?")
     expect_equal(jsonlite::fromJSON(output)$mean, mean(var))
 
-    model <- equip(model, tool(mean) |> add_Rd())
+    model <- equip(model, mean)
     output <- predict(model, "What is the mean of `var`?")
     expect_equal(jsonlite::fromJSON(output)$mean, mean(var))
     
