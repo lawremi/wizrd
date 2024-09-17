@@ -13,8 +13,21 @@ assert_scalar <- function(scalar, class, arg = deparse(substitute(scalar)))
 }
 
 nullable <- function(prop) {
+    if (S7:::is_foundation_class(prop))
+        prop <- new_property(prop)
     prop$class <- new_union(NULL, prop$class)
     prop["default"] <- list(NULL)
+    prop
+}
+
+named <- function(prop) {
+    if (S7:::is_foundation_class(prop))
+        prop <- new_property(prop)
+    validator <- prop$validator
+    prop$validator <- \(value)
+        c(if (is.null(names(value)))
+            "must have names",
+          validator(value))
     prop
 }
 

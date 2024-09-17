@@ -32,15 +32,9 @@ Tool <- new_class("Tool", class_function,
                       name = prop_string,
                       description = nullable(prop_string),
                       signature = ToolSignature,
-                      param_descriptions = new_property(
-                          class_character,
-                          validator = \(value) {
-                              if (is.null(names(value)))
-                                  "must have names"
-                          }
-                      ),
+                      param_descriptions = named(class_character),
                       value_description = nullable(prop_string),
-                      examples = new_list_property(of = S7_object)
+                      examples = named(class_list)
                   ),
                   validator = validate_Tool)
 

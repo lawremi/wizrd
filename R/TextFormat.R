@@ -1,6 +1,6 @@
 TextFormat <- new_class("TextFormat",
                         properties = list(
-                            examples = new_list_property(named = TRUE)
+                            examples = named(class_list)
                         ))
 
 PlainTextFormat <- new_class("PlainTextFormat", TextFormat)
