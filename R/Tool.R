@@ -2,11 +2,6 @@ validate_Tool <- function(self) {
     formal_names <- names(formals(self) |> dodge_dots())
     extra_sig_args <- setdiff(names(self@signature@parameters@properties),
                               formal_names)
-    extra_example_args <-
-        if (!"..." %in% names(formals(self)))
-            setdiff(names(unlist(self@examples, recursive = FALSE)),
-                    names(formals(self)))
-        else character()
     extra_param_descs <- setdiff(names(self@param_descriptions), formal_names)
 
     ex_problems <- unique(unlist(lapply(self@examples, \(ex) {
@@ -20,9 +15,6 @@ validate_Tool <- function(self) {
       if (length(extra_param_descs))
         paste("@param_descriptions contains extra args:",
               paste(extra_param_descs, collapse = ", ")),
-      if (length(extra_example_args))
-          paste("@examples contains extra args:",
-                paste(extra_example_args, collapse = ", ")),
       ex_problems
       )
 }
@@ -54,9 +46,11 @@ any_signature <- function(args) {
     tool_signature(class_any, params)
 }
 
-norm_examples <- function(examples, signature) {
+norm_examples <- function(FUN, examples, signature) {
     lapply(examples, \(example) {
-        do.call(signature@parameters, example)
+        mc <- match.call(FUN, as.call(examples), expand.dots = FALSE) |>
+            dodge_dots() |> as.list()
+        do.call(signature@parameters, mc[-1L])
     })
 }
 
@@ -102,7 +96,7 @@ tool <- function(FUN, signature = any_signature(formals(FUN)),
 {
     force(name)
     FUN <- match.fun(FUN)
-    examples <- norm_examples(examples, signature)
+    examples <- norm_examples(FUN, examples, signature)
     param_descriptions <- norm_param_descriptions(param_descriptions, signature)
     Tool(FUN, name = name, description = description, signature = signature,
          param_descriptions = param_descriptions,
@@ -179,7 +173,8 @@ tool_input_json_format <- function(tool) {
 
     schema <- tool_input_json_schema(sig_params, param_descs)
     
-    JSONFormat(schema = schema, schema_class = sig_params)
+    JSONFormat(schema = schema, schema_class = sig_params,
+               examples = tool@examples)
 }
 
 tool_output_json_format <- function(tool) {

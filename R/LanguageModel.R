@@ -95,9 +95,13 @@ method(tool_instructions, LanguageModel) <- function(x) {
            "the user explicitly requests or ",
            "the task requires precise computation or external data.\n\n",
            paste(unlist(lapply(x@tools, \(binding) {
-               if (!is.null(binding@instructions))
+               if (!is.null(binding@instructions) ||
+                       length(binding@tool@examples) > 0L)
                    paste0("Specific instructions for '", binding@tool@name,
-                          "':\n", binding@instructions)
+                          "':\n",
+                          paste(c(binding@instructions,
+                                  describe_examples(binding@tool@examples)),
+                                collapse = "\n"))
            })), collapse = "\n\n"))
 }
 
@@ -117,13 +121,17 @@ method(output_instructions,
     NULL
 }
 
-append_examples <- function(prompt, on) {
-    ex <- lapply(on@examples, textify)
-    if (length(ex) > 0L)
-        paste0(prompt, "Example(s):\n\n",
+describe_examples <- function(ex) {
+    if (length(ex) > 0L) {
+        ex <- vapply(ex, textify, character(1L))
+        paste0("Example(s):\n\n",
                paste0(names(ex), "\nwould be encoded as:\n", ex,
                       collapse = "\n\n"))
-    else prompt
+    }
+}
+
+append_examples <- function(prompt, on) {
+    paste(c(prompt, describe_examples(on@examples)), collapse = "\n")
 }
 
 method(output_instructions,

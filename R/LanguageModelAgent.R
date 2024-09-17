@@ -36,9 +36,7 @@ method(instructions, list(LanguageModelAgent, LanguageModel)) <- function(on, to
         if (!is.null(on@description))
             paste0("\n\nYour task is:\n", on@description, "\n\n"), 
         "The user will pass a list of arguments to you.",
-        "You will perform your task on the input and return the result.\n\n",
-        if (length(on@examples > 0L))
-            paste0("Example(s):\n\n", describe_examples(on@examples))
+        "You will perform your task on the input and return the result.\n\n"
     ), collapse = "")
 }
 
