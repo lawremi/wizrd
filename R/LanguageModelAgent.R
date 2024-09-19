@@ -61,5 +61,5 @@ agent_io_binding <- function(x, tool) {
 
 become <- function(model, tool) {
     do.call(LanguageModelAgent,
-            c(agent_fun(formals(tool)), props(tool), model = model))
+            c(agent_fun(function_formals(tool)), props(tool), model = model))
 }

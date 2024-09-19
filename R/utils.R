@@ -365,3 +365,13 @@ list_S7_property <- new_S3_class(c("list_S7_property", "S7_property"))
 numeric_S7_property <- new_S3_class(c("numeric_S7_property", "S7_property"))
 
 nameOfClass.S7_S3_class <- function(x) x$class[1L]
+
+as_stub_closure <- function(x) {
+    eval(parse(text = capture.output(args(x)))[[1L]])
+}
+
+function_formals <- function(x) {
+    if (is.primitive(x))
+        x <- as_stub_closure(x)
+    formals(x)
+}

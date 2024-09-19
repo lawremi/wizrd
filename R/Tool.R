@@ -1,5 +1,5 @@
 validate_Tool <- function(self) {
-    formal_names <- names(formals(self) |> dodge_dots())
+    formal_names <- names(tool_formals(self))
     extra_sig_args <- setdiff(names(self@signature@parameters@properties),
                               formal_names)
     extra_param_descs <- setdiff(names(self@param_descriptions), formal_names)
@@ -38,7 +38,8 @@ method(print, Tool) <- function(x, ...) {
     cat("\n")
 }
 
-any_signature <- function(args) {
+any_signature <- function(FUN) {
+    args <- function_formals(FUN)
     params <- as.list(args)
     params[] <- list(class_any)
     if (!is.null(params$"..."))
@@ -48,7 +49,9 @@ any_signature <- function(args) {
 
 norm_examples <- function(FUN, examples, signature) {
     lapply(examples, \(example) {
-        mc <- match.call(FUN, as.call(examples), expand.dots = FALSE) |>
+        if (is.primitive(FUN))
+            FUN <- as_stub_closure(FUN)
+        mc <- match.call(FUN, as.call(c(FUN, example)), expand.dots = FALSE) |>
             dodge_dots() |> as.list()
         do.call(signature@parameters, mc[-1L])
     })
@@ -89,7 +92,7 @@ add_Rd <- function(tool) {
     tool
 }
 
-tool <- function(FUN, signature = any_signature(formals(FUN)),
+tool <- function(FUN, signature = any_signature(FUN),
                  name = deparse(substitute(FUN)),
                  description = NULL, param_descriptions = character(),
                  value_description = NULL, examples = list())
@@ -143,13 +146,17 @@ json_schema_add_defaults <- function(params, formals) {
     }, params, formals)
 }
 
+tool_formals <- function(tool) {
+    function_formals(tool) |> dodge_dots()
+}
+
 json_schema_param_descs <- function(tool) {
-    formals <- dodge_dots(formals(tool))
-    lapply(tool@param_descriptions[names(formals)], \(desc) {
+    param_names <- names(tool@signature@parameters@properties)
+    lapply(tool@param_descriptions[param_names], \(desc) {
         if (!is.na(desc))
             list(description = desc)
         else TRUE
-    }) |> json_schema_add_defaults(formals)
+    }) |> json_schema_add_defaults(tool_formals(tool))[param_names]
 }
 
 tool_input_json_schema <- function(sig_params, param_descs) {
