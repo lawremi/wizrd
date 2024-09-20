@@ -40,5 +40,5 @@ BugReports: https://github.com/lawremi/wizrd/issues
 Collate: utils.R ToolCall.R TextFormat.R ChatMessage.R LanguageModelParams.R
 	 TextProtocol.R ToolSignature.R Tool.R LanguageModel.R Chat.R
 	 LanguageModelAgent.R LanguageModelServer.R OpenAIAPIServer.R
-	 LlamaCppServer.R OllamaServer.R RemoteLanguageModel.R openai.R become.R
-	 json_schema.R zzz.R
+	 LlamaCppServer.R OllamaServer.R AzureOpenAIServer.R
+	 RemoteLanguageModel.R openai.R become.R json_schema.R zzz.R

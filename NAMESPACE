@@ -4,7 +4,8 @@ importFrom(jsonlite, toJSON, fromJSON)
 importFrom(stats, predict)
 
 # model constructors
-export(language_model, ollama_model, llama_cpp_model, openai_model)
+export(language_model, ollama_model, llama_cpp_model, openai_model,
+       azure_openai_model)
 # other constructors
 export(chat, tool, tool_signature)
 # builders

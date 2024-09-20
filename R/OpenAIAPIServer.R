@@ -94,7 +94,7 @@ method(chat, OpenAIAPIServer) <- function(x, model, messages, tools,
 
 method(perform_chat, OpenAIAPIServer) <- function(x, body, stream_callback) {
     req <- create_request(x) |>
-        httr2::req_url_path_append("v1", "chat", "completions") |>
+        httr2::req_url_path_append(chat_completions_path(x, body$model)) |>
         httr2::req_body_json(body)
     if (!is.null(stream_callback)) {
         req |> req_capture_stream_openai(stream_callback)
@@ -107,6 +107,10 @@ method(perform_chat, OpenAIAPIServer) <- function(x, body, stream_callback) {
 
 method(req_auth_fun, OpenAIAPIServer) <- function(server) {
     httr2::req_auth_bearer_token
+}
+
+method(chat_completions_path, OpenAIAPIServer) <- function(server) {
+    "v1/chat/completions"
 }
 
 openai_tool_calls <- function(message) {
