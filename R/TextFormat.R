@@ -174,16 +174,16 @@ default_example <- function(class) {
 }
 
 output_as <- function(x, class = S7_object, description = NULL,
-                      example = NULL, ...)
+                      examples = setNames(list(), character()), ...)
 {
     if (is.null(example))
         example <- default_example(class)
     stopifnot(is.list(examples),
               all(vapply(examples, inherits, logical(1L), class)))
     schema <- as_json_schema(class, description, ...)
-    example <- as_json(example)
+    examples <- lapply(examples, as_json)
     format <- JSONFormat(schema = schema, schema_class = class,
-                         example = example)
+                         examples = examples)
     x@io@output <- format
     x
 }

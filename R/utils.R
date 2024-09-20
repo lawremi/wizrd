@@ -27,7 +27,12 @@ named <- function(prop) {
     prop$validator <- \(value)
         c(if (is.null(names(value)))
             "must have names",
-          validator(value))
+          if (!is.null(validator))
+              validator(value))
+    if (is.null(prop$default))
+        prop$default <- S7:::prop_default(prop)
+    if (is.null(names(prop$default)))
+        names(prop$default) <- rep("", length(prop$default))
     prop
 }
 

@@ -95,7 +95,8 @@ add_Rd <- function(tool) {
 tool <- function(FUN, signature = any_signature(FUN),
                  name = deparse(substitute(FUN)),
                  description = NULL, param_descriptions = character(),
-                 value_description = NULL, examples = list())
+                 value_description = NULL,
+                 examples = setNames(list(), character()))
 {
     force(name)
     FUN <- match.fun(FUN)
@@ -156,7 +157,7 @@ json_schema_param_descs <- function(tool) {
         if (!is.na(desc))
             list(description = desc)
         else TRUE
-    }) |> json_schema_add_defaults(tool_formals(tool))[param_names]
+    }) |> json_schema_add_defaults(tool_formals(tool)[param_names])
 }
 
 tool_input_json_schema <- function(sig_params, param_descs) {
