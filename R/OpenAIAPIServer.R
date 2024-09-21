@@ -45,28 +45,15 @@ openai_add_params <- function(body, params) {
 
 req_perform_sse <- function(req, onmessage_callback = NULL,
                             event_callbacks = list(),
-                            timeout_sec = Inf, buffer_kb = 64,
-                            reconnection_time = 3000L)
+                            timeout_sec = Inf, buffer_kb = 64)
 {
-    last_id <- "" # needed in header when reconnecting
     callback <- function(bytes) {
         text <- rawToChar(bytes)
         msgs <- strsplit(text, "\n\n", fixed = TRUE)[[1L]]
         m <- gregexec("(event|data|id|retry): ?(.*)", msgs, perl = TRUE)
         for (mat in regmatches(msgs, m)) {
             event <- split(mat[3L,], mat[2L,])
-            if (identical(event$data, ""))
-                next
-            event$data <- paste0(paste(sub("\n$", "", event$data),
-                                       collapse = "\n"),
-                                 "\n")
-            if (identical(event$id, ""))
-                event$id <- NULL
-            event$last_id <- last_id
-            last_id <<- event$id %||% last_id
-            retry <- suppressWarnings(as.integer(event$retry)[1L])
-            if (!is.na(retry))
-                reconnection_time <- retry
+            event$data <- paste(event$data, collapse = "\n")
             if (is.null(event$event)) {
                 event$event <- "message"
                 callback <- onmessage_callback
@@ -81,7 +68,6 @@ req_perform_sse <- function(req, onmessage_callback = NULL,
     }
     httr2::req_perform_stream(req, callback, timeout_sec, buffer_kb, round)
 }
-
 
 req_capture_stream_openai <- function(req, stream_callback) {
     assert_function(stream_callback, nargs = 1L)
