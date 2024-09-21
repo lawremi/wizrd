@@ -100,7 +100,8 @@ method(tool_instructions, LanguageModel) <- function(x) {
                    paste0("Specific instructions for '", binding@tool@name,
                           "':\n",
                           paste(c(binding@instructions,
-                                  describe_examples(binding@tool@examples)),
+                                  describe_examples(binding@tool@examples,
+                                                    binding@io@input)),
                                 collapse = "\n"))
            })), collapse = "\n\n"))
 }
@@ -121,9 +122,9 @@ method(output_instructions,
     NULL
 }
 
-describe_examples <- function(ex) {
+describe_examples <- function(ex, format = TextFormat()) {
     if (length(ex) > 0L) {
-        ex <- vapply(ex, textify, character(1L))
+        ex <- vapply(ex, textify, character(1L), format)
         paste0("Example(s):\n\n",
                paste0(names(ex), "\nwould be encoded as:\n", ex,
                       collapse = "\n\n"))
@@ -131,7 +132,7 @@ describe_examples <- function(ex) {
 }
 
 append_examples <- function(prompt, on) {
-    paste(c(prompt, describe_examples(on@examples)), collapse = "\n")
+    paste(c(prompt, describe_examples(on@examples, on)), collapse = "\n")
 }
 
 method(output_instructions,
