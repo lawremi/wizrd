@@ -69,21 +69,17 @@ method(as_json_schema, S7_union) <- function(from, descriptions = NULL, ...) {
                      ))
 }
 
-base_json_schema_type <- function(from, scalar) {
-    if (scalar)
-        switch(from$class, logical = "boolean",
-               integer = "integer", double = "number",
-               complex =, raw =, character = "string")
-    else switch(from$class, logical =, integer =,
-                double =, character =, list =, complex =, raw =,
-                expression =, environment = "array",
-                name =, call =, `function` = "string")
+base_json_schema_type <- function(from) {
+    switch(from$class, logical = "boolean",
+           integer = "integer", double = "number",
+           complex =, raw =, character =,
+           name =, call =, `function` =  "string")
 }
 
-s3_json_schema_type <- function(from, scalar) {
+s3_json_schema_type <- function(from) {
     string_classes <- c("Date", "factor", "POSIXt", "formula")
     if (any(string_classes %in% from$class)) {
-        if (scalar) "string" else "array"
+        "string"
     } else if ("data.frame" %in% from$class)
         "object"
 }
@@ -91,11 +87,9 @@ s3_json_schema_type <- function(from, scalar) {
 base_json_schema <- function(from, description = NULL, scalar = FALSE,
                              named = FALSE, type_mapper = base_json_schema_type)
 {
-    type <- type_mapper(from, scalar)
+    type <- if (named) "object" else if (!scalar) "array" else type_mapper(from)
     if (is.null(type))
         return(setNames(c(list(), description), character()))
-    if (named)
-        type <- "object"
     schema <- list(type = type)
     if (type == "array")
         schema$items <- base_json_schema(from, scalar = TRUE,
@@ -115,8 +109,9 @@ base_json_schema <- function(from, description = NULL, scalar = FALSE,
 }
 
 method(as_json_schema, S7_base_class) <- function(from, description = NULL,
-                                                  scalar = FALSE, named = FALSE)
+                                                  scalar = NULL, named = FALSE)
 {
+    scalar <- scalar %||% from$class %in% c("name", "call", "function")
     base_json_schema(from, description, scalar, named)
 }
 
@@ -132,7 +127,10 @@ method(as_json_schema, S7_S3_class) <- function(from, description = NULL) {
     if (is.null(description))
         description <- paste("S3 object of class",
                              paste(from$class, collapse = ", "))
-    base_json_schema(from, description, type_mapper = s3_json_schema_type)
+    known_vector_classes <- c("Date", "POSIXt", "factor", "data.frame")
+    scalar <- !any(from$class %in% known_vector_classes)
+    base_json_schema(from, description, scalar,
+                     type_mapper = s3_json_schema_type)
 }
 
 method(as_json_schema, S7_property) <- function(from, description = NULL, ...) {
