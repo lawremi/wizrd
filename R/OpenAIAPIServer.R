@@ -43,20 +43,34 @@ openai_add_params <- function(body, params) {
     body
 }
 
-req_perform_sse <- function(req, event_callbacks = list(),
-                            onmessage_callback = NULL,
-                            timeout_sec = Inf, buffer_kb = 64)
+req_perform_sse <- function(req, onmessage_callback = NULL,
+                            event_callbacks = list(),
+                            timeout_sec = Inf, buffer_kb = 64,
+                            reconnection_time = 3000L)
 {
+    last_id <- "" # needed in header when reconnecting
     callback <- function(bytes) {
         text <- rawToChar(bytes)
         msgs <- strsplit(text, "\n\n", fixed = TRUE)[[1L]]
-        m <- gregexec("(event|data|id|retry):?(.*)", msgs, perl = TRUE)
+        m <- gregexec("(event|data|id|retry): ?(.*)", msgs, perl = TRUE)
         for (mat in regmatches(msgs, m)) {
             event <- split(mat[3L,], mat[2L,])
-            event$data <- paste(event$data, collapse = "\n")
-            if (is.null(event$event))
+            if (identical(event$data, ""))
+                next
+            event$data <- paste0(paste(sub("\n$", "", event$data),
+                                       collapse = "\n"),
+                                 "\n")
+            if (identical(event$id, ""))
+                event$id <- NULL
+            event$last_id <- last_id
+            last_id <<- event$id %||% last_id
+            retry <- suppressWarnings(as.integer(event$retry)[1L])
+            if (!is.na(retry))
+                reconnection_time <- retry
+            if (is.null(event$event)) {
+                event$event <- "message"
                 callback <- onmessage_callback
-            else callback <- event_callbacks[[event$event]]
+            } else callback <- event_callbacks[[event$event]]
             if (!is.null(callback) && !isTRUE(callback(event)))
                 return(FALSE)
         }
@@ -65,21 +79,23 @@ req_perform_sse <- function(req, event_callbacks = list(),
     round <- function(bytes) {
         which(diff(bytes == charToRaw("\n")) == 0L)
     }
-    req_perform_stream(req, callback, timeout_sec, buffer_kb, round)
+    httr2::req_perform_stream(req, callback, timeout_sec, buffer_kb, round)
 }
+
 
 req_capture_stream_openai <- function(req, stream_callback) {
     assert_function(stream_callback, nargs = 1L)
     content <- NULL
     sse_callback <- function(event) {
-        data <- fromJSON(event$data)
+        if (event$data == "[DONE]")
+            return(FALSE)
+        data <- fromJSON(event$data, simplifyDataFrame = FALSE)
         new_content <- data$choices[[1L]]$delta$content
         content <<- c(content, new_content)
-        if (!is.null(new_content))
-            stream_callback(new_content)
+        stream_callback(new_content)
     }
-    req_perform_sse(req, sse_callback)
-    ChatMessage(content = paste(content, collapse = ""))
+    req_perform_sse(req, sse_callback, buffer_kb = 256 / 1024)
+    ChatMessage(role = "assistant", content = paste(content, collapse = ""))
 }
 
 method(chat, OpenAIAPIServer) <- function(x, model, messages, tools,

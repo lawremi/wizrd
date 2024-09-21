@@ -37,6 +37,21 @@ test_that("chat() and predict() work for images", {
     expect_match(last_output(chat), "Yes")
 })
 
+test_that("chat() can stream responses", {
+    model <- llama3()
+    
+    model@instructions <- "Respond with a single sentence"
+
+    all_content <- ""
+    stream_callback <- function(content) {
+        all_content <<- paste0(all_content, content)
+        TRUE
+    }
+    
+    chat <- chat(model, "Who created R?", stream_callback = stream_callback)
+    
+})
+
 test_that("models can call R functions as tools", {
     model <- llama3()
     
