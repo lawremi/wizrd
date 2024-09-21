@@ -83,7 +83,8 @@ req_perform_sse <- function(req, onmessage_callback = NULL,
         TRUE
     }
     round <- function(bytes) {
-        which(diff(bytes == charToRaw("\n")) == 0L)
+        nl <- bytes == charToRaw("\n")
+        which(diff(nl) == 0L & nl[-1L])
     }
     httr2::req_perform_stream(req, callback, timeout_sec, buffer_kb, round)
 }
@@ -152,6 +153,8 @@ method(chat_message, OpenAIAPIResponse) <- function(x) {
     ChatMessage(content = msg$content, tool_calls = openai_tool_calls(msg),
                 role = "assistant", refusal = msg$refusal)
 }
+
+method(chat_message, ChatMessage) <- function(x) x
 
 openai_encode_message <- function(x) {
     content <- openai_encode_content(x@content)

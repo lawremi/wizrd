@@ -46,9 +46,11 @@ test_that("chat() can stream responses", {
         all_content <<- paste0(all_content, content)
         TRUE
     }
-    
-    chat <- chat(model, "Who created R?", stream_callback = stream_callback)
-    
+
+    prompt <- "Who created R?"
+    ans <- predict(model, prompt, stream_callback = stream_callback)
+    expect_equal(ans, all_content)
+    expect_equal(predict(model, prompt), all_content)
 })
 
 test_that("models can call R functions as tools", {
