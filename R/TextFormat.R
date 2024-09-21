@@ -19,8 +19,26 @@ CSVFormat <- new_class("CSVFormat", PlainTextFormat,
 CodeFormat <- new_class("CodeFormat", PlainTextFormat,
                         properties = list(language = nullable(prop_string)))
 
+expect_format <- function(x, format = TextFormat()) {
+    x@io@input <- format
+    x
+}
+
+expect_json <- function(x, schema = list(), examples = list()) {
+    expect_format(x, JSONFormat(schema = schema, examples = examples))
+}
+
+expect_csv <- function(x, schema = list(), examples = list()) {
+    expect_format(x, CSVFormat(schema = schema, examples = examples))
+}
+
+expect_code <- function(x) {
+    expect_format(x, CodeFormat())
+}
+
 respond_with_format <- function(x, format = TextFormat()) {
-    set_props(x, response_format = format)
+    x@io@output <- format
+    x
 }
 
 respond_with_json <- function(x, schema = list(), examples = list()) {

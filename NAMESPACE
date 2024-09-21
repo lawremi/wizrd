@@ -9,7 +9,7 @@ export(language_model, ollama_model, llama_cpp_model, openai_model,
 # other constructors
 export(chat, tool, tool_signature)
 # builders
-export(equip, unequip)
+export(equip, unequip, instruct, expect_json, respond_with_json)
 # accessors
 export(last_output)
 # convenience models
