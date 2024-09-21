@@ -19,21 +19,47 @@ CSVFormat <- new_class("CSVFormat", PlainTextFormat,
 CodeFormat <- new_class("CodeFormat", PlainTextFormat,
                         properties = list(language = nullable(prop_string)))
 
+json_format <- function(schema = list(),
+                        examples = setNames(list(), character()))
+{
+    schema_class <- if (inherits(schema, S7_class)) schema else class_any
+    schema <- as_json_schema(schema)
+    examples <- lapply(examples, jsonify)
+    JSONFormat(schema = schema, schema_class = schema_class,
+               examples = examples)
+}
+
+csv_format <- function(schema = data.frame(),
+                       examples = setNames(list(), character()))
+{
+    schema <- as_csv_json_schema(schema)
+    examples <- lapply(examples, as.data.frame)
+    CSVFormat(schema = schema, examples = examples)
+}
+
+code_format <- function(language = "R") {
+    CodeFormat(language = language)
+}
+
 expect_format <- function(x, format = TextFormat()) {
     x@io@input <- format
     x
 }
 
-expect_json <- function(x, schema = list(), examples = list()) {
-    expect_format(x, JSONFormat(schema = schema, examples = examples))
+expect_json <- function(x, schema = list(),
+                        examples = setNames(list(), character()))
+{
+    expect_format(x, json_format(schema, examples))
 }
 
-expect_csv <- function(x, schema = list(), examples = list()) {
-    expect_format(x, CSVFormat(schema = schema, examples = examples))
+expect_csv <- function(x, schema = data.frame(),
+                       examples = setNames(list(), character()))
+{
+    expect_format(x, csv_format(schema, examples))
 }
 
-expect_code <- function(x) {
-    expect_format(x, CodeFormat())
+expect_code <- function(x, language = "R") {
+    expect_format(x, code_format(language))
 }
 
 respond_with_format <- function(x, format = TextFormat()) {
@@ -41,16 +67,20 @@ respond_with_format <- function(x, format = TextFormat()) {
     x
 }
 
-respond_with_json <- function(x, schema = list(), examples = list()) {
-    respond_with_format(x, JSONFormat(schema = schema, examples = examples))
+respond_with_json <- function(x, schema = list(),
+                        examples = setNames(list(), character()))
+{
+    respond_with_format(x, json_format(schema, examples))
 }
 
-respond_with_csv <- function(x, schema = list(), examples = list()) {
-    respond_with_format(x, CSVFormat(schema = schema, examples = examples))
+respond_with_csv <- function(x, schema = data.frame(),
+                       examples = setNames(list(), character()))
+{
+    respond_with_format(x, csv_format(schema, examples))
 }
 
-respond_with_code <- function(x) {
-    respond_with_format(x, CodeFormat())
+respond_with_code <- function(x, language = "R") {
+    respond_with_format(x, code_format(language))
 }
 
 textify <- new_generic("textify", c("x", "format"))
@@ -173,38 +203,6 @@ method(detextify, list(class_list, JSONFormat)) <- function(x, format) {
 }
 
 method(detextify, list(class_any, TextFormat)) <- function(x, format) x
-
-Example <- new_class("Example",
-                     properties = list(
-                         property1 = new_property(class_numeric,
-                                                  default = 42),
-                         property2 = new_property(class_character,
-                                                  default = "Hello, World!"),
-                         property3 = new_property(class_logical,
-                                                  default = TRUE)))
-
-default_example <- function(class) {
-    ex <- if (identical(class, S7_object))
-        Example()
-    else class()
-    desc <- paste0("An object with this structure:\n", capture.output(str(ex)))
-    setNames(list(ex), desc)
-}
-
-output_as <- function(x, class = S7_object, description = NULL,
-                      examples = setNames(list(), character()), ...)
-{
-    if (is.null(example))
-        example <- default_example(class)
-    stopifnot(is.list(examples),
-              all(vapply(examples, inherits, logical(1L), class)))
-    schema <- as_json_schema(class, description, ...)
-    examples <- lapply(examples, as_json)
-    format <- JSONFormat(schema = schema, schema_class = class,
-                         examples = examples)
-    x@io@output <- format
-    x
-}
 
 method(textify, list(class_any, CodeFormat)) <- function(x, format) {
     paste(c(paste(c("```", format@language), collapse = ""),
