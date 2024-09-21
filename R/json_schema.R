@@ -161,8 +161,31 @@ method(as_json_schema, list_S7_property) <- function(from, description = NULL)
     c(schema, items = if (!is.null(from$of)) list(as_json_schema(from$of)))
 }
 
-method(as_json_schema, numeric_S7_property) <- function(from, description = NULL)
+method(as_json_schema, numeric_S7_property) <- function(from,
+                                                        description = NULL)
 {
     schema <- as_json_schema(super(from, scalar_S7_property), description)
     c(schema, minimum = from$min, maximum = from$max)
+}
+
+method(as_json_schema, class_data.frame) <- function(from, description = NULL) {
+    schema <- list(type = "array",
+                   items = list(
+                       type = "object",
+                       properties = lapply(from, as_json_schema, scalar = TRUE)
+                   ))
+    schema$description <- description
+    schema
+}
+
+as_csv_json_schema <- new_generic("as_csv_json_schema", "from")
+
+method(as_csv_json_schema, class_list) <- function(from, ...) from
+
+method(as_csv_json_schema, class_data.frame) <- function(from,
+                                                         description = NULL)
+{
+    schema <- list(type = "object", properties = lapply(from, as_json_schema))
+    schema$description <- description
+    schema
 }
