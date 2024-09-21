@@ -105,12 +105,16 @@ method(perform_chat, OpenAIAPIServer) <- function(x, body, stream_callback) {
     }
 }
 
-method(req_auth_fun, OpenAIAPIServer) <- function(server) {
-    httr2::req_auth_bearer_token
+method(add_api_key, OpenAIAPIServer) <- function(server, req, key) {
+    httr2::req_auth_bearer_token(req, key)
+}
+
+method(add_api_version, OpenAIAPIServer) <- function(server, req) {
+    httr2::req_url_path_append(req, "v1")
 }
 
 method(chat_completions_path, OpenAIAPIServer) <- function(server) {
-    "v1/chat/completions"
+    "chat/completions"
 }
 
 openai_tool_calls <- function(message) {

@@ -12,16 +12,14 @@ azure_openai_model <- function(name = "gpt-4o", ...) {
     language_model(azure_openai_server(), name, ...)
 }
 
-method(req_auth_fun, AzureOpenAIServer) <- function(server) {
-    function(req, key) {
-        httr2::req_headers(req, "api-key" = key)
-    }
+method(add_api_key, AzureOpenAIServer) <- function(server, req, key) {
+    httr2::req_headers(req, "api-key" = key)
 }
 
 method(chat_completions_path, AzureOpenAIServer) <- function(server, model) {
     paste0("openai/deployments/", model, "/chat/completions")
 }
 
-method(init_request, AzureOpenAIServer) <- function(server, req) {
+method(add_api_version, AzureOpenAIServer) <- function(server, req) {
     httr2::req_url_query(req, "api-version" = AZURE_OPENAI_API_VERSION)
 }

@@ -15,18 +15,17 @@ method(language_model, LanguageModelServer) <-
 
 chat_completions_path <- new_generic("chat_completions_path", "server")
 
-req_auth_fun <- new_generic("req_auth_fun", "server")
+add_api_key <- new_generic("add_api_key", "server",
+                           function(server, req, key) S7_dispatch())
 
-init_request <- new_generic("init_request", "server",
+add_api_version <- new_generic("add_api_version", "server",
                             function(server, req) S7_dispatch())
-
-method(init_request, LanguageModelServer) <- function(server, req) req
 
 create_request <- function(server) {
     req <- httr2::request(server@url) |> httr2::req_retry(max_tries = 10L)
     if (nzchar(server@key_prefix))
-        req <- req_auth_fun(server)(req, get_api_key(server@key_prefix))
-    init_request(server, req)
+        req <- add_auth_key(server, req, get_api_key(server@key_prefix))
+    add_api_version(server, req)
 }
 
 method(print, LanguageModelServer) <- function(x, ...) {
