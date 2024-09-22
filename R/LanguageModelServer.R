@@ -24,7 +24,7 @@ add_api_version <- new_generic("add_api_version", "server",
 create_request <- function(server) {
     req <- httr2::request(server@url) |> httr2::req_retry(max_tries = 10L)
     if (nzchar(server@key_prefix))
-        req <- add_auth_key(server, req, get_api_key(server@key_prefix))
+        req <- add_api_key(server, req, get_api_key(server@key_prefix))
     add_api_version(server, req)
 }
 
