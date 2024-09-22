@@ -380,3 +380,10 @@ function_formals <- function(x) {
         x <- as_stub_closure(x)
     formals(x)
 }
+
+class_object <- function(x) {
+    if (is.null(x))
+        return(NULL)
+    S7_class(x) %||% as_class(methods::getClassDef(class(x)[1L])) %||%
+        new_S3_class(class(x))
+}
