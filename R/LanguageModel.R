@@ -143,7 +143,9 @@ method(output_instructions,
         prompt <- paste0(prompt,
                          "The JSON must conform to the following schema:\n\n",
                          toJSON(on@schema),
-                         "\nEnsure the JSON matches this schema exactly.\n")
+                         "\nIf the user input is incompatible with the task, ",
+                         "issue an informative refusal. Otherwise, ",
+                         "ensure the JSON matches this schema exactly.\n")
     append_examples(prompt, on)
 }
 
@@ -170,7 +172,9 @@ method(output_instructions,
                          "\nInterpret the JSON schema to understand ",
                          "the required columns and data types and produce ",
                          "the corresponding CSV. ",
-                         "Ensure the CSV matches this schema exactly.\n")
+                         "If the user input is incompatible with the task, ",
+                         "issue an informative refusal. Otherwise, ",
+                         "ensure the CSV matches this schema exactly.\n")
     append_examples(prompt, on)
 }
 
