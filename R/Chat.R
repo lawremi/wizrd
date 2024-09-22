@@ -51,12 +51,12 @@ last_message <- function(x, role = NULL) {
     msg
 }
 
-last_prompt <- function(x) last_message(x, "user")@content
-last_input <- function(x) last_message(x, "user")@object
+last_prompt <- function(x) last_message(x, "user")
+last_input <- function(x) last_input(x)@object
 
-last_response <- function(x) last_message(x, "assistant")@content
+last_response <- function(x) last_message(x, "assistant")
 last_output <- function(x) {
-    msg <- last_message(x, "assistant")
+    msg <- last_response(x)
     if (!is.null(msg$refusal))
         stop("model refused to generate requested output: ", msg$refusal)
     msg@object
