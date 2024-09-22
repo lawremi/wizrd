@@ -142,7 +142,7 @@ method(output_instructions,
     if (length(on@schema) > 0L)
         prompt <- paste0(prompt,
                          "The JSON must conform to the following schema:\n\n",
-                         toJSON(on),
+                         toJSON(on@schema),
                          "\nEnsure the JSON matches this schema exactly.\n")
     append_examples(prompt, on)
 }
@@ -154,7 +154,7 @@ method(input_instructions,
     if (length(on@schema) > 0L)
         prompt <- paste0(prompt,
                          "The JSON will conform to the following schema:\n\n",
-                         toJSON(on),
+                         toJSON(on@schema),
                          "\nExpect the JSON to match this schema exactly.\n")
     append_examples(prompt, on)
 }
@@ -165,8 +165,8 @@ method(output_instructions,
     prompt <- "Return only CSV, without any explanation or other text.\n"
     if (length(on@schema) > 0L)
         prompt <- paste0(prompt,
-                         "This JSON schema defines the structure of the data:\n",
-                         toJSON(on),
+                         "This JSON schema defines the columns of the data:\n",
+                         toJSON(on@schema),
                          "\nInterpret the JSON schema to understand ",
                          "the required columns and data types and produce ",
                          "the corresponding CSV. ",
@@ -180,8 +180,8 @@ method(input_instructions,
     prompt <- "The user will send only CSV, without any other text.\n"
     if (length(on@schema) > 0L)
         prompt <- paste0(prompt,
-                         "This JSON schema defines the structure of the data:\n",
-                         toJSON(on),
+                         "This JSON schema defines the columns of the data:\n",
+                         toJSON(on@schema),
                          "\nInterpret the JSON schema to understand ",
                          "the expected columns and data types. ",
                          "Expect the CSV to match this schema exactly.\n")
