@@ -52,7 +52,8 @@ method(as_json_schema, S7_class) <- function(from, description = NULL, ...) {
             as_json_schema(base_class, description = desc)
     }
     schema <- list(type = "object", title = from@name,
-                   properties = prop_schema)
+                   properties = prop_schema,
+                   additionalProperties = FALSE)
     description <- c(description, if (!is.null(Rd)) Rd_description(Rd))
     schema$description <- paste(description, collapse = " ")
     required <- names(Filter(Negate(valid_by_default), props))
@@ -62,10 +63,11 @@ method(as_json_schema, S7_class) <- function(from, description = NULL, ...) {
 }
 
 method(as_json_schema, S7_union) <- function(from, descriptions = NULL, ...) {
-    list(anyOf = Map(as_json_schema,
-                     from$classes,
-                     as.list(descriptions)[seq_along(from$classes)]
-                     ))
+    schemas <- Map(as_json_schema, from$classes,
+                   as.list(descriptions)[seq_along(from$classes)])
+    list(anyOf = schemas,
+         title = paste(vapply(schemas, `[[`, character(1L), "title"),
+                       collapse=" or "))
 }
 
 base_json_schema_type <- function(from) {
@@ -88,10 +90,11 @@ s3_json_schema_type <- function(from) {
 base_json_schema <- function(from, description = NULL, scalar = FALSE,
                              named = FALSE, type_mapper = base_json_schema_type)
 {
+    schema <- list(title = from[1L])
     type <- if (named) "object" else if (!scalar) "array" else type_mapper(from)
     if (is.null(type))
-        return(setNames(c(list(), description), character()))
-    schema <- list(type = type)
+        return(c(schema, description = description))
+    schema$type <- type
     if (type == "array" && !scalar)
         schema$items <- base_json_schema(from, scalar = TRUE,
                                          type_mapper = type_mapper)
@@ -117,19 +120,16 @@ method(as_json_schema, S7_base_class) <- function(from, description = NULL,
 }
 
 method(as_json_schema, NULL) <- function(from, description = NULL) {
-    c(list(type = NULL), description = description)
+    c(list(type = NULL, title = "NULL"), description = description)
 }
 
 method(as_json_schema, S7_any) <- function(from, description = NULL) {
-    c(list(), description = description)
+    c(list(title = "Anything"), description = description)
 }
 
 method(as_json_schema, S7_S3_class) <- function(from, description = NULL,
                                                 scalar = NULL)
 {
-    if (is.null(description))
-        description <- paste("S3 object of class",
-                             paste(from$class, collapse = ", "))
     known_vector_classes <- c("Date", "POSIXt", "factor", "data.frame",
                               "matrix", "array")
     if (is.null(scalar))
@@ -178,9 +178,12 @@ json_schema_for_object <- function(x, ...) as_json_schema(class_object(x), ...)
 method(as_json_schema, class_data.frame) <- function(from, description = NULL) {
     schema <- list(type = "array",
                    items = list(
+                       title = "data.frame",
                        type = "object",
                        properties = lapply(from, json_schema_for_object,
-                                           scalar = TRUE)
+                                           scalar = TRUE),
+                       additionalProperties = FALSE,
+                       required = names(from)
                    ))
     schema$description <- description
     schema
@@ -193,8 +196,11 @@ method(as_csv_json_schema, class_list) <- function(from, ...) from
 method(as_csv_json_schema, class_data.frame) <- function(from,
                                                          description = NULL)
 {
-    schema <- list(type = "object",
-                   properties = lapply(from, json_schema_for_object))
+    schema <- list(title = "data.frame",
+                   type = "object",
+                   properties = lapply(from, json_schema_for_object),
+                   additionalProperties = FALSE,
+                   required = names(from))
     schema$description <- description
     schema
 }
