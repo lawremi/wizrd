@@ -44,8 +44,7 @@ method(as_json_schema, S7_class) <- function(from, description = NULL, ...) {
     Rd <- get_Rd(from@name)
     arg_descriptions <- if (!is.null(Rd)) Rd_args(Rd) else list()
     props <- Filter(Negate(prop_read_only), from@properties)
-    prop_schema <- Map(as_json_schema, props, arg_descriptions[names(props)],
-                       MoreArgs = list(...))
+    prop_schema <- Map(as_json_schema, props, arg_descriptions[names(props)])
     base_class <- base_ancestor_class(from)
     if (!is.null(base_class)) {
         desc <- "Base R object representing instances of the class"
@@ -82,6 +81,8 @@ s3_json_schema_type <- function(from) {
         "string"
     } else if ("data.frame" %in% from$class)
         "object"
+    else if ("matrix" %in% from$class) # arrays not handled because could be 1D
+        "array"
 }
 
 base_json_schema <- function(from, description = NULL, scalar = FALSE,
@@ -91,7 +92,7 @@ base_json_schema <- function(from, description = NULL, scalar = FALSE,
     if (is.null(type))
         return(setNames(c(list(), description), character()))
     schema <- list(type = type)
-    if (type == "array")
+    if (type == "array" && !scalar)
         schema$items <- base_json_schema(from, scalar = TRUE,
                                          type_mapper = type_mapper)
     else if (named)
