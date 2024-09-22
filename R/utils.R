@@ -369,6 +369,8 @@ string_S7_property <- new_S3_class(c("string_S7_property", "S7_property"))
 list_S7_property <- new_S3_class(c("list_S7_property", "S7_property"))
 numeric_S7_property <- new_S3_class(c("numeric_S7_property", "S7_property"))
 
+class_json <- new_S3_class("json") # from jsonlite
+
 nameOfClass.S7_S3_class <- function(x) x$class[1L]
 
 as_stub_closure <- function(x) {

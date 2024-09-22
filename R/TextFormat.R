@@ -97,6 +97,8 @@ method(textify, list(class_list, TextFormat)) <- function(x, format) {
     lapply(unname(x), textify, format)
 }
 
+method(textify, list(class_json, TextFormat)) <- function(x, format) unclass(x)
+
 nativeRaster <- new_S3_class("nativeRaster")
 raster <- new_S3_class("raster")
 union_raster <- new_union(nativeRaster, raster)
@@ -130,12 +132,12 @@ method(jsonify, S7_object) <- function(x) {
 
 method(textify, list(class_list | class_any, JSONFormat)) <- function(x, format)
 {
-    toJSON(jsonify(x), null = "null")
+    unclass(toJSON(jsonify(x), null = "null"))
 }
 
 ## Could this be done with S7?
-json <- function(x) structure(x, class = "json")
-class_json <- new_S3_class("json")
+jsonic <- function(x) structure(x, class = "jsonic")
+class_jsonic <- new_S3_class("jsonic")
 
 dejsonify <- new_generic("dejsonify", c("x", "spec"))
 
@@ -152,17 +154,17 @@ method(dejsonify, list(class_any, list_S7_property)) <- function(x, spec) {
     lapply(x, dejsonify, spec$of)
 }
 
-method(convert, list(class_json, class_raw)) <- function(from, to) {
+method(convert, list(class_jsonic, class_raw)) <- function(from, to) {
     require_ns("base64enc", "decode raw vectors from JSON")
     base64enc::base64decode(from)
 }
 
-method(convert, list(class_json, class_function)) <- function(from, to) {
+method(convert, list(class_jsonic, class_function)) <- function(from, to) {
     p <- parse(text=from)[[1L]]
     as.function(c(p[[2L]], p[[3L]]), .GlobalEnv)
 }
 
-method(convert, list(class_json, class_call)) <- function(from, to) {
+method(convert, list(class_jsonic, class_call)) <- function(from, to) {
     parse(text=from)[[1L]]
 }
 
