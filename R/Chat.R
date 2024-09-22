@@ -55,7 +55,12 @@ last_prompt <- function(x) last_message(x, "user")@content
 last_input <- function(x) last_message(x, "user")@object
 
 last_response <- function(x) last_message(x, "assistant")@content
-last_output <- function(x) last_message(x, "assistant")@object
+last_output <- function(x) {
+    msg <- last_message(x, "assistant")
+    if (!is.null(msg$refusal))
+        stop("model refused to generate requested output: ", msg$refusal)
+    msg@object
+}
 
 append_messages <- function(x, ...) {
     set_props(x, messages = c(x@messages, list(...)))
