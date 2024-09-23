@@ -32,7 +32,7 @@ json_format <- function(schema = list(),
 csv_format <- function(schema = data.frame(),
                        examples = setNames(list(), character()))
 {
-    schema <- as_csv_json_schema(schema)
+    schema <- as_json_schema(schema)
     examples <- lapply(examples, as.data.frame)
     CSVFormat(schema = schema, examples = examples)
 }

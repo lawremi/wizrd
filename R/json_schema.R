@@ -175,26 +175,7 @@ method(as_json_schema, numeric_S7_property) <- function(from,
 
 json_schema_for_object <- function(x, ...) as_json_schema(class_object(x), ...)
 
-method(as_json_schema, class_data.frame) <- function(from, description = NULL) {
-    schema <- list(type = "array",
-                   items = list(
-                       title = "data.frame",
-                       type = "object",
-                       properties = lapply(from, json_schema_for_object,
-                                           scalar = TRUE),
-                       additionalProperties = FALSE,
-                       required = names(from)
-                   ))
-    schema$description <- description
-    schema
-}
-
-as_csv_json_schema <- new_generic("as_csv_json_schema", "from")
-
-method(as_csv_json_schema, class_list) <- function(from, ...) from
-
-method(as_csv_json_schema, class_data.frame) <- function(from,
-                                                         description = NULL)
+method(as_json_schema, class_data.frame) <- function(from, description = NULL)
 {
     schema <- list(title = "data.frame",
                    type = "object",
