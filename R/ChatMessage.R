@@ -34,29 +34,32 @@ split_into_blocks <- function(x) {
     Filter(nzchar, setNames(as.list(m[-2L,]), labels))
 }
 
+esc <- function(x) paste0("{", x, "}")
+
 method(print, ChatMessage) <- function(x, ...)
 {
     float <- switch(x@role, assistant = "left", user = "right", "center")
     half_width <- cli::console_width() / 2L
     if (length(x@content) > 0L) {
         if (x@role == "assistant")
-            cli::cli_text(x@content)
+            cli::cli_text(esc(x@content))
         else if (x@role %in% c("user", "system")) {
             border_style <- switch(x@role, user = "single", system = "double")
-            cat(cli::boxx(strwrap(x@content, width = half_width),
-                          float = float, border_style = border_style,
-                          header = x@participant %||% ""))
+            cat(cli::boxx(esc(strwrap(x@content, width = half_width)),
+                              float = float, border_style = border_style,
+                              header = x@participant %||% ""))
             cat("\n")
         }
     }
     for (tool_call in x@tool_calls) {
-        cat(cli::boxx(strwrap(capture.output(print(tool_call))), float = float,
-                      header = "Tool call", border_style = "classic"))
+        cat(cli::boxx(esc(strwrap(capture.output(print(tool_call)))),
+                          float = float, header = "Tool call",
+                          border_style = "classic"))
     }
     if ((!is.null(x@object) || !is.null(x@refusal)) &&
             !identical(x@object, x@content)) {
         if (!is.null(x@object))
-            msg <- capture.output(print(x@object, width = half_width))
+            msg <- esc(capture.output(print(x@object, width = half_width)))
         else msg <- strwrap(cli::col_red(x@refusal), width = half_width) 
         cat(cli::boxx(msg,
                       float = float, header = x@participant %||% "",
