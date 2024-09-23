@@ -57,8 +57,8 @@ last_input <- function(x) last_input(x)@object
 last_response <- function(x) last_message(x, "assistant")
 last_output <- function(x) {
     msg <- last_response(x)
-    if (!is.null(msg$refusal))
-        stop("model refused to generate requested output: ", msg$refusal)
+    if (!is.null(msg@refusal))
+        stop("model refused to generate requested output: ", msg@refusal)
     msg@object
 }
 

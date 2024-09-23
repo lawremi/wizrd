@@ -22,7 +22,7 @@ method(textify, list(ChatMessage, TextFormat)) <- function(x, format) {
 }
 
 method(detextify, list(ChatMessage, TextFormat)) <- function(x, format) {
-    if (!is.null(x@refusal))
+    if (is.null(x@refusal))
         x@object <- detextify(x@content, format)
     x
 }
