@@ -68,13 +68,13 @@ respond_with_format <- function(x, format = TextFormat()) {
 }
 
 respond_with_json <- function(x, schema = list(),
-                        examples = setNames(list(), character()))
+                              examples = setNames(list(), character()))
 {
     respond_with_format(x, json_format(schema, examples))
 }
 
 respond_with_csv <- function(x, schema = data.frame(),
-                       examples = setNames(list(), character()))
+                             examples = setNames(list(), character()))
 {
     respond_with_format(x, csv_format(schema, examples))
 }
@@ -83,10 +83,14 @@ respond_with_code <- function(x, language = "R") {
     respond_with_format(x, code_format(language))
 }
 
+output_as <- function(x, schema) {
+    respond_with_json(x, schema)
+}
+
 textify <- new_generic("textify", c("x", "format"))
 
 method(textify, list(class_any, TextFormat)) <- function(x, format) {
-    paste(capture.output(dput(x)), collapse = "\n")
+    textify(x, JSONFormat())
 }
 
 method(textify, list(class_character, TextFormat)) <- function(x, format) {
