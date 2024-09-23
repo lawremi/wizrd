@@ -50,25 +50,19 @@ method(predict, LanguageModel) <- function(object, input, env = parent.frame(),
 }
 
 instruct <- function(x, ...) {
-    set_props(x, instructions = paste(c(...), collapse = "\n\n"))
+    set_props(x, instructions = paste(c(...), collapse = ""))
 }
 
 compile_instructions <- new_generic("compile_instructions", "x")
 
 method(compile_instructions, LanguageModel) <- function(x) {
     paste(c(x@instructions,
-            instructions(x@io, x),
+            instructions(x@io@output, x),
             tool_instructions(x)),
           collapse = "\n\n")
 }
 
 instructions <- new_generic("instructions", c("on", "to"))
-
-method(instructions, list(TextProtocol, LanguageModel)) <- function(on, to) {
-    instr <- c(input_instructions(on@input, to),
-               output_instructions(on@output, to))
-    if (!is.null(instr)) paste(instr, collapse = "\n\n")
-}
 
 prepare_input <- function(model, input, env) {
     if (!is.list(input) || is.object(input))
@@ -106,17 +100,7 @@ method(tool_instructions, LanguageModel) <- function(x) {
            })), collapse = "\n\n"))
 }
 
-input_instructions <- new_generic("input_instructions", c("on", "to"))
-
-output_instructions <- new_generic("output_instructions", c("on", "to"))
-
-method(input_instructions,
-       list(TextFormat, LanguageModel)) <- function(on, to)
-{
-    NULL
-}
-
-method(output_instructions,
+method(instructions,
        list(TextFormat, LanguageModel)) <- function(on, to)
 {
     NULL
@@ -135,7 +119,7 @@ append_examples <- function(prompt, on) {
     paste(c(prompt, describe_examples(on@examples, on)), collapse = "\n")
 }
 
-method(output_instructions,
+method(instructions,
        list(JSONFormat, LanguageModel)) <- function(on, to)
 {
     prompt <- "Return only JSON, without any explanation or other text.\n"
@@ -144,24 +128,11 @@ method(output_instructions,
                          "The JSON must conform to the following schema:\n\n",
                          toJSON(on@schema),
                          "\nIf the user input is incompatible with the task, ",
-                         "issue an informative refusal. Otherwise, ",
-                         "ensure the JSON matches this schema exactly.\n")
+                         "issue an informative refusal.\n")
     append_examples(prompt, on)
 }
 
-method(input_instructions,
-       list(JSONFormat, LanguageModel)) <- function(on, to)
-{
-    prompt <- "The user will send only JSON, without any other text.\n"
-    if (length(on@schema) > 0L)
-        prompt <- paste0(prompt,
-                         "The JSON will conform to the following schema:\n\n",
-                         toJSON(on@schema),
-                         "\nExpect the JSON to match this schema exactly.\n")
-    append_examples(prompt, on)
-}
-
-method(output_instructions,
+method(instructions,
        list(CSVFormat, LanguageModel)) <- function(on, to)
 {
     prompt <- "Return only CSV, without any explanation or other text.\n"
@@ -173,39 +144,14 @@ method(output_instructions,
                          "the required columns and data types and produce ",
                          "the corresponding CSV. ",
                          "If the user input is incompatible with the task, ",
-                         "issue an informative refusal. Otherwise, ",
-                         "ensure the CSV matches this schema exactly.\n")
+                         "issue an informative refusal.\n")
     append_examples(prompt, on)
 }
 
-method(input_instructions,
-       list(CSVFormat, LanguageModel)) <- function(on, to)
-{
-    prompt <- "The user will send only CSV, without any other text.\n"
-    if (length(on@schema) > 0L)
-        prompt <- paste0(prompt,
-                         "This JSON schema defines the columns of the data:\n",
-                         toJSON(on@schema),
-                         "\nInterpret the JSON schema to understand ",
-                         "the expected columns and data types. ",
-                         "Expect the CSV to match this schema exactly.\n")
-    append_examples(prompt, on)
-}
-
-method(output_instructions,
+method(instructions,
        list(CodeFormat, LanguageModel)) <- function(on, to)
 {
     prompt <- paste(c("Return only", on@language,
-                      "code in markdown-style blocks,",
-                      "without any explanation or other text.\n"),
-                    collapse = " ")
-    append_examples(prompt, on)
-}
-
-method(input_instructions,
-       list(CodeFormat, LanguageModel)) <- function(on, to)
-{
-    prompt <- paste(c("The user will send only", on@language,
                       "code in markdown-style blocks,",
                       "without any explanation or other text.\n"),
                     collapse = " ")
