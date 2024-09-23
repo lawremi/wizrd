@@ -132,7 +132,8 @@ method(jsonify, S7_object) <- function(x) {
 
 method(textify, list(class_list | class_any, JSONFormat)) <- function(x, format)
 {
-    unclass(toJSON(jsonify(x), null = "null"))
+    unclass(toJSON(jsonify(x), null = "null", dataframe = "columns",
+                   POSIXt = "ISO8601"))
 }
 
 ## Could this be done with S7?

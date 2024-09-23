@@ -108,6 +108,8 @@ base_json_schema <- function(from, description = NULL, scalar = FALSE,
                          "date"
                      else if ("POSIXt" %in% from$class)
                          "date-time"
+                     else if ("raw" %in% from$class)
+                         "binary"
 
     schema
 }
