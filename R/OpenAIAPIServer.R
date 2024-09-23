@@ -19,13 +19,18 @@ method(openai_response_format, TextFormat) <- function(x) {
    NULL 
 }
 
+schema_name_regex <- "^[a-zA-Z0-9_-]+$"
+
 method(openai_response_format, JSONFormat) <- function(x) {
-    if (identical(x@schema$type, "object"))
+    if (identical(x@schema$type, "object")) {
+        name <- x@schema$title %||% "object"
+        if (!grepl(schema_name_regex, name))
+            stop("schema@title must match '", schema_name_regex, "'")
         list(type = "json_schema", json_schema = list(
-            name = x@schema$title %||% "object",
+            name = name,
             schema = x@schema
         ))
-    else list(type = "json_object")
+    } else list(type = "json_object")
 }
 
 openai_chat_body <- function(model, messages, tools, output_format, params, ...)
