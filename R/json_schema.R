@@ -6,6 +6,7 @@ method(as_json_schema, class_logical | class_list) <- function(from, ...) {
 
 ## meta schema of S7 objects; used for S7_object
 s7_schema <- list(
+    title = "S7_object",
     type = "object",
     properties = list(
         ".data" = list(
@@ -66,8 +67,7 @@ method(as_json_schema, S7_union) <- function(from, descriptions = NULL, ...) {
     schemas <- Map(as_json_schema, from$classes,
                    as.list(descriptions)[seq_along(from$classes)])
     list(anyOf = schemas,
-         title = paste(vapply(schemas, `[[`, character(1L), "title"),
-                       collapse=" or "))
+         title = paste(unlist(lapply(schemas, `[[`, "title")), collapse=" or "))
 }
 
 base_json_schema_type <- function(from) {
@@ -90,7 +90,7 @@ s3_json_schema_type <- function(from) {
 base_json_schema <- function(from, description = NULL, scalar = FALSE,
                              named = FALSE, type_mapper = base_json_schema_type)
 {
-    schema <- list(title = from[1L])
+    schema <- list()
     type <- if (named) "object" else if (!scalar) "array" else type_mapper(from)
     if (is.null(type))
         return(c(schema, description = description))
@@ -120,11 +120,11 @@ method(as_json_schema, S7_base_class) <- function(from, description = NULL,
 }
 
 method(as_json_schema, NULL) <- function(from, description = NULL) {
-    c(list(type = NULL, title = "NULL"), description = description)
+    c(list(type = NULL), description = description)
 }
 
 method(as_json_schema, S7_any) <- function(from, description = NULL) {
-    c(list(title = "Anything"), description = description)
+    c(list(), description = description)
 }
 
 method(as_json_schema, S7_S3_class) <- function(from, description = NULL,

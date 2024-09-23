@@ -20,9 +20,9 @@ method(openai_response_format, TextFormat) <- function(x) {
 }
 
 method(openai_response_format, JSONFormat) <- function(x) {
-    if (length(x@schema) > 0L)
+    if (identical(x@schema$type, "object"))
         list(type = "json_schema", json_schema = list(
-            name = x@schema$title %||% "schema",
+            name = x@schema$title %||% "object",
             schema = x@schema
         ))
     else list(type = "json_object")
