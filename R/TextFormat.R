@@ -115,7 +115,7 @@ method(textify, list(class_json, TextFormat)) <- function(x, format) unclass(x)
 method(textify, list(class_data.frame, TextFormat)) <- function(x, format) {
     con <- file()
     on.exit(close(con))
-    write.csv(x, con)
+    write.csv(x, con, row.names = FALSE)
     paste(readLines(con), collapse = "\n")
 }
 
