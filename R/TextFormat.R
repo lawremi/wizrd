@@ -150,10 +150,11 @@ method(jsonify, S7_object) <- function(x) {
       lapply(S7_class(x)@properties, prop_jsonify))
 }
 
-method(textify, list(class_list | class_any, JSONFormat)) <- function(x, format)
-{
-    unclass(toJSON(jsonify(x), null = "null", POSIXt = "ISO8601"))
-}
+method(textify, list(class_list | class_any | class_data.frame, JSONFormat)) <-
+    function(x, format)
+    {
+        unclass(toJSON(jsonify(x), null = "null", POSIXt = "ISO8601"))
+    }
 
 ## Could this be done with S7?
 jsonic <- function(x) structure(x, class = "jsonic")
