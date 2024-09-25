@@ -180,10 +180,13 @@ json_schema_for_object <- function(x, ...) as_json_schema(class_object(x), ...)
 method(as_json_schema, class_data.frame) <- function(from, description = NULL)
 {
     schema <- list(title = "data_frame",
-                   type = "object",
-                   properties = lapply(from, json_schema_for_object),
-                   additionalProperties = FALSE,
-                   required = names(from))
+                   type = "array",
+                   items = list(
+                       type = "object",
+                       properties = lapply(from, json_schema_for_object),
+                       additionalProperties = FALSE,
+                       required = names(from))
+                   )
     schema$description <- description
     schema
 }

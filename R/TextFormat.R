@@ -10,11 +10,11 @@ JSONFormat <- new_class("JSONFormat", PlainTextFormat,
                                           schema_class = union_classes))
 
 CSVFormat <- new_class("CSVFormat", PlainTextFormat,
-                       properties = list(schema = class_list,
-                                         examples = new_list_property(
-                                             of = class_data.frame,
-                                             named = TRUE
-                                         )))
+                       properties = list(
+                           col_classes = class_character,
+                           examples = named(new_list_property(
+                               of = class_data.frame,
+                           ))))
 
 CodeFormat <- new_class("CodeFormat", PlainTextFormat,
                         properties = list(language = nullable(prop_string)))
@@ -22,19 +22,28 @@ CodeFormat <- new_class("CodeFormat", PlainTextFormat,
 json_format <- function(schema = list(),
                         examples = setNames(list(), character()))
 {
-    schema_class <- if (inherits(schema, S7_class)) schema else class_any
+    schema_class <- if (S7:::class_inherits(schema, union_classes)) schema
+                    else class_any
     schema <- as_json_schema(schema)
     examples <- lapply(examples, jsonify)
     JSONFormat(schema = schema, schema_class = schema_class,
                examples = examples)
 }
 
-csv_format <- function(schema = data.frame(),
+as_col_classes <- new_generic("as_col_classes", "x")
+
+method(as_col_classes, class_character | class_logical) <- function(x) x
+
+method(as_col_classes, class_data.frame) <- function(x) {
+    vapply(x, \(xi) class(xi)[1L], character(1L))
+}
+
+csv_format <- function(col_classes = NA,
                        examples = setNames(list(), character()))
 {
-    schema <- as_json_schema(schema)
+    col_classes <- as_col_classes(col_classes)
     examples <- lapply(examples, as.data.frame)
-    CSVFormat(schema = schema, examples = examples)
+    CSVFormat(col_classes = col_classes, examples = examples)
 }
 
 code_format <- function(language = "R") {
@@ -52,10 +61,10 @@ expect_json <- function(x, schema = list(),
     expect_format(x, json_format(schema, examples))
 }
 
-expect_csv <- function(x, schema = data.frame(),
+expect_csv <- function(x, col_classes = NA,
                        examples = setNames(list(), character()))
 {
-    expect_format(x, csv_format(schema, examples))
+    expect_format(x, csv_format(col_classes, examples))
 }
 
 expect_code <- function(x, language = "R") {
@@ -73,18 +82,24 @@ respond_with_json <- function(x, schema = list(),
     respond_with_format(x, json_format(schema, examples))
 }
 
-respond_with_csv <- function(x, schema = data.frame(),
+respond_with_csv <- function(x, col_classes = NA,
                              examples = setNames(list(), character()))
 {
-    respond_with_format(x, csv_format(schema, examples))
+    respond_with_format(x, csv_format(col_classes, examples))
 }
 
 respond_with_code <- function(x, language = "R") {
     respond_with_format(x, code_format(language))
 }
 
-output_as <- function(x, schema) {
-    respond_with_json(x, schema)
+format_constructor <- new_generic("format_constructor", "x")
+
+method(format_constructor, class_any) <- function(x) json_format
+
+method(format_constructor, class_data.frame) <- function(x) csv_format
+
+output_as <- function(x, schema, examples = setNames(list(), character())) {
+    respond_with_format(x, format_constructor(schema)(schema, examples))
 }
 
 textify <- new_generic("textify", c("x", "format"))
@@ -102,6 +117,13 @@ method(textify, list(class_list, TextFormat)) <- function(x, format) {
 }
 
 method(textify, list(class_json, TextFormat)) <- function(x, format) unclass(x)
+
+method(textify, list(class_data.frame, TextFormat)) <- function(x, format) {
+    con <- file()
+    on.exit(close(con))
+    write.csv(x, con)
+    paste(readLines(con), collapse = "\n")
+}
 
 nativeRaster <- new_S3_class("nativeRaster")
 raster <- new_S3_class("raster")
@@ -136,8 +158,7 @@ method(jsonify, S7_object) <- function(x) {
 
 method(textify, list(class_list | class_any, JSONFormat)) <- function(x, format)
 {
-    unclass(toJSON(jsonify(x), null = "null", dataframe = "columns",
-                   POSIXt = "ISO8601"))
+    unclass(toJSON(jsonify(x), null = "null", POSIXt = "ISO8601"))
 }
 
 ## Could this be done with S7?
@@ -202,11 +223,15 @@ method(dejsonify, list(class_any, S7_any)) <- function(x, spec) x
 detextify <- new_generic("detextify", c("x", "format"))
 
 method(detextify, list(class_character, JSONFormat)) <- function(x, format) {
-    detextify(fromJSON(x))
+    detextify(fromJSON(x), format)
 }
 
 method(detextify, list(class_list, JSONFormat)) <- function(x, format) {
     dejsonify(x, format@schema_class)
+}
+
+method(detextify, list(class_character, CSVFormat)) <- function(x, format) {
+    read.csv(text = x, colClasses = format@col_classes)
 }
 
 method(detextify, list(class_any, TextFormat)) <- function(x, format) x

@@ -119,38 +119,33 @@ append_examples <- function(prompt, on) {
     paste(c(prompt, describe_examples(on@examples, on)), collapse = "\n")
 }
 
-method(instructions,
-       list(JSONFormat, LanguageModel)) <- function(on, to)
-{
-    prompt <- "Return only JSON, without any explanation or other text.\n"
-    if (length(on@schema) > 0L)
+method(instructions, list(JSONFormat, LanguageModel)) <- function(on, to) {
+    prompt <- paste0("Return only JSON, without any explanation or other text. ",
+                     "If the user input is incompatible with the task, ",
+                     "issue an informative refusal.\n")
+    ## object types are handled formally by backends, so we skip those
+    if (length(on@schema) > 0L && !identical(on@schema$type, "object"))
         prompt <- paste0(prompt,
                          "The JSON must conform to the following schema:\n\n",
                          toJSON(on@schema),
-                         "\nIf the user input is incompatible with the task, ",
-                         "issue an informative refusal.\n")
+                         "\n\n")
     append_examples(prompt, on)
 }
 
-method(instructions,
-       list(CSVFormat, LanguageModel)) <- function(on, to)
-{
-    prompt <- "Return only CSV, without any explanation or other text.\n"
-    if (length(on@schema) > 0L)
+method(instructions, list(CSVFormat, LanguageModel)) <- function(on, to) {
+    prompt <- paste("Return only CSV, with values separated by commas.",
+                    "Do not embed in markdown and do not send any other text.\n")
+    if (length(names(on@col_classes)) > 0L)
         prompt <- paste0(prompt,
-                         "This JSON schema defines the columns of the data:\n",
-                         toJSON(on@schema),
-                         "\nInterpret the JSON schema to understand ",
-                         "the required columns and data types and produce ",
-                         "the corresponding CSV. ",
-                         "If the user input is incompatible with the task, ",
-                         "issue an informative refusal.\n")
+                         "The CSV should contain these columns: ",
+                         paste0("\"", names(on@col_classes), "\"",
+                                ifelse(is.na(on@col_classes), "",
+                                       paste0(" (", on@col_classes, ")")),
+                                collapse = ", "))
     append_examples(prompt, on)
 }
 
-method(instructions,
-       list(CodeFormat, LanguageModel)) <- function(on, to)
-{
+method(instructions, list(CodeFormat, LanguageModel)) <- function(on, to) {
     prompt <- paste(c("Return only", on@language,
                       "code in markdown-style blocks,",
                       "without any explanation or other text.\n"),
