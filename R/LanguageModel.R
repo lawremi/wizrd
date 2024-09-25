@@ -152,8 +152,8 @@ method(instructions, list(CSVFormat, LanguageModel)) <- function(on, to) {
 
 method(instructions, list(CodeFormat, LanguageModel)) <- function(on, to) {
     prompt <- paste(c("Return only", on@language,
-                      "code in markdown-style blocks,",
-                      "without any explanation or other text.\n"),
+                      "code. Do not wrap the code in ``` blocks.",
+                      "Do not include any explanation or other text.\n"),
                     collapse = " ")
     append_examples(prompt, on)
 }

@@ -232,6 +232,15 @@ method(detextify, list(class_character, CSVFormat)) <- function(x, format) {
 method(detextify, list(class_any, TextFormat)) <- function(x, format) x
 
 method(textify, list(class_any, CodeFormat)) <- function(x, format) {
-    paste(c(paste(c("```", format@language), collapse = ""),
-            deparse(x), "```\n"), collapse = "\n")
+    paste(deparse(x), collapse = "\n")
+}
+
+method(textify, list(class_expression, CodeFormat)) <- function(x, format) {
+    paste(as.character(x), collapse = "\n")
+}
+
+method(detextify, list(class_character, CodeFormat)) <- function(x, format) {
+    if (format@language == "R")
+        parse(text = x)
+    else x
 }
