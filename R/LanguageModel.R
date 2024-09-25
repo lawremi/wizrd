@@ -50,15 +50,15 @@ method(predict, LanguageModel) <- function(object, input, env = parent.frame(),
 }
 
 instruct <- function(x, ...) {
-    set_props(x, instructions = paste(c(...), collapse = ""))
+    set_props(x, instructions = paste0(...))
 }
 
 compile_instructions <- new_generic("compile_instructions", "x")
 
 method(compile_instructions, LanguageModel) <- function(x) {
-    paste(c(x@instructions,
+    paste(c(tool_instructions(x),
             instructions(x@io@output, x),
-            tool_instructions(x)),
+            x@instructions),
           collapse = "\n\n")
 }
 
