@@ -42,14 +42,14 @@ method(print, ChatMessage) <- function(x, ...)
     half_width <- cli::console_width() / 2L
     if (length(x@content) > 0L) {
         if (x@role == "assistant")
-            cli::cli_text(esc(x@content))
+            cat(strwrap(x@content))
         else if (x@role %in% c("user", "system")) {
             border_style <- switch(x@role, user = "single", system = "double")
             cat(cli::boxx(esc(strwrap(x@content, width = half_width)),
                               float = float, border_style = border_style,
                               header = x@participant %||% ""))
-            cat("\n")
         }
+        cat("\n")
     }
     for (tool_call in x@tool_calls) {
         cat(cli::boxx(esc(strwrap(capture.output(print(tool_call)))),
