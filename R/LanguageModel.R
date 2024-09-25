@@ -109,8 +109,13 @@ method(instructions,
 describe_examples <- function(ex, format = TextFormat()) {
     if (length(ex) > 0L) {
         ex <- vapply(ex, textify, character(1L), format)
+        if (is.null(names(ex)))
+            names(ex) <- ""
         paste0("Example(s):\n\n",
-               paste0(names(ex), "\nwould be encoded as:\n", ex,
+               paste0(ifelse(nzchar(names(ex)),
+                             paste(names(ex), "would be encoded as:\n"),
+                             ""),
+                      ex,
                       collapse = "\n\n"))
     }
 }

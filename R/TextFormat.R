@@ -1,6 +1,6 @@
 TextFormat <- new_class("TextFormat",
                         properties = list(
-                            examples = named(class_list)
+                            examples = class_list
                         ))
 
 PlainTextFormat <- new_class("PlainTextFormat", TextFormat)
@@ -12,15 +12,14 @@ JSONFormat <- new_class("JSONFormat", PlainTextFormat,
 CSVFormat <- new_class("CSVFormat", PlainTextFormat,
                        properties = list(
                            col_classes = class_character,
-                           examples = named(new_list_property(
+                           examples = new_list_property(
                                of = class_data.frame,
-                           ))))
+                           )))
 
 CodeFormat <- new_class("CodeFormat", PlainTextFormat,
                         properties = list(language = nullable(prop_string)))
 
-json_format <- function(schema = list(),
-                        examples = setNames(list(), character()))
+json_format <- function(schema = list(), examples = list())
 {
     schema_class <- if (S7:::class_inherits(schema, union_classes)) schema
                     else class_any
@@ -38,8 +37,7 @@ method(as_col_classes, class_data.frame) <- function(x) {
     vapply(x, \(xi) class(xi)[1L], character(1L))
 }
 
-csv_format <- function(col_classes = NA,
-                       examples = setNames(list(), character()))
+csv_format <- function(col_classes = NA, examples = list())
 {
     col_classes <- as_col_classes(col_classes)
     examples <- lapply(examples, as.data.frame)
@@ -55,14 +53,12 @@ expect_format <- function(x, format = TextFormat()) {
     x
 }
 
-expect_json <- function(x, schema = list(),
-                        examples = setNames(list(), character()))
+expect_json <- function(x, schema = list(), examples = list())
 {
     expect_format(x, json_format(schema, examples))
 }
 
-expect_csv <- function(x, col_classes = NA,
-                       examples = setNames(list(), character()))
+expect_csv <- function(x, col_classes = NA, examples = list())
 {
     expect_format(x, csv_format(col_classes, examples))
 }
@@ -76,14 +72,12 @@ respond_with_format <- function(x, format = TextFormat()) {
     x
 }
 
-respond_with_json <- function(x, schema = list(),
-                              examples = setNames(list(), character()))
+respond_with_json <- function(x, schema = list(), examples = list())
 {
     respond_with_format(x, json_format(schema, examples))
 }
 
-respond_with_csv <- function(x, col_classes = NA,
-                             examples = setNames(list(), character()))
+respond_with_csv <- function(x, col_classes = NA, examples = list())
 {
     respond_with_format(x, csv_format(col_classes, examples))
 }
@@ -98,7 +92,7 @@ method(format_constructor, class_any) <- function(x) json_format
 
 method(format_constructor, class_data.frame) <- function(x) csv_format
 
-output_as <- function(x, schema, examples = setNames(list(), character())) {
+output_as <- function(x, schema, examples = list()) {
     respond_with_format(x, format_constructor(schema)(schema, examples))
 }
 

@@ -26,7 +26,7 @@ Tool <- new_class("Tool", class_function,
                       signature = ToolSignature,
                       param_descriptions = named(class_character),
                       value_description = nullable(prop_string),
-                      examples = named(class_list)
+                      examples = class_list
                   ),
                   validator = validate_Tool)
 
@@ -96,7 +96,7 @@ tool <- function(FUN, signature = any_signature(FUN),
                  name = deparse(substitute(FUN)),
                  description = NULL, param_descriptions = character(),
                  value_description = NULL,
-                 examples = setNames(list(), character()))
+                 examples = list())
 {
     force(name)
     FUN <- match.fun(FUN)
