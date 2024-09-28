@@ -91,7 +91,10 @@ base_json_schema <- function(from, description = NULL, scalar = FALSE,
                              named = FALSE, type_mapper = base_json_schema_type)
 {
     schema <- list()
-    type <- if (named) "object" else if (!scalar) "array" else type_mapper(from)
+    type <- if (named && "list" %in% from$class)
+                "object"
+            else if (!scalar) "array"
+            else type_mapper(from)
     if (is.null(type))
         return(c(schema, description = description))
     schema$type <- type
