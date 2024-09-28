@@ -137,15 +137,28 @@ method(instructions, list(JSONFormat, LanguageModel)) <- function(on, to) {
     append_examples(prompt, on)
 }
 
+json_type <- function(x) {
+    vswitch(x, logical = "boolean",
+            integer = "integer", numeric = "number", double = "number",
+            complex = "string", character = "string", factor = "string",
+            Date = "date in ISO8601 format",
+            POSIXct = "date-time in ISO8601 format")
+}
+
 method(instructions, list(CSVFormat, LanguageModel)) <- function(on, to) {
     prompt <- paste("Return only CSV, with values separated by commas.",
+                    "Include a header containing the column names.",
+                    "The CSV should adhere to the RFC 4180 standard,",
+                    "so use double quotes (\"\") to escape quotes.",
+                    "Never use \\ to escape quotes.",
                     "Do not embed in markdown and do not send any other text.\n")
     if (length(names(on@col_classes)) > 0L)
         prompt <- paste0(prompt,
                          "The CSV should contain these columns: ",
                          paste0("\"", names(on@col_classes), "\"",
                                 ifelse(is.na(on@col_classes), "",
-                                       paste0(" (", on@col_classes, ")")),
+                                       paste0(" (", json_type(on@col_classes),
+                                              ")")),
                                 collapse = ", "))
     append_examples(prompt, on)
 }

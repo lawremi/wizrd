@@ -158,9 +158,12 @@ vswitch <- function(EXPR, ...) {
     if (is.null(cases))
         cases <- logical()
     ans <- cases[as.character(EXPR)]
-    if (identical(names(cases)[length(cases)], ""))
-        ans[is.na(names(ans)) & !is.na(EXPR)] <- cases[[length(cases)]]
 
+    notfound <- is.na(names(ans)) & !is.na(EXPR)
+    ans[notfound] <- if (identical(names(dots)[length(dots)], "")) {
+        dots[[length(dots)]]
+    } else EXPR[notfound]
+    
     ans
 }
 
