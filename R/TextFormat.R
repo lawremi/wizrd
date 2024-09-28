@@ -6,8 +6,15 @@ TextFormat <- new_class("TextFormat",
 PlainTextFormat <- new_class("PlainTextFormat", TextFormat)
 
 JSONFormat <- new_class("JSONFormat", PlainTextFormat,
-                        properties = list(schema = class_list,
-                                          schema_class = union_classes))
+                        properties = list(
+                            schema = new_property(
+                                class_list,
+                                validator = \(self) {
+                                    if (!identical(self$type, "object"))
+                                        "must specify an object"
+                                }
+                            ),
+                            schema_class = union_classes))
 
 CSVFormat <- new_class("CSVFormat", PlainTextFormat,
                        properties = list(
@@ -23,7 +30,7 @@ json_format <- function(schema = list(), examples = list())
 {
     schema_class <- if (S7:::class_inherits(schema, union_classes)) schema
                     else class_any
-    schema <- as_json_schema(schema)
+    schema <- box_json_schema(as_json_schema(schema))
     examples <- lapply(examples, jsonify)
     JSONFormat(schema = schema, schema_class = schema_class,
                examples = examples)
@@ -90,7 +97,8 @@ format_constructor <- new_generic("format_constructor", "x")
 
 method(format_constructor, class_any) <- function(x) json_format
 
-method(format_constructor, class_data.frame) <- function(x) csv_format
+## CSV not reliable enough in practice
+## method(format_constructor, class_data.frame) <- function(x) csv_format
 
 output_as <- function(x, schema, examples = list()) {
     respond_with_format(x, format_constructor(schema)(schema, examples))
@@ -153,7 +161,8 @@ method(jsonify, S7_object) <- function(x) {
 method(textify, list(class_list | class_any | class_data.frame, JSONFormat)) <-
     function(x, format)
     {
-        unclass(toJSON(jsonify(x), null = "null", POSIXt = "ISO8601"))
+        jsonify(x) |> box_json() |> toJSON(null = "null", POSIXt = "ISO8601") |>
+            unclass()
     }
 
 ## Could this be done with S7?
@@ -217,8 +226,12 @@ method(dejsonify, list(class_any, S7_any)) <- function(x, spec) x
 
 detextify <- new_generic("detextify", c("x", "format"))
 
+unbox_json <- function(x) x$"__boxed" %||% x
+is_json_object <- function(x) is.list(x) && !is.null(names(x))
+box_json <- function(x) if (!is_json_object(x)) list("__boxed" = x) else x
+
 method(detextify, list(class_character, JSONFormat)) <- function(x, format) {
-    detextify(fromJSON(x), format)
+    dejsonify(unbox_json(fromJSON(x)), format)
 }
 
 method(detextify, list(class_list, JSONFormat)) <- function(x, format) {

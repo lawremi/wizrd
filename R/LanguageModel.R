@@ -128,12 +128,6 @@ method(instructions, list(JSONFormat, LanguageModel)) <- function(on, to) {
     prompt <- paste0("Return only JSON, without any explanation or other text. ",
                      "If the user input is incompatible with the task, ",
                      "issue an informative refusal.\n")
-    ## object types are handled formally by backends, so we skip those
-    if (length(on@schema) > 0L && !identical(on@schema$type, "object"))
-        prompt <- paste0(prompt,
-                         "The JSON must conform to the following schema:\n\n",
-                         toJSON(on@schema),
-                         "\n\n")
     append_examples(prompt, on)
 }
 

@@ -193,3 +193,9 @@ method(as_json_schema, class_data.frame) <- function(from, description = NULL)
     schema$description <- description
     schema
 }
+
+box_json_schema <- function(x) {
+    if (!identical(x$type, "object"))
+        list(type = "object", properties = list("__boxed" = x))
+    else x
+}
