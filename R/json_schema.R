@@ -57,9 +57,7 @@ method(as_json_schema, S7_class) <- function(from, description = NULL, ...) {
                    additionalProperties = FALSE)
     description <- c(description, if (!is.null(Rd)) Rd_description(Rd))
     schema$description <- paste(description, collapse = " ")
-    required <- names(Filter(Negate(valid_by_default), props))
-    if (length(required) > 0L)
-        schema$required <- required
+    schema$required <- I(names(props))
     schema
 }
 
@@ -101,9 +99,8 @@ base_json_schema <- function(from, description = NULL, scalar = FALSE,
     if (type == "array" && !scalar)
         schema$items <- base_json_schema(from, scalar = TRUE,
                                          type_mapper = type_mapper)
-    else if (named)
-        schema$patternProperties$"^.*$" <-
-            base_json_schema(from, scalar = TRUE, type_mapper = type_mapper)
+    else if (type == "object")
+        schema$patternProperties$"^.*$" <- list()
     
     schema$description <- description
     
@@ -186,9 +183,10 @@ method(as_json_schema, class_data.frame) <- function(from, description = NULL)
                    type = "array",
                    items = list(
                        type = "object",
-                       properties = lapply(from, json_schema_for_object),
+                       properties = lapply(from, json_schema_for_object,
+                                           scalar = TRUE),
                        additionalProperties = FALSE,
-                       required = names(from))
+                       required = I(names(from)))
                    )
     schema$description <- description
     schema
@@ -196,6 +194,8 @@ method(as_json_schema, class_data.frame) <- function(from, description = NULL)
 
 box_json_schema <- function(x) {
     if (!identical(x$type, "object"))
-        list(type = "object", properties = list("__boxed" = x))
+        list(type = "object", properties = list("__boxed" = x),
+             additionalProperties = FALSE,
+             required = I("__boxed"))
     else x
 }

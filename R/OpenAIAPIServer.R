@@ -21,6 +21,16 @@ method(openai_response_format, TextFormat) <- function(x) {
 
 schema_name_regex <- "^[a-zA-Z0-9_-]+$"
 
+schema_is_strict <- function(x) {
+    if (identical(x$type, "object")) {
+        identical(x$additionalProperties, FALSE) &&
+            all(names(x$properties) %in% x$required) &&
+            all(vapply(x$properties, schema_is_strict, logical(1L)))
+    } else if (identical(x$type, "array") && !is.null(x$items))
+        schema_is_strict(x$items)
+    else TRUE
+}
+
 method(openai_response_format, JSONFormat) <- function(x) {
     if (identical(x@schema$type, "object")) {
         name <- x@schema$title %||% "object"
@@ -28,7 +38,8 @@ method(openai_response_format, JSONFormat) <- function(x) {
             stop("schema@title must match '", schema_name_regex, "'")
         list(type = "json_schema", json_schema = list(
             name = name,
-            schema = x@schema
+            schema = x@schema,
+            strict = schema_is_strict(x@schema)
         ))
     } else list(type = "json_object")
 }
