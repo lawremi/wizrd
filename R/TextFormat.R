@@ -9,12 +9,12 @@ JSONFormat <- new_class("JSONFormat", PlainTextFormat,
                         properties = list(
                             schema = new_property(
                                 class_list,
-                                validator = \(self) {
-                                    if (!identical(self$type, "object"))
+                                validator = \(value) {
+                                    if (!identical(value$type, "object"))
                                         "must specify an object"
                                 }
                             ),
-                            schema_class = union_classes))
+                            schema_class = union_classes | class_data.frame))
 
 CSVFormat <- new_class("CSVFormat", PlainTextFormat,
                        properties = list(
@@ -26,10 +26,13 @@ CSVFormat <- new_class("CSVFormat", PlainTextFormat,
 CodeFormat <- new_class("CodeFormat", PlainTextFormat,
                         properties = list(language = nullable(prop_string)))
 
+fits_schema_class <- function(x) {
+    S7:::class_inherits(x, JSONFormat@properties$schema_class$class)
+}
+
 json_format <- function(schema = list(), examples = list())
 {
-    schema_class <- if (S7:::class_inherits(schema, union_classes)) schema
-                    else class_any
+    schema_class <- if (fits_schema_class(schema)) schema else class_any
     schema <- box_json_schema(as_json_schema(schema))
     examples <- lapply(examples, jsonify)
     JSONFormat(schema = schema, schema_class = schema_class,
@@ -222,6 +225,11 @@ method(dejsonify, list(class_any, S7_union)) <- function(x, spec) {
     stop("failed to convert to ", capture.output(print(x)))
 }
 
+method(dejsonify, list(class_data.frame, class_data.frame)) <- function(x, spec)
+{
+    x[colnames(spec)] # JSON schema does not ensure order
+}
+
 method(dejsonify, list(class_any, S7_any)) <- function(x, spec) x
 
 detextify <- new_generic("detextify", c("x", "format"))
@@ -231,7 +239,7 @@ is_json_object <- function(x) is.list(x) && !is.null(names(x))
 box_json <- function(x) if (!is_json_object(x)) list("__boxed" = x) else x
 
 method(detextify, list(class_character, JSONFormat)) <- function(x, format) {
-    dejsonify(unbox_json(fromJSON(x)), format)
+    fromJSON(x) |> unbox_json() |> dejsonify(format@schema_class)
 }
 
 method(detextify, list(class_list, JSONFormat)) <- function(x, format) {
