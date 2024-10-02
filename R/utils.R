@@ -392,3 +392,15 @@ class_object <- function(x) {
     S7_class(x) %||% as_class(methods::getClassDef(class(x)[1L])) %||%
         new_S3_class(class(x))
 }
+
+strfit <- function(x, width = getOption("width")) {
+    cli::ansi_strtrim(strwrap(x, width), width)
+}
+
+print.raster <- function(x, ...) {
+    cat("<raster>: ", nrow(x), "x", ncol(x), "\n", sep = "")
+}
+
+print.nativeRaster <- function(x, ...) {
+    cat("<nativeRaster>: ", nrow(x), "x", ncol(x), "\n", sep = "")
+}

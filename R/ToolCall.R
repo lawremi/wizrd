@@ -5,7 +5,8 @@ ToolCall <- new_class("ToolCall",
                           arguments = class_list
                       ))
 
-method(print, ToolCall) <- function(x, ...) {
-    cat("<ToolCall> ", x@id, ":", sep = "")
-    print(do.call(call, c(x@tool_name, x@arguments), quote = TRUE))
+method(print, ToolCall) <- function(x, width = getOption("width"), ...) {
+    cli::ansi_strtrim(cat("<ToolCall> ", x@id, ":", sep = ""), width)
+    print(do.call(call, c(x@tool_name, x@arguments), quote = TRUE),
+          width = width, ...)
 }
