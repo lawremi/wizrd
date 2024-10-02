@@ -134,7 +134,9 @@ nativeRaster <- new_S3_class("nativeRaster")
 raster <- new_S3_class("raster")
 union_raster <- new_union(nativeRaster, raster)
 
-method(textify, list(union_raster, TextFormat)) <- function(x, format) x
+method(textify, list(union_raster, TextFormat)) <- function(x, format) {
+    convert(x, MediaURI)
+}
 
 jsonify <- new_generic("jsonify", "x")
 

@@ -190,20 +190,6 @@ get_api_key <- function(prefix) {
     key
 }
 
-image_data_uri <- function(x) {
-    require_ns(c("base64enc", "png"), "encode images")
-    
-    if (inherits(x, "nativeRaster")) { # like from dev.capture() or readPNG()
-        image <- x
-    } else {
-        m <- as.matrix(as.raster(x))
-        rgb <- col2rgb(m, alpha = TRUE) / 255L
-        image <- array(t(rgb), c(dim(m), 4L))
-    }
-    
-    base64enc::dataURI(png::writePNG(image), mime = "image/png")
-}
-
 get_Rd <- function(topic, package = NULL) {
     files <- help(topic, identity(package))
     if (length(files) > 1L)

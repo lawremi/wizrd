@@ -184,7 +184,7 @@ method(openai_encode_content, class_character) <- function(x) {
     else x
 }
 
-method(openai_encode_content, union_raster) <- function(x) {
+method(openai_encode_content, MediaURI) <- function(x) {
     list(openai_encode_content_part(x))
 }
 
@@ -198,8 +198,8 @@ method(openai_encode_content_part, class_character) <- function(x) {
     list(type = "text", text = x)
 }
 
-method(openai_encode_content_part, union_raster) <- function(x) {
-    list(type = "image_url", image_url = list(url = image_data_uri(x)))
+method(openai_encode_content_part, ImageURI) <- function(x) {
+    list(type = "image_url", image_url = list(url = x))
 }
 
 openai_encode_tool <- new_generic("openai_encode_tool", "x")

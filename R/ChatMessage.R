@@ -4,7 +4,7 @@ ChatMessage <- new_class("ChatMessage",
                                  choices = c("system", "user", "assistant",
                                              "tool")
                              ),
-                             content = class_any,
+                             content = class_character | class_list,
                              object = class_any,
                              tool_calls = new_list_property(of = ToolCall),
                              participant = nullable(prop_string),
