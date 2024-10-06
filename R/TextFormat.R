@@ -27,6 +27,9 @@ CSVFormat <- new_class("CSVFormat", PlainTextFormat,
 CodeFormat <- new_class("CodeFormat", PlainTextFormat,
                         properties = list(language = nullable(prop_string)))
 
+GlueFormat <- new_class("GlueFormat", PlainTextFormat,
+                        properties = list(template = prop_string))
+
 fits_schema_class <- function(x) {
     S7:::class_inherits(x, JSONFormat@properties$schema_class$class)
 }
@@ -57,6 +60,10 @@ csv_format <- function(col_classes = NA, examples = list())
 
 code_format <- function(language = "R") {
     CodeFormat(language = language)
+}
+
+glue_format <- function(template) {
+    GlueFormat(template = template)
 }
 
 expect_format <- function(x, format = TextFormat()) {
@@ -97,15 +104,26 @@ respond_with_code <- function(x, language = "R") {
     respond_with_format(x, code_format(language))
 }
 
-format_constructor <- new_generic("format_constructor", "x")
+output_format_constructor <- new_generic("output_format_constructor", "x")
 
-method(format_constructor, class_any) <- function(x) json_format
+method(output_format_constructor, class_any) <- function(x) json_format
 
 ## CSV not reliable enough in practice
 ## method(format_constructor, class_data.frame) <- function(x) csv_format
 
 output_as <- function(x, schema, examples = list()) {
-    respond_with_format(x, format_constructor(schema)(schema, examples))
+    respond_with_format(x, output_format_constructor(schema)(schema, examples))
+}
+
+input_format_constructor <- new_generic("input_format_constructor", "x")
+
+class_glue <- new_S3_class("glue")
+
+method(input_format_constructor, class_character | class_glue) <-
+    function(x) glue_format
+
+accept_as <- function(x, schema) {
+    expect_format(x, input_format_constructor(schema)(schema))
 }
 
 textify <- new_generic("textify", c("x", "format"))
@@ -173,6 +191,11 @@ method(textify, list(class_list | class_any | class_data.frame, JSONFormat)) <-
     {
         jsonify(x) |> box_json() |> toJSON(null = "null", POSIXt = "ISO8601") |>
             unclass()
+    }
+
+method(textify, list(class_list | class_any | class_data.frame, GlueFormat)) <-
+    function(x, format) {
+        glue(format@template, .envir = as.environment(x))
     }
 
 ## Could this be done with S7?

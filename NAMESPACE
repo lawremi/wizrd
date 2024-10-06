@@ -2,6 +2,7 @@ import(S7)
 import(checkmate)
 importFrom(jsonlite, toJSON, fromJSON)
 importFrom(stats, predict)
+importFrom(glue, glue)
 
 # model constructors
 export(language_model, ollama_model, llama_cpp_model, openai_model,
@@ -9,7 +10,7 @@ export(language_model, ollama_model, llama_cpp_model, openai_model,
 # other constructors
 export(chat, tool, tool_signature)
 # builders
-export(equip, unequip, instruct, output_as)
+export(equip, unequip, instruct, output_as, accept_as)
 # accessors
 export(last_output)
 # convenience models

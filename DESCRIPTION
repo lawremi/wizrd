@@ -22,7 +22,8 @@ Imports:
     S7,
     httr2,
     jsonlite,
-    checkmate
+    checkmate,
+    glue
 Suggests:
     processx,
     base64enc,
