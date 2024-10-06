@@ -125,4 +125,5 @@ readline_chat <- function(model, env = parent.frame()) {
         ctx <- chat(ctx, prompt)
         print(last_response(ctx))
     }
+    invisible(ctx)
 }
