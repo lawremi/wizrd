@@ -390,3 +390,11 @@ print.raster <- function(x, ...) {
 print.nativeRaster <- function(x, ...) {
     cat("<nativeRaster>: ", nrow(x), "x", ncol(x), "\n", sep = "")
 }
+
+rename <- function(x, ...) {
+    dots <- c(...)
+    if (is.null(dots))
+        stop("arguments in '...' must be named")
+    names(x)[match(names(dots), names(x))] <- dots
+    x
+}
