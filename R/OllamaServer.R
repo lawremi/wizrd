@@ -41,7 +41,7 @@ ollama_list <- function(server = ollama_server()) {
     assert_class(server, "OllamaServer")
     to_df <- function(x) {
         do.call(rbind, lapply(x$models, \(m) {
-            m$details$families <- I(m$details$families)
+            m$details$families <- I(list(unlist(m$details$families)))
             as.data.frame(m)
         }))
     }
