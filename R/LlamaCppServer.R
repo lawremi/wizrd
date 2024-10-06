@@ -71,14 +71,14 @@ install_llamafile <- function() {
     unzip(dest_file, exdir = user_dir)
     unlink(dest_file)
 
-    Sys.chmod(dir(llama_file_bin_dir(), full.names = TRUE), "755")
+    Sys.chmod(dir(llamafile_bin_dir(), full.names = TRUE), "755")
 
     invisible(TRUE)
 }
 
 prompt_install_llamafile <- function() {
     answer <- if (interactive())
-                  utils::askYesNo("Do you want to download llamafile?")
+                  utils::askYesNo("Do you want to download llamafile in order to use llama.cpp models?")
               else TRUE
     
     if (isTRUE(answer)) {
