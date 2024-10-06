@@ -14,6 +14,8 @@ export(equip, unequip, instruct, output_as)
 export(last_output)
 # convenience models
 export(llama3, llava)
+# server API
+export(models)
 
 # S3 methods
 S3method(nameOfClass, S7_S3_class)

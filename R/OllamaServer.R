@@ -49,6 +49,10 @@ ollama_list <- function(server = ollama_server()) {
         httr2::req_perform() |> httr2::resp_body_json() |> to_df()
 }
 
+method(models, OllamaServer) <- function(x) {
+    ollama_list(x) |> rename(name = "id")
+}
+
 ollama_pull <- function(name, server = ollama_server()) {
     assert_class(server, "OllamaServer")
     system2("ollama", c("pull", name))

@@ -2,6 +2,12 @@ OpenAIAPIServer <- new_class("OpenAIAPIServer", LanguageModelServer)
 
 OpenAIAPIResponse <- new_class("OpenAIAPIResponse", class_list)
 
+method(models, OpenAIAPIServer) <- function(x) {
+    json <- create_request(x) |> httr2::req_url_path_append("models") |>
+        httr2::req_perform() |> httr2::resp_body_json()
+    json$data
+}
+
 openai_body_messages <- function(messages) {
     assert_list(messages, "ChatMessage")
     unname(lapply(messages, openai_encode_message))
