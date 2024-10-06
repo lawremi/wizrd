@@ -48,8 +48,8 @@ method(chat, LanguageModel) <- function(x, input = NULL, stream_callback = NULL,
                                         ..., env = parent.frame())
 {
     system_msg <- ChatMessage(role = "system",
-                              content = compile_instructions(model))
-    chat(Chat(model, messages = list(system_msg), env = env), input,
+                              content = compile_instructions(x))
+    chat(Chat(model = x, messages = list(system_msg), env = env), input,
          stream_callback, ...)
 }
 
