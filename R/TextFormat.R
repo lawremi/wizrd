@@ -12,7 +12,8 @@ JSONFormat <- new_class("JSONFormat", PlainTextFormat,
                                 validator = \(value) {
                                     if (!identical(value$type, "object"))
                                         "must specify an object"
-                                }
+                                },
+                                default = list(type = "object")
                             ),
                             schema_class = union_classes | class_data.frame))
 
