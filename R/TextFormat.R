@@ -111,7 +111,9 @@ output_as <- function(x, schema, examples = list()) {
 textify <- new_generic("textify", c("x", "format"))
 
 method(textify, list(class_any, TextFormat)) <- function(x, format) {
-    textify(x, JSONFormat())
+    if (!is.object(x) && length(x) == 1L)
+        unname(as.character(x))
+    else textify(x, JSONFormat())
 }
 
 method(textify, list(class_character, TextFormat)) <- function(x, format) {
@@ -119,7 +121,9 @@ method(textify, list(class_character, TextFormat)) <- function(x, format) {
 }
 
 method(textify, list(class_list, TextFormat)) <- function(x, format) {
-    lapply(unname(x), textify, format)
+    if (!is.null(names(x)))
+        textify(x, JSONFormat())
+    else lapply(x, textify, format)
 }
 
 method(textify, list(class_json, TextFormat)) <- function(x, format) unclass(x)

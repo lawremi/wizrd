@@ -20,11 +20,8 @@ method(predict, Chat) <- function(object, input, ...) {
 }
 
 append_input <- function(chat, input) {
-    if (!is.list(input) || is.object(input))
-        input <- list(input)
-    input <- lapply(input, convert, ChatMessage)
-    chat@messages <- c(chat@messages,
-                       lapply(input, textify, format = chat@model@io@input))
+    input <- convert(input, ChatMessage) |> textify(chat@model@io@input)
+    chat@messages <- c(chat@messages, list(input))
     chat
 }
 
