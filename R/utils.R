@@ -264,20 +264,20 @@ require_ns <- function(x, to) {
     loaded <- vapply(x, requireNamespace, logical(1L), quietly = TRUE)
     if (any(!loaded))
         stop("Install package", if (sum(loaded) > 1L) "s" else "", " ",
-             paste0("'", x[!loaded], "'", collapse = " and "), " to ", to, ".")
+             paste0("'", x[!loaded], "'", collapse = " and "), " to ", to, ".",
+             call. = FALSE)
 
     invisible(TRUE)
 }
 
 init_process <- function(path, args, ready_callback, error_callback,
-                         process_timeout = 10L, poll_timeout = 10L)
+                         poll_timeout = 10L)
 {
     p <- processx::process$new(path, args, stdout = "|", stderr = "|")
 
     error <- ""
     output <- ""
-    start_time <- Sys.time()
-    while(p$is_alive() && (Sys.time() - start_time) < process_timeout) {
+    while(p$is_alive()) {
         io <- p$poll_io(poll_timeout)
         if (io["output"] == "ready") {
             output <- paste0(output, p$read_output())
