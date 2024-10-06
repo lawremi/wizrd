@@ -104,7 +104,7 @@ ollama_weights_path <- function(name) {
 
 wait_until_ready <- function(server, max_seconds) {
     assert_int(max_seconds, lower = 0L)
-    create_request(server) |> httr2::req_url_path_append("api", "tags") |>
+    httr2::request(server@url) |> httr2::req_url_path_append("api", "tags") |>
         httr2::req_retry(max_seconds = max_seconds) |> httr2::req_perform()
     server
 }
