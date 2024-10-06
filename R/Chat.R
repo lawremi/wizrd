@@ -19,12 +19,21 @@ method(predict, Chat) <- function(object, input, ...) {
     last_output(chat(object, input, ...))
 }
 
-method(chat, Chat) <- function(x, input, ...) {
-    if (length(input) == 0L)
-        return(x)
+append_input <- function(chat, input) {
     if (!is.list(input) || is.object(input))
         input <- list(input)
-    chat(x@model, c(x@messages, input), env = x@env, ...)
+    input <- lapply(input, convert, ChatMessage)
+    chat@messages <- c(chat@messages,
+                       lapply(input, textify, format = chat@model@io@input))
+    chat
+}
+
+method(chat, Chat) <- function(x, input = NULL, stream_callback = NULL, ...) {
+    if (length(input) == 0L)
+        return(x)
+    x <- append_input(x, input)
+    output <- perform_chat(x@model, x, stream_callback, ...)
+    handle_output(x, output)
 }
 
 method(print, Chat) <- function(x, full = FALSE, ...) {

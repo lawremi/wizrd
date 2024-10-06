@@ -2,17 +2,12 @@ RemoteLanguageModel <- new_class("RemoteLanguageModel", LanguageModel,
                                  properties = list(server = LanguageModelServer,
                                                    name = prop_string))
 
-method(chat, RemoteLanguageModel) <- function(x, input,
-                                              stream_callback = NULL,
-                                              env = parent.frame(), ...)
+method(perform_chat, RemoteLanguageModel) <- function(x, chat,
+                                                      stream_callback = NULL,
+                                                      ...)
 {
-    chat <- prepare_input(x, input, env)
-  
-    output <- chat(x@server, x@name, chat@messages,
-                   x@tools, x@io, set_props(x@params, ...),
-                   stream_callback)
-
-    handle_output(chat, output)
+    perform_chat(x@server, x@name, chat@messages, x@tools, x@io,
+                 set_props(x@params, ...), stream_callback)
 }
 
 method(print, RemoteLanguageModel) <- function(x, ...) {

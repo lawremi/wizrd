@@ -104,15 +104,16 @@ req_capture_stream_openai <- function(req, stream_callback) {
     ChatMessage(role = "assistant", content = paste(content, collapse = ""))
 }
 
-method(chat, OpenAIAPIServer) <- function(x, model, messages, tools,
-                                          io, params, stream_callback, ...)
+method(perform_chat, OpenAIAPIServer) <- function(x, model, messages, tools,
+                                                  io, params, stream_callback,
+                                                  ...)
 {
     body <- openai_chat_body(model, messages, tools, io@output, params,
                              stream = !is.null(stream_callback), ...)
-    chat_message(perform_chat(x, body, stream_callback))
+    openai_send_chat_body(x, body, stream_callback)
 }
 
-method(perform_chat, OpenAIAPIServer) <- function(x, body, stream_callback) {
+openai_send_chat_body <- function(x, body, stream_callback) {
     req <- create_request(x) |>
         httr2::req_url_path_append(chat_completions_path(x, body$model)) |>
         httr2::req_body_json(body)
@@ -121,7 +122,7 @@ method(perform_chat, OpenAIAPIServer) <- function(x, body, stream_callback) {
     } else {
         req |> httr2::req_perform(verbosity = getOption("wizrd.debug")) |>
             httr2::resp_body_json() |>
-            OpenAIAPIResponse()
+            OpenAIAPIResponse() |> chat_message()
     }
 }
 
@@ -153,8 +154,6 @@ method(chat_message, OpenAIAPIResponse) <- function(x) {
     ChatMessage(content = msg$content, tool_calls = openai_tool_calls(msg),
                 role = "assistant", refusal = msg$refusal)
 }
-
-method(chat_message, ChatMessage) <- function(x) x
 
 openai_encode_message <- function(x) {
     content <- openai_encode_content(x@content)

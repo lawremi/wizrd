@@ -6,7 +6,7 @@ LanguageModelServer <- new_class("LanguageModelServer",
                                  ),
                                  abstract = TRUE)
 
-perform_chat <- new_generic("perform_chat", "x")
+models <- new_generic("models", "x")
 
 method(language_model, LanguageModelServer) <-
     function(x, name, ..., params = language_model_params(...)) {

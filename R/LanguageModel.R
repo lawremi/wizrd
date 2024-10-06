@@ -12,6 +12,7 @@ LanguageModel <- new_class("LanguageModel", abstract = TRUE,
 language_model <- new_generic("language_model", "x")
 
 chat <- new_generic("chat", "x")
+perform_chat <- new_generic("perform_chat", "x")
 
 embed <- new_generic("embed", "x")
 
@@ -43,6 +44,15 @@ method(print, LanguageModel) <- function(x, ...) {
     cat("\n")
 }
 
+method(chat, LanguageModel) <- function(x, input = NULL, stream_callback = NULL,
+                                        ..., env = parent.frame())
+{
+    system_msg <- ChatMessage(role = "system",
+                              content = compile_instructions(model))
+    chat(Chat(model, messages = list(system_msg), env = env), input,
+         stream_callback, ...)
+}
+
 method(predict, LanguageModel) <- function(object, input, env = parent.frame(),
                                            ...)
 {
@@ -63,18 +73,6 @@ method(compile_instructions, LanguageModel) <- function(x) {
 }
 
 instructions <- new_generic("instructions", c("on", "to"))
-
-prepare_input <- function(model, input, env) {
-    if (!is.list(input) || is.object(input))
-        input <- list(input)
-    input <- lapply(input, convert, ChatMessage)
-    input <- lapply(input, textify, format = model@io@input)
-    instructions <- compile_instructions(model)
-    system <- ChatMessage(role = "system",
-                          content = textify(instructions, TextFormat()))
-    input$system <- NULL
-    Chat(model, messages = c(system, input), env = env)
-}
 
 tool_instructions <- new_generic("tool_instructions", "x")
 
