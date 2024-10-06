@@ -133,7 +133,7 @@ method(add_api_version, OpenAIAPIServer) <- function(server, req) {
     httr2::req_url_path_append(req, "v1")
 }
 
-method(chat_completions_path, OpenAIAPIServer) <- function(server) {
+method(chat_completions_path, OpenAIAPIServer) <- function(server, ...) {
     "chat/completions"
 }
 
