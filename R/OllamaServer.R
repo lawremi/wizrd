@@ -23,7 +23,7 @@ start_ollama_server <- function(server, path = Sys.which("ollama"),
     require_ns("processx", "run ollama")
 
     assert_class(server, "OllamaServer")
-    if (missing(path) && identical(path, ""))
+    if (missing(path) && !nzchar(path))
         stop("Cannot find the ", sQuote("ollama"), " binary. Ensure that ",
              "it is installed and on the $PATH.")
     assert_file_exists(path, "x")
