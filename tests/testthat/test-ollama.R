@@ -73,7 +73,6 @@ test_that("models can call R functions as tools", {
     output <- predict(model, "What is the mean of `var`?")
     expect_equal(jsonlite::fromJSON(output)$mean, mean(var))
 
-    options(wizrd.debug = 0L)
     sig <- tool_signature(class_data.frame, x = class_formula,
                           data = class_name, FUN = class_name,
                           subset = class_call)
