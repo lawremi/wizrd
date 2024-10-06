@@ -44,11 +44,11 @@ print_message_content <- function(x) {
     float <- float_for_role(x@role)
     if (length(x@content) > 0L) {
         if (x@role == "assistant")
-            cat(strwrap(x@content))
+            cat(paste(strwrap(x@content), collapse = "\n"))
         else if (x@role %in% c("user", "system")) {
             border_style <- switch(x@role, user = "single", system = "double")
             str <- strfit(x@content, width = cli::console_width() / 2L)
-            cat(cli::boxx(esc(str), float = float, border_style = border_style,
+            cat(cli::boxx(str, float = float, border_style = border_style,
                           header = x@participant %||% ""))
             cat("\n")
         }
@@ -63,7 +63,7 @@ print_message_object <- function(x) {
         opts <- options(max.print = 10L)
         on.exit(options(opts))
         str <- capture.output(print(x@object, width = cli::console_width() / 2L))
-        cat(cli::boxx(esc(str), float = float, header = x@participant %||% "",
+        cat(cli::boxx(str, float = float, header = x@participant %||% "",
                       border_style = "classic"))
     }
 }
