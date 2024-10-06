@@ -154,7 +154,7 @@ method(jsonify, S7_object) <- function(x) {
     prop_jsonify <- function(property) {
         val <- prop(x, property$name)
         if (inherits(property, scalar_S7_property))
-            val <- unbox(val)
+            val <- jsonlite::unbox(val)
         else if (is.object(val))
             jsonify(val)
         else val
