@@ -114,3 +114,15 @@ handle_output <- function(x, output) {
     append_messages(x, detextify(output, x@model@io@output)) |>
         handle_tool_calls()
 }
+
+readline_chat <- function(model, env = parent.frame()) {
+    ctx <- chat(model, env = env)
+    cat("Enter 'Q' to exit.\n")
+    while (TRUE) {
+        prompt <- readline("User: ")
+        if (prompt == "Q")
+            break
+        ctx <- chat(ctx, prompt)
+        print(last_response(ctx))
+    }
+}
