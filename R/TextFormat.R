@@ -66,64 +66,25 @@ glue_format <- function(template) {
     GlueFormat(template = template)
 }
 
-expect_format <- function(x, format = TextFormat()) {
-    x@io@input <- format
+method(convert, list(class_any, TextFormat)) <- function(from, to) {
+    json_format(from)
+}
+
+output_as <- function(x, format, examples = list()) {
+    x@io@output <- convert(format, TextFormat)
     x
 }
-
-expect_json <- function(x, schema = list(), examples = list())
-{
-    expect_format(x, json_format(schema, examples))
-}
-
-expect_csv <- function(x, col_classes = NA, examples = list())
-{
-    expect_format(x, csv_format(col_classes, examples))
-}
-
-expect_code <- function(x, language = "R") {
-    expect_format(x, code_format(language))
-}
-
-respond_with_format <- function(x, format = TextFormat()) {
-    x@io@output <- format
-    x
-}
-
-respond_with_json <- function(x, schema = list(), examples = list())
-{
-    respond_with_format(x, json_format(schema, examples))
-}
-
-respond_with_csv <- function(x, col_classes = NA, examples = list())
-{
-    respond_with_format(x, csv_format(col_classes, examples))
-}
-
-respond_with_code <- function(x, language = "R") {
-    respond_with_format(x, code_format(language))
-}
-
-output_format_constructor <- new_generic("output_format_constructor", "x")
-
-method(output_format_constructor, class_any) <- function(x) json_format
-
-## CSV not reliable enough in practice
-## method(format_constructor, class_data.frame) <- function(x) csv_format
-
-output_as <- function(x, schema, examples = list()) {
-    respond_with_format(x, output_format_constructor(schema)(schema, examples))
-}
-
-input_format_constructor <- new_generic("input_format_constructor", "x")
 
 class_glue <- new_S3_class("glue")
 
-method(input_format_constructor, class_character | class_glue) <-
-    function(x) glue_format
+method(convert, list(class_character | class_glue, TextFormat)) <-
+    function(from, to) {
+        glue_format(from)
+    }
 
 accept_as <- function(x, schema) {
-    expect_format(x, input_format_constructor(schema)(schema))
+    x@io@input <- convert(schema, TextFormat)
+    x
 }
 
 textify <- new_generic("textify", c("x", "format"))
