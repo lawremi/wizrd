@@ -1,11 +1,14 @@
 OpenAIAPIServer <- new_class("OpenAIAPIServer", LanguageModelServer)
 
-OpenAIAPIResponse <- new_class("OpenAIAPIResponse", class_list)
+openai_response_models <- function(x) x$data
+
+openai_send_models_request <- function(x) {
+    create_request(x) |> httr2::req_url_path_append(models_path(x)) |>
+        httr2::req_perform() |> httr2::resp_body_json()
+}
 
 method(models, OpenAIAPIServer) <- function(x) {
-    json <- create_request(x) |> httr2::req_url_path_append("models") |>
-        httr2::req_perform() |> httr2::resp_body_json()
-    json$data
+    openai_send_models_request(x) |> openai_response_models()
 }
 
 openai_body_messages <- function(messages) {
@@ -114,21 +117,20 @@ method(perform_chat, OpenAIAPIServer) <- function(x, model, messages, tools,
                                                   io, params, stream_callback,
                                                   ...)
 {
-    body <- openai_chat_body(model, messages, tools, io@output, params,
-                             stream = !is.null(stream_callback), ...)
-    openai_send_chat_body(x, body, stream_callback)
+    openai_chat_body(model, messages, tools, io@output, params,
+                     stream = !is.null(stream_callback), ...) |>
+        openai_send_chat_body(x, stream_callback) |>
+        openai_response_chat_message()
 }
 
-openai_send_chat_body <- function(x, body, stream_callback) {
-    req <- create_request(x) |>
-        httr2::req_url_path_append(chat_completions_path(x, body$model)) |>
+openai_send_chat_body <- function(body, server, stream_callback) {
+    req <- create_request(server) |>
+        httr2::req_url_path_append(chat_completions_path(server, body$model)) |>
         httr2::req_body_json(body)
     if (!is.null(stream_callback)) {
         req |> req_capture_stream_openai(stream_callback)
     } else {
-        req |> httr2::req_perform(verbosity = getOption("wizrd.debug")) |>
-            httr2::resp_body_json() |>
-            OpenAIAPIResponse() |> chat_message()
+        req |> httr2::req_perform() |> httr2::resp_body_json()
     }
 }
 
@@ -140,8 +142,16 @@ method(add_api_version, OpenAIAPIServer) <- function(server, req) {
     httr2::req_url_path_append(req, "v1")
 }
 
-method(chat_completions_path, OpenAIAPIServer) <- function(server, ...) {
+method(chat_completions_path, OpenAIAPIServer) <- function(server, model) {
     "chat/completions"
+}
+
+method(embeddings_path, OpenAIAPIServer) <- function(server, model) {
+    "embeddings"
+}
+
+method(models_path, OpenAIAPIServer) <- function(server) {
+    "models"
 }
 
 openai_tool_calls <- function(message) {
@@ -152,9 +162,9 @@ openai_tool_calls <- function(message) {
     })
 }
 
-chat_message <- new_generic("chat_message", "x")
-
-method(chat_message, OpenAIAPIResponse) <- function(x) {
+openai_response_chat_message <- function(x) {
+    if (inherits(x, ChatMessage)) # captured during streaming
+        return(x)
     ## TODO: handle multiple choices (via callback?)
     msg <- x$choices[[1L]]$message
     ChatMessage(content = msg$content, tool_calls = openai_tool_calls(msg),
@@ -235,3 +245,30 @@ method(openai_encode_tool, ToolBinding) <- function(x) {
                            description = openai_tool_description(x),
                            parameters = x@io@input@schema))
 }
+
+openai_embedding_body <- function(model, input, dimensions) {
+    c(list(input = as.character(input), model = model),
+      dimensions = dimensions)
+}
+
+method(perform_embedding, OpenAIAPIServer) <- function(x, model, data,
+                                                       ndim = NULL)
+{
+    assert_string(model)
+    assert_string(data)
+    assert_int(ndim, lower = 1L, null.ok = TRUE)
+    
+    openai_embedding_body(model, data, ndim) |>
+        openai_send_embedding_body(x) |>
+        openai_response_embedding()
+}
+
+openai_send_embedding_body <- function(body, server) {
+    req <- create_request(server) |>
+        httr2::req_url_path_append(embeddings_path(server, body$model)) |>
+        httr2::req_body_json(body) |>
+        httr2::req_perform() |>
+        httr2::resp_body_json()
+}
+
+openai_response_embedding <- function(x) x$data$embedding

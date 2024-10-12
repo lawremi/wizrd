@@ -20,6 +20,14 @@ method(chat_completions_path, AzureOpenAIServer) <- function(server, model) {
     paste0("openai/deployments/", model, "/chat/completions")
 }
 
+method(embeddings_path, AzureOpenAIServer) <- function(server, model) {
+    paste0("openai/deployments/", model, "/embeddings")
+}
+
+method(models_path, AzureOpenAIServer) <- function(server) {
+    "openai/models"
+}
+
 method(add_api_version, AzureOpenAIServer) <- function(server, req) {
     httr2::req_url_query(req, "api-version" = AZURE_OPENAI_API_VERSION)
 }

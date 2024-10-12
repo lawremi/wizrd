@@ -198,3 +198,14 @@ interpret_symbols <-function(x) {
     x@instructions <- "You are an assistant embedded in an R session, where users will reference variables using backticks (``). When responding to user requests and calling tools, always preserve these backticks around variable names to correctly identify them as R variables. Do not remove the backticks when passing variable names to tools or functions, as the backticks identify them as R variables. Do not wrap other types of strings in backticks. If backticks are present around a word, treat it as a variable name, and use it as-is when calling tools."
     x
 }
+
+method(embed, LanguageModel) <- function(x, data, ndim = NULL) {
+    assert_flag(recursive)
+    assert_int(ndim, null.ok = TRUE)
+
+    data <- textify(data, x@io@input)
+    if (length(data) == 1L && !is.list(data))
+        data <- list(data)
+    
+    do.call(rbind, lapply(data, perform_embedding, x = x@backend, ndim = ndim))
+}

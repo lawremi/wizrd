@@ -13,7 +13,11 @@ method(language_model, LanguageModelBackend) <-
         LanguageModel(backend = x, name = name, params = params)
     }
 
-chat_completions_path <- new_generic("chat_completions_path", "server")
+chat_completions_path <- new_generic("chat_completions_path", "server",
+                                     function(server, model) S7_dispatch())
+embeddings_path <- new_generic("embeddings_path", "server",
+                               function(server, model) S7_dispatch())
+models_path <- new_generic("models_path", "server")
 
 add_api_key <- new_generic("add_api_key", "server",
                            function(server, req, key) S7_dispatch())
