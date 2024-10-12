@@ -81,3 +81,15 @@ test_that("models can call R functions as tools", {
     output <- predict(model, "Mean of MPG.city for each Manufacturer in the Cars93 dataset")
     expect_equal(as.numeric(output), mean(var))
 })
+
+test_that("models can generate embeddings", {
+    model <- nomic()
+    embed(model, db)
+})
+
+test_that("RAG works", {
+    store <- text_store(nomic(), chunk_Rd("S7"))
+    model <- llama3() |> accept_as(results_augmented_query_to(store))
+    predict(model, "How do I create a new property with the S7 package?")
+})
+
