@@ -1,5 +1,6 @@
-LanguageModel <- new_class("LanguageModel", abstract = TRUE,
+LanguageModel <- new_class("LanguageModel",
                            properties = list(
+                               backend = LanguageModelBackend,
                                name = nullable(prop_string),
                                instructions = new_string_property(
                                    default = "You are a helpful assistant."
@@ -11,9 +12,12 @@ LanguageModel <- new_class("LanguageModel", abstract = TRUE,
 
 language_model <- new_generic("language_model", "x")
 
-chat <- new_generic("chat", "x")
-perform_chat <- new_generic("perform_chat", "x")
+method(language_model, LanguageModelBackend) <-
+    function(x, name, ..., params = language_model_params(...)) {
+        LanguageModel(backend = x, name = name, params = params)
+    }
 
+chat <- new_generic("chat", "x")
 embed <- new_generic("embed", "x")
 
 ## Vector databases / indexing methods to support
@@ -42,6 +46,8 @@ method(print, LanguageModel) <- function(x, ...) {
                        collapse = ", ")
     cat(cli::ansi_strtrim(paste("@params:", param_str)))
     cat("\n")
+    cat("@backend: ")
+    print(x@backend)
 }
 
 method(chat, LanguageModel) <- function(x, input = NULL, stream_callback = NULL,

@@ -1,4 +1,4 @@
-LanguageModelServer <- new_class("LanguageModelServer",
+LanguageModelServer <- new_class("LanguageModelServer", LanguageModelBackend,
                                  properties = list(
                                      url = prop_string,
                                      key_prefix = prop_string,
@@ -8,9 +8,9 @@ LanguageModelServer <- new_class("LanguageModelServer",
 
 models <- new_generic("models", "x")
 
-method(language_model, LanguageModelServer) <-
+method(language_model, LanguageModelBackend) <-
     function(x, name, ..., params = language_model_params(...)) {
-        RemoteLanguageModel(server = x, name = name, params = params)
+        LanguageModel(backend = x, name = name, params = params)
     }
 
 chat_completions_path <- new_generic("chat_completions_path", "server")

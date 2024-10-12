@@ -11,7 +11,7 @@ method(models, LlamaCppServer) <- function(x) data.frame(id = x@model)
 method(language_model, LlamaCppServer) <-
     function(x, ..., params = language_model_params(...))
     {
-        RemoteLanguageModel(server = x, name = x@model, params = params)
+        LanguageModel(backend = x, name = x@model, params = params)
     }
 
 method(chat, LlamaCppServer) <- function(x, ...) {

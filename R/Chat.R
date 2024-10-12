@@ -29,7 +29,9 @@ method(chat, Chat) <- function(x, input = NULL, stream_callback = NULL, ...) {
     if (length(input) == 0L)
         return(x)
     x <- append_input(x, input)
-    output <- perform_chat(x@model, x, stream_callback, ...)
+    m <- x@model
+    output <- perform_chat(m@backend, m@name, x@messages, m@tools, m@io,
+                           set_props(m@params, ...), stream_callback)
     handle_output(x, output)
 }
 
