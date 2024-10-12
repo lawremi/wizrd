@@ -116,3 +116,7 @@ llama3 <- function(temperature = 0, ...) {
 llava <- function(temperature = 0, ...) {
     ollama_model("llava", temperature = temperature, ...)
 }
+
+nomic <- function(temperature = 0, ...) {
+    ollama_model("nomic-embed-text:v1.5", temperature = temperature, ...)
+}
