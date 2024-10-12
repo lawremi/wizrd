@@ -8,13 +8,13 @@ importFrom(glue, glue)
 export(language_model, ollama_model, llama_cpp_model, openai_model,
        azure_openai_model)
 # other constructors
-export(chat, tool, tool_signature)
+export(chat, tool, tool_signature, results_augmented_query_to, text_store)
 # builders
 export(equip, unequip, instruct, output_as, accept_as)
 # accessors
 export(last_output)
 # convenience models
-export(llama3, llava)
+export(llama3, llava, nomic)
 # server API
 export(models)
 
