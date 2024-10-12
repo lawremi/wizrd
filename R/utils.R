@@ -399,3 +399,38 @@ rename <- function(x, ...) {
     names(x)[match(names(dots), names(x))] <- dots
     x
 }
+
+writable_props <- function(x) {
+    stopifnot(inherits(x, S7_object))
+    static_names <- names(Filter(Negate(prop_read_only), S7_class(x)@properties))
+    props(x, static_names)
+}
+
+persist <- new_generic("persist", "x")
+on_persist <- new_generic("on_persist", "x")
+
+method(persist, class_any) <- function(x, file) {
+    on_persist(x, file)
+    saveRDS(x, file)
+}
+
+method(on_persist, class_any) <- function(x, ...) { }
+
+method(on_persist, S7_object) <- function(x, ...) {
+    for (p in writable_props(x))
+        on_persist(p, ...)
+}
+
+on_restore <- new_generic("on_restore", "x")
+
+restore <- function(file) {
+    obj <- readRDS(file)
+    on_restore(x, file)
+}
+
+method(on_restore, class_any) <- function(x, ...) x
+
+method(on_restore, S7_object) <- function(x, ...) {
+    props(x) <- lapply(writable_props(x), on_restore, ...)
+    x
+}
