@@ -202,28 +202,29 @@ get_Rd <- function(topic, package = NULL) {
 }
 
 Rd_args <- function(Rd) {
-    args <- Find(\(x) attr(x, "Rd_tag") == "\\arguments", Rd)
+    Rd_parse_args(Find(\(x) attr(x, "Rd_tag") == "\\arguments", Rd))
+}
+
+Rd_src <- function(Rd) {
+    paste(as.character(attr(Rd, "srcref"), useSource = TRUE), collapse="\n")
+}
+
+Rd_parse_args <- function(args) {
     items <- Filter(\(x) attr(x, "Rd_tag") == "\\item", args)
-    ans <- vapply(items, \(x) paste(unlist(x[[2L]]), collapse = ""),
-                  character(1L))
-    ans_names <- vapply(items, \(x) {
-        dots <- Find(\(xi) attr(xi, "Rd_tag") == "\\dots", x[[1L]])
-        paste(c(unlist(x[[1L]]), if (!is.null(dots)) "..."),
-              collapse = "")
-    }, character(1L))
+    ans <- vapply(items, \(x) Rd_src(x[[2L]]), character(1L))
+    ans_names <- vapply(items, \(x) gsub("\\dots", "...", Rd_src(x[[1L]])),
+                        character(1L))
     ans_names_split <- strsplit(ans_names, ",", fixed = TRUE)
     setNames(rep(ans, lengths(ans_names_split)),
              trimws(unlist(ans_names_split)))
 }
 
 Rd_description <- function(Rd) {
-    desc <- Find(function(x) attr(x, "Rd_tag") == "\\description", Rd)
-    paste(unlist(desc), collapse = "")
+    Rd_src(Find(function(x) attr(x, "Rd_tag") == "\\description", Rd))
 }
 
 Rd_value <- function(Rd) {
-    desc <- Find(function(x) attr(x, "Rd_tag") == "\\value", Rd)
-    paste(unlist(desc), collapse = "")
+    Rd_src(Find(function(x) attr(x, "Rd_tag") == "\\value", Rd))
 }
 
 Rd_for_function <- function(FUN, name = deparse(substitute(FUN))) {
