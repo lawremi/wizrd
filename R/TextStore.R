@@ -15,7 +15,9 @@ TextStore <- new_class("TextStore",
                            text = new_property(
                                NULL | class_data.frame,
                                setter = \(self, value) {
-                                   self@index <- build(self@index, value)
+                                   if (!is.null(value) && is.null(value$text))
+                                       stop("'value' must have a 'text' column")
+                                   self@index <- build(self@index, value$text)
                                    self@text <- value
                                    self
                                }
@@ -33,7 +35,7 @@ method(fetch, list(class_any, TextStore)) <- function(x, from, n) {
 }
 
 method(fetch, list(class_any, TextIndex)) <- function(x, from, n) {
-    embed(from@embedder, x) |> fetch(from@vector_index, n)
+    embed_text(from@embedder, x) |> fetch(from@vector_index, n)
 }
 
 build <- new_generic("build", "x")
@@ -45,7 +47,7 @@ method(build, TextStore) <- function(x, text, ...) {
 method(build, TextIndex) <- function(x, text, ...) {
     if (is.null(text))
         return(x)
-    embedding <- embed(x@embedder, text, x@ndim)
+    embedding <- embed_text(x@embedder, text, x@ndim)
     set_props(x, vector_index = x@vector_index_builder(embedding, ...),
               ndim = ncol(embedding))
 }
@@ -66,8 +68,9 @@ results_augmented_query_to <- function(store, n = 5L) {
 
 method(textify, list(class_any, ResultsAugmentedFormat)) <- function(x, format) {
     results <- fetch(x, format@store, format@n)
-    paste0(textify(results),
-           "\n\n",
+    paste0("Using this data:\n",
+           textify(results),
+           "\n\nRespond to this prompt:\n",
            textify(x))
 }
 
