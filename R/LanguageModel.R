@@ -18,7 +18,7 @@ method(language_model, LanguageModelBackend) <-
     }
 
 chat <- new_generic("chat", "x")
-embed <- new_generic("embed", "x")
+embed_text <- new_generic("embed_text", "x")
 
 ## Vector databases / indexing methods to support
 ## - RcppAnnoy
@@ -199,13 +199,18 @@ interpret_symbols <-function(x) {
     x
 }
 
-method(embed, LanguageModel) <- function(x, data, ndim = NULL) {
-    assert_flag(recursive)
+method(embed_text, LanguageModel) <- function(x, data, ndim = NULL) {
     assert_int(ndim, null.ok = TRUE)
 
-    data <- textify(data, x@io@input)
-    if (length(data) == 1L && !is.list(data))
-        data <- list(data)
+    if (length(data) == 0L)
+        return(matrix(numeric(), ncol = ndim))
     
-    do.call(rbind, lapply(data, perform_embedding, x = x@backend, ndim = ndim))
+    data <- textify(data, x@io@input)
+    if (length(data) == 1L && (!is.list(data) || is.object(data)))
+        data <- list(data)
+    if (any(lengths(data) != 1L))
+        stop("elements of 'data' must be length one")
+    
+    do.call(rbind, lapply(data, perform_embedding, model = x@name, x = x@backend,
+                          ndim = ndim))
 }

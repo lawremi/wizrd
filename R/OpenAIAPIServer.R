@@ -255,7 +255,6 @@ method(perform_embedding, OpenAIAPIServer) <- function(x, model, data,
                                                        ndim = NULL)
 {
     assert_string(model)
-    assert_string(data)
     assert_int(ndim, lower = 1L, null.ok = TRUE)
     
     openai_embedding_body(model, data, ndim) |>
@@ -271,4 +270,6 @@ openai_send_embedding_body <- function(body, server) {
         httr2::resp_body_json()
 }
 
-openai_response_embedding <- function(x) x$data$embedding
+openai_response_embedding <- function(x) {
+    do.call(rbind, lapply(x$data, `[[`, "embedding"))
+}

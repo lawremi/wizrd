@@ -84,11 +84,13 @@ test_that("models can call R functions as tools", {
 
 test_that("models can generate embeddings", {
     model <- nomic()
-    embed(model, db)
+    embedding <- embed_text(model, c("test", "test"))
+    expect_equal(dim(embedding), c(2L, 768L))
 })
 
 test_that("RAG works", {
-    store <- text_store(nomic(), chunk_Rd("S7"))
+    chunks <- chunk_Rd("S7")
+    store <- text_store(nomic(), chunks)
     model <- llama3() |> accept_as(results_augmented_query_to(store))
     predict(model, "How do I create a new property with the S7 package?")
 })
