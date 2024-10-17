@@ -37,7 +37,7 @@ llama_cpp_model <- function(path, mode = c("chat", "embedding"), alias = NULL,
     if (mode == "chat")
         server <- run_llama_cpp_server(path, alias = alias)
     else {
-        server <- run_llamafiler_server(path)
+        server <- run_llamafiler(path)
         server@model <- alias
     }
     language_model(server, ...)
@@ -161,8 +161,9 @@ run_llamafiler <- function(model, port = 0L, path = llamafiler_path(), ...)
 
     require_ns("processx", "run llamafiler")
 
-    url <- paste0("http://localhost:", port)
-    args <- make_args(log_disable = TRUE, model = model, listen = url, ...)
+    addr <- paste0("127.0.0.1:", port)
+    url <- paste0("http://", addr)
+    args <- make_args(log_disable = TRUE, model = model, listen = addr, ...)
     p <- init_process(path, args, llamafile_ready, llamafiler_error)
     
     model_name <- tools::file_path_sans_ext(basename(model))
