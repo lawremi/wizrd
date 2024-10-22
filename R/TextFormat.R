@@ -204,7 +204,7 @@ method(dejsonify, list(class_any, S7_S3_class | S7_base_class)) <- function(x,
         return(as.vector(x))
     if (identical(spec, class_language))
         return(parse(text=x)[[1L]])
-    convert(json(x), spec)
+    convert(jsonic(x), spec)
 }
 
 method(dejsonify, list(class_any, S7_union)) <- function(x, spec) {
