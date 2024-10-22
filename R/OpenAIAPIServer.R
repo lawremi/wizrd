@@ -267,7 +267,7 @@ openai_send_embedding_body <- function(body, server) {
         httr2::req_url_path_append(embeddings_path(server, body$model)) |>
         httr2::req_body_json(body) |>
         httr2::req_perform() |>
-        httr2::resp_body_json()
+        httr2::resp_body_json(simplifyVector = TRUE, simplifyDataFrame = FALSE)
 }
 
 openai_response_embedding <- function(x) {

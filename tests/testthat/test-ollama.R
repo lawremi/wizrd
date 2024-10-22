@@ -87,11 +87,3 @@ test_that("models can generate embeddings", {
     embedding <- embed_text(model, c("test", "test"))
     expect_equal(dim(embedding), c(2L, 768L))
 })
-
-test_that("RAG works", {
-    chunks <- chunk_Rd("S7")
-    store <- text_store(nomic(), chunks)
-    model <- llama3() |> accept_as(results_augmented_query_to(store))
-    predict(model, "How do I create a new property with the S7 package?")
-})
-

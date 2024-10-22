@@ -31,11 +31,13 @@ text_store <- function(index, text = NULL) {
 }
 
 method(fetch, list(class_any, TextStore)) <- function(x, from, n) {
-    x@text[fetch(x, from@index, n),]
+    from@text[fetch(x, from@index, n),]
 }
 
 method(fetch, list(class_any, TextIndex)) <- function(x, from, n) {
-    embed_text(from@embedder, x) |> fetch(from@vector_index, n)
+    embeddings <- embed_text(from@embedder, x)
+    unique(unlist(apply(embeddings, 1L, fetch, from@vector_index, n,
+                        simplify = FALSE)))
 }
 
 build <- new_generic("build", "x")
@@ -68,7 +70,10 @@ results_augmented_query_to <- function(store, n = 5L) {
     ResultsAugmentedFormat(store = store, n = as.integer(n))
 }
 
-method(textify, list(class_any, ResultsAugmentedFormat)) <- function(x, format) {
+method(textify,
+       list(class_character | class_list | class_any,
+            ResultsAugmentedFormat)) <- function(x, format)
+{
     results <- fetch(x, format@store, format@n)
     paste0("Using these items, in decreasing order of relevance:\n",
            textify(results),
@@ -78,4 +83,17 @@ method(textify, list(class_any, ResultsAugmentedFormat)) <- function(x, format) 
 
 method(on_restore, TextIndex) <- function(x, file) {
     set_props(x, vector_index = on_restore(x@vector_index, file, x@ndim))
+}
+
+method(print, TextIndex) <- function(x, ...) {
+    cat(x@embedder@name %||% "<unnamed>", " -> <",
+        class(x@vector_index)[1L], "> (x", x@ndim, ")\n", sep = "")
+}
+
+method(print, TextStore) <- function(x, ...) {
+    cat(S7:::obj_desc(x))
+    cat("\n")
+    cat("@index: "); print(x@index)
+    cat("@text:", if (!is.null(x@text)) nrow(x@text) else 0L, "records")
+    cat("\n")
 }

@@ -1,10 +1,10 @@
 ## Really an S4 reference class, but this keeps the dependency optional
-Rcpp_AnnoyAngular <- new_S3_class("Rcpp_AnnoyAngular")
+Rcpp_AnnoyAngular <- setClass("Rcpp_AnnoyAngular", package = "RcppAnnoy")
 
 annoy_index <- function(embedding, ntrees = ncol(embedding) %/% 5L) {
     require_ns("RcppAnnoy", "index vectors (by default)")
     index <- new(RcppAnnoy::AnnoyAngular, ncol(embedding))
-    for (i in seq_along(nrow(embedding)))
+    for (i in seq_len(nrow(embedding)))
         index$addItem(i, embedding[i,])
     index$build(ntrees)
     index

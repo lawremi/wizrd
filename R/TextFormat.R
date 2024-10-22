@@ -70,6 +70,10 @@ method(convert, list(class_any, TextFormat)) <- function(from, to) {
     json_format(from)
 }
 
+method(convert, list(TextFormat, TextFormat)) <- function(from, to) {
+    from
+}
+
 output_as <- function(x, format, examples = list()) {
     x@io@output <- convert(format, TextFormat)
     x
@@ -88,6 +92,10 @@ accept_as <- function(x, schema) {
 }
 
 textify <- new_generic("textify", c("x", "format"))
+
+method(textify, list(class_any, class_missing)) <- function(x, format) {
+    textify(x, TextFormat())
+}
 
 method(textify, list(class_any, TextFormat)) <- function(x, format) {
     if (!is.object(x) && length(x) == 1L)

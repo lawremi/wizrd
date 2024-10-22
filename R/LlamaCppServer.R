@@ -20,7 +20,7 @@ method(perform_chat, LlamaCppServer) <- function(x, ...) {
     perform_chat(super(x, OpenAIAPIServer), ...)
 }
 
-method(perform_embeddding, LlamaCppServer) <- function(x, ...) {
+method(perform_embedding, LlamaCppServer) <- function(x, ...) {
     if (!x@embedding)
         stop("llama.cpp server does not embed when not started with --embedding")
     perform_embedding(super(x, OpenAIAPIServer), ...)
