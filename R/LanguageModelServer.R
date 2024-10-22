@@ -8,6 +8,8 @@ LanguageModelServer <- new_class("LanguageModelServer", LanguageModelBackend,
 
 models <- new_generic("models", "x")
 
+language_model <- new_generic("language_model", "x")
+
 method(language_model, LanguageModelBackend) <-
     function(x, name, ..., params = language_model_params(...)) {
         LanguageModel(backend = x, name = name, params = params)

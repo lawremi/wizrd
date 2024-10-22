@@ -10,13 +10,6 @@ LanguageModel <- new_class("LanguageModel",
                                params = LanguageModelParams
                            ))
 
-language_model <- new_generic("language_model", "x")
-
-method(language_model, LanguageModelBackend) <-
-    function(x, name, ..., params = language_model_params(...)) {
-        LanguageModel(backend = x, name = name, params = params)
-    }
-
 chat <- new_generic("chat", "x")
 embed_text <- new_generic("embed_text", "x")
 
