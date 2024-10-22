@@ -52,6 +52,8 @@ method(build, TextIndex) <- function(x, text, ...) {
               ndim = ncol(embedding))
 }
 
+## Is this the right way to do RAG? Or should we provide the model a
+## tool that performs a search?
 ResultsAugmentedFormat <- new_class("ResultsAugmentedFormat", PlainTextFormat,
                                     properties = list(
                                         store = TextStore,
@@ -68,7 +70,7 @@ results_augmented_query_to <- function(store, n = 5L) {
 
 method(textify, list(class_any, ResultsAugmentedFormat)) <- function(x, format) {
     results <- fetch(x, format@store, format@n)
-    paste0("Using this data:\n",
+    paste0("Using these items, in decreasing order of relevance:\n",
            textify(results),
            "\n\nRespond to this prompt:\n",
            textify(x))
