@@ -22,7 +22,7 @@ start_ollama_server <- function(server, path = Sys.which("ollama"),
 {
     require_ns("processx", "run ollama")
 
-    assert_class(server, "OllamaServer")
+    stopifnot(inherits(server, OllamaServer))
     if (missing(path) && !nzchar(path))
         stop("Cannot find the ", sQuote("ollama"), " binary. Ensure that ",
              "it is installed and on the $PATH.")
@@ -38,7 +38,7 @@ ollama_is_running <- function(server = ollama_server()) {
 }
 
 ollama_list <- function(server = ollama_server()) {
-    assert_class(server, "OllamaServer")
+    stopifnot(inherits(server, OllamaServer))
     to_df <- function(x) {
         do.call(rbind, lapply(x$models, \(m) {
             m$details$families <- I(list(unlist(m$details$families)))
@@ -54,7 +54,7 @@ method(models, OllamaServer) <- function(x) {
 }
 
 ollama_pull <- function(name, server = ollama_server()) {
-    assert_class(server, "OllamaServer")
+    stopifnot(inherits(server, OllamaServer))
     system2("ollama", c("pull", name))
 }
 

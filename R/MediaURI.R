@@ -10,8 +10,7 @@ MediaURI <- new_class("MediaURI", class_character,
 
 validate_MediaURI <- function(self) {
     category <- self@category
-    class_prefix <- tolower(sub("URI$", "",
-                                class(self)[1L]))
+    class_prefix <- tolower(sub(".*?::", "", sub("URI$", "", class(self)[1L])))
     if (category != class_prefix)
         paste0("@category must be '", class_prefix, "', ",
                "not '", category, "'")

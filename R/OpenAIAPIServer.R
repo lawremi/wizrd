@@ -12,12 +12,12 @@ method(models, OpenAIAPIServer) <- function(x) {
 }
 
 openai_body_messages <- function(messages) {
-    assert_list(messages, "ChatMessage")
+    assert_list(messages, "wizrd::ChatMessage")
     unname(lapply(messages, openai_encode_message))
 }
 
 openai_body_tools <- function(tools) {
-    assert_list(tools, "ToolBinding")
+    assert_list(tools, "wizrd::ToolBinding")
     if (length(tools) > 0L)
         lapply(unname(tools), openai_encode_tool)
 }
@@ -239,7 +239,7 @@ openai_tool_description <- function(x) {
 }
 
 method(openai_encode_tool, ToolBinding) <- function(x) {
-    assert_class(x@io@input, "JSONFormat")
+    stopifnot(inherits(x@io@input, JSONFormat))
     list(type = "function",
          `function` = list(name = x@tool@name,
                            description = openai_tool_description(x),
