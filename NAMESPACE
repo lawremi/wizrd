@@ -21,6 +21,8 @@ export(chunk_Rd)
 export(llama3, llava, nomic)
 # backend API
 export(models)
+# persistence
+export(persist, restore)
 
 # S3 methods
 S3method(nameOfClass, S7_S3_class)

@@ -109,6 +109,12 @@ wait_until_ready <- function(server, max_seconds) {
     server
 }
 
+method(on_restore, OllamaServer) <- function(x, name, ...) {
+    server <- ollama_server(x@url)
+    maybe_ollama_pull(NA, name, server)
+    server
+}
+
 llama3 <- function(temperature = 0, ...) {
     ollama_model("llama3.1:8b-instruct-q4_K_M", temperature = temperature, ...)
 }

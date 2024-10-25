@@ -143,10 +143,14 @@ llama_cpp_server <- function(model_name, url, embedding = FALSE, process = NULL)
                       alias = alias, embedding = embedding, port = port,
                       nobrowser = if (is_llamafile) TRUE,
                       ngl = if (gpu) 9999, ...)
-    p <- init_process(path, args, llamafile_ready, llamafile_error)
+    p <- init_llamafile_process(path, args)
     
     url <- paste0("http://localhost:", port)
     llama_cpp_server(alias, url, embedding, process = p)
+}
+
+init_llamafile_process <- function(path, args) {
+    init_process(path, args, llamafile_ready, llamafile_error)
 }
 
 run_llamafiler <- function(model, port = 0L, path = llamafiler_path(), ...)
@@ -164,11 +168,15 @@ run_llamafiler <- function(model, port = 0L, path = llamafiler_path(), ...)
     addr <- paste0("127.0.0.1:", port)
     url <- paste0("http://", addr)
     args <- make_args(log_disable = TRUE, model = model, listen = addr, ...)
-    p <- init_process(path, args, llamafile_ready, llamafiler_error)
+    p <- init_llamafiler_process(path, args)
     
     model_name <- tools::file_path_sans_ext(basename(model))
 
     llama_cpp_server(model, url, embedding = TRUE, process = p)
+}
+
+init_llamafiler_process <- function(path, args) {
+    init_process(path, args, llamafile_ready, llamafiler_error)
 }
 
 run_llamafile <- function(path = llamafile_path(), threads = 8L, port = 0L,
@@ -210,4 +218,10 @@ find_available_port <- function(start = 8000, end = 8100) {
         }
     }
     stop("No available ports found in ", start, ":", end)
+}
+
+method(on_restore, LlamaCppServer) <- function(x, ...) {
+    init_fun <- if (x@embedding) init_llamafiler_process else init_llamafile_process
+    p <- R6_private(x@process)
+    set_props(x, process = init_fun(p$command, p$args))
 }

@@ -17,6 +17,8 @@ TextStore <- new_class("TextStore",
                                setter = \(self, value) {
                                    if (!is.null(value) && is.null(value$text))
                                        stop("'value' must have a 'text' column")
+                                   if (identical(self@text, value))
+                                       return(self)
                                    self@index <- build(self@index, value$text)
                                    self@text <- value
                                    self
@@ -82,7 +84,9 @@ method(textify,
 }
 
 method(on_restore, TextIndex) <- function(x, file) {
-    set_props(x, vector_index = on_restore(x@vector_index, file, x@ndim))
+    set_props(x,
+              embedder = on_restore(x@embedder),
+              vector_index = on_restore(x@vector_index, file, x@ndim))
 }
 
 method(print, TextIndex) <- function(x, ...) {

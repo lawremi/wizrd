@@ -425,12 +425,17 @@ on_restore <- new_generic("on_restore", "x")
 
 restore <- function(file) {
     obj <- readRDS(file)
-    on_restore(x, file)
+    on_restore(obj, file)
 }
 
 method(on_restore, class_any) <- function(x, ...) x
 
 method(on_restore, S7_object) <- function(x, ...) {
-    props(x) <- lapply(writable_props(x), on_restore, ...)
+    p <- writable_props(x)
+    props(x) <- lapply(p, on_restore, ...)
     x
+}
+
+R6_private <- function(x) {
+    x$.__enclos_env__$private
 }

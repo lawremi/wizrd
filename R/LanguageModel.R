@@ -207,3 +207,7 @@ method(embed_text, LanguageModel) <- function(x, data, ndim = NULL) {
     do.call(rbind, lapply(data, perform_embedding, model = x@name, x = x@backend,
                           ndim = ndim))
 }
+
+method(on_restore, LanguageModel) <- function(x, ...) {
+    set_props(x, backend = on_restore(x@backend, x@name, ...))
+}
