@@ -32,13 +32,13 @@ text_store <- function(index, text = NULL) {
     TextStore(index = index, text = text)
 }
 
-method(fetch, list(class_any, TextStore)) <- function(x, from, n) {
-    from@text[fetch(x, from@index, n),]
+method(fetch, list(class_any, TextStore)) <- function(x, from, params) {
+    from@text[fetch(x, from@index, params),]
 }
 
-method(fetch, list(class_any, TextIndex)) <- function(x, from, n) {
+method(fetch, list(class_any, TextIndex)) <- function(x, from, params) {
     embeddings <- embed_text(from@embedder, x)
-    unique(unlist(apply(embeddings, 1L, fetch, from@vector_index, n,
+    unique(unlist(apply(embeddings, 1L, fetch, from@vector_index, params,
                         simplify = FALSE)))
 }
 
@@ -56,27 +56,32 @@ method(build, TextIndex) <- function(x, text, ...) {
               ndim = ncol(embedding))
 }
 
+VectorIndexRetrievalParams := new_class(
+    properties = list(
+        k = new_int_property(min = 0L, default = 5L),
+        min_similarity = new_number_property(min = 0L)
+    )
+)
+
 ## Is this the right way to do RAG? Or should we provide the model a
 ## tool that performs a search?
 ResultsAugmentedFormat <- new_class("ResultsAugmentedFormat", PlainTextFormat,
                                     properties = list(
                                         store = TextStore,
-                                        n = new_int_property(
-                                            min = 0L,
-                                            default = 5L
-                                        )
+                                        params = VectorIndexRetrievalParams
                                     ))
 
-results_augmented_query_to <- function(store, n = 5L) {
-    assert_int(n, lower = 0L)
-    ResultsAugmentedFormat(store = store, n = as.integer(n))
+results_augmented_query_to <- function(store, k = 5L, min_similarity = 0L, ...) {
+    params <- param_class(store@index@vector_index)(k = as.integer(k),
+        min_similarity = min_similarity, ...)
+    ResultsAugmentedFormat(store = store, params = params)
 }
 
 method(textify,
        list(class_character | class_list | class_any,
             ResultsAugmentedFormat)) <- function(x, format)
 {
-    results <- fetch(x, format@store, format@n)
+    results <- fetch(x, format@store, format@params)
     paste0("Using these items, in decreasing order of relevance:\n",
            textify(results),
            "\n\nRespond to this prompt:\n",

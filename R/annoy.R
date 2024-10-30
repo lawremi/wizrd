@@ -12,9 +12,12 @@ annoy_index <- function(embedding, ntrees = ncol(embedding) %/% 5L) {
 
 fetch <- new_generic("fetch", c("x", "from"))
 
-## Cosine distance would be 1-cos(d)
-method(fetch, list(class_numeric, Rcpp_AnnoyAngular)) <- function(x, from, n) {
-    from$getNNsByVector(x, n)
+method(fetch, list(class_numeric, Rcpp_AnnoyAngular)) <- function(x, from,
+                                                                  params)
+{
+    nns <- from$getNNsByVectorList(x, params@k, -1L, include_distances = TRUE)
+    cosine_similarity <- (2 - (nns$distance ^ 2)) / 2
+    nns$item[cosine_similarity >= params@min_similarity]
 }
 
 annoy_path <- function(file) {
@@ -31,3 +34,6 @@ method(on_restore, Rcpp_AnnoyAngular) <- function(x, file, ndim) {
     index
 }
 
+param_class := new_generic("x")
+
+method(param_class, Rcpp_AnnoyAngular) <- function(x) VectorIndexRetrievalParams
