@@ -1,13 +1,15 @@
-TextIndex <- new_class("TextIndex",
-                       properties = list(
-                           embedder = LanguageModel,
-                           vector_index_builder = new_property(
-                               class_function,
-                               default = annoy_index
-                           ),
-                           vector_index = class_any,
-                           ndim = nullable(prop_int_nn)
-                       ))
+TextIndex <- new_class("TextIndex", abstract = TRUE)
+
+EmbeddingTextIndex <- new_class("EmbeddingTextIndex", TextIndex,
+                                properties = list(
+                                    embedder = LanguageModel,
+                                    vector_index_builder = new_property(
+                                        class_function,
+                                        default = annoy_index
+                                    ),
+                                    vector_index = class_any,
+                                    ndim = nullable(prop_int_nn)
+                                ))
 
 TextStore <- new_class("TextStore",
                        properties = list(
@@ -28,7 +30,7 @@ TextStore <- new_class("TextStore",
 
 text_store <- function(index, text = NULL) {
     if (inherits(index, LanguageModel))
-        index <- TextIndex(embedder = index)
+        index <- EmbeddingTextIndex(embedder = index)
     TextStore(index = index, text = text)
 }
 
@@ -36,7 +38,7 @@ method(fetch, list(class_any, TextStore)) <- function(x, from, params) {
     from@text[fetch(x, from@index, params),]
 }
 
-method(fetch, list(class_any, TextIndex)) <- function(x, from, params) {
+method(fetch, list(class_any, EmbeddingTextIndex)) <- function(x, from, params) {
     embeddings <- embed_text(from@embedder, x)
     unique(unlist(apply(embeddings, 1L, fetch, from@vector_index, params,
                         simplify = FALSE)))
@@ -48,7 +50,7 @@ method(build, TextStore) <- function(x, text, ...) {
     set_props(x, text = text)
 }
 
-method(build, TextIndex) <- function(x, text, ...) {
+method(build, EmbeddingTextIndex) <- function(x, text, ...) {
     if (is.null(text))
         return(x)
     embedding <- embed_text(x@embedder, text, x@ndim)
@@ -88,13 +90,13 @@ method(textify,
            textify(x))
 }
 
-method(on_restore, TextIndex) <- function(x, file) {
+method(on_restore, EmbeddingTextIndex) <- function(x, file) {
     set_props(x,
               embedder = on_restore(x@embedder),
               vector_index = on_restore(x@vector_index, file, x@ndim))
 }
 
-method(print, TextIndex) <- function(x, ...) {
+method(print, EmbeddingTextIndex) <- function(x, ...) {
     cat(x@embedder@name %||% "<unnamed>", " -> <",
         class(x@vector_index)[1L], "> (x", x@ndim, ")\n", sep = "")
 }
