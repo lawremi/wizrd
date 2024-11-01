@@ -36,6 +36,11 @@ named <- function(prop) {
     prop
 }
 
+with_default <- function(prop, default) {
+    prop$default <- default
+    prop
+}
+
 new_scalar_property <- function(class, ..., validator = NULL, default) {
     assert_scalar(default, class)
     prop <- new_property(class, ..., validator = function(value) {
