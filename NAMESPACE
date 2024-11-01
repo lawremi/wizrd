@@ -1,7 +1,7 @@
 import(S7)
 import(checkmate)
 importFrom(jsonlite, toJSON, fromJSON)
-importFrom(stats, predict)
+importFrom(stats, predict, setNames, aggregate)
 importFrom(glue, glue)
 
 # model constructors
@@ -16,7 +16,7 @@ export(last_output)
 # operations
 export(embed_text)
 # chunkers
-export(chunk_Rd)
+export(chunk_Rd, chunk_Rmd, chunk_Qmd)
 # convenience models
 export(llama3, llava, nomic)
 # backend API

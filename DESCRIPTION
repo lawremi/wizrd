@@ -29,6 +29,7 @@ Suggests:
     base64enc,
     png,
     RcppAnnoy,
+    parsermd,
     knitr,
     rmarkdown,
     testthat (>= 3.0.0)
