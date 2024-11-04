@@ -123,7 +123,8 @@ new_list_property <- function(..., validator = NULL,
                               default = setNames(
                                   list(),
                                   if (isTRUE(named)) character()),
-                              of = class_any, named = NA)
+                              of = class_any, named = NA,
+                              min_length = 0L, max_length = Inf)
 {
     prop <- new_property(class_list, ..., validator = function(value) {
         c(if (!identical(of, class_any) &&
@@ -133,6 +134,8 @@ new_list_property <- function(..., validator = NULL,
               "must have names",
           if (identical(named, FALSE) && !is.null(names(value)))
               "must not have names",
+          if (length(value) < min_length || length(value) > max_length)
+              paste0("must have length in [", min_length, ", ", max_length, "]"),
           if (!is.null(validator))
               validator(value)
           )
