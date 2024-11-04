@@ -20,11 +20,7 @@ ParagraphChunking := new_class(ElementChunking)
 MarkdownChunking := new_class(
     Chunking,
     properties = list(
-        ## Each element corresponds to a level of the section
-        ## hierarchy. The last element applies to any lower levels
-        ## present in the document. An empty list specifies no
-        ## internal chunking.
-        section_chunking = new_list_property(of = Chunking)
+        section_chunking = NULL | Chunking
     )
 )
 
@@ -100,33 +96,30 @@ method(chunk_string, list(class_character, QuartoChunking)) <- function(x, by)
 }
 
 rmd_ast <- new_S3_class("rmd_ast")
+rmd_chunk <- new_S3_class("rmd_chunk")
+rmd_markdown <- new_S3_class("rmd_markdown")
+
+method(chunk, list(rmd_chunk | rmd_markdown, Chunking)) <- function(x, by) {
+    data.frame(text = chunk(parsermd::as_document(x), by))
+}
 
 method(chunk, list(rmd_ast, MarkdownChunking)) <- function(x, by) {
     df <- as.data.frame(x)
     leaf_types <- c("rmd_chunk", "rmd_markdown")
     df_leaves <- subset(df, type %in% leaf_types)
-    grouping_cols <- intersect(names(df_leaves), paste0("sec_h", 1:6))
-    section_chunking <- head(c(by@section_chunking, rep(list(NULL), 6L)), 6L)
-    do.call(rbind, lapply(seq_along(grouping_cols), \(i) {
-        grp <- head(grouping_cols, i)
-        df_leaves[head(grp, -1L)] <- lapply(df_leaves[head(grp, -1L)], addNA)
-        cdf <- aggregate(df_leaves["ast"], df_leaves[grp], \(ast) {
-            chunk(paste(as_document(ast), collapse = "\n"),
-                  section_chunking[[i]])
-        }, simplify = FALSE)
-        later_grp <- tail(grouping_cols, -i)
-        data.frame(cdf[rep(seq_len(nrow(cdf)), lengths(cdf$ast)), grp],
-                   sapply(later_grp, \(y) NA, simplify = FALSE),
-                   text = unlist(cdf$ast))
-    }))
+    chunks <- lapply(df_leaves$ast, chunk, by@section_chunking)
+    meta_cols <- c(intersect(names(df_leaves), paste0("sec_h", 1:6)), "label")
+    metadata <- df_leaves[rep(seq_len(nrow(df_leaves)), sapply(chunks, nrow)),
+                          meta_cols]
+    data.frame(metadata, text = do.call(rbind, chunks))
 }
 
-chunk_Rmd <- function(x, section_chunking = list(ParagraphChunking())) {
-    chunk(x, RMarkdownChunking(leaf_chunking = leaf_chunking))
+chunk_Rmd <- function(x, section_chunking = NULL) {
+    chunk(x, RMarkdownChunking(section_chunking = section_chunking))
 }
 
-chunk_Qmd <- function(x, section_chunking = list(ParagraphChunking())) {
-    chunk(x, QuartoChunking(leaf_chunking = leaf_chunking))
+chunk_Qmd <- function(x, section_chunking = NULL) {
+    chunk(x, QuartoChunking(section_chunking = section_chunking))
 }
 
 chunk_Rd <- function(package) {
