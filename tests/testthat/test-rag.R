@@ -10,5 +10,6 @@ test_that("RAG works with Rd", {
 })
 
 test_that("RAG works with vignettes", {
-    chunk_Rmd("some.Rmd")
+    vignettes <- utils::vignette(package = "S7")
+    chunk(vignettes)
 })

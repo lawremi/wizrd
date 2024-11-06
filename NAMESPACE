@@ -15,8 +15,8 @@ export(equip, unequip, instruct, output_as, accept_as)
 export(last_output)
 # operations
 export(embed_text)
-# chunkers
-export(chunk_Rd, chunk_Rmd, chunk_Qmd)
+# chunking
+export(chunk)
 # convenience models
 export(llama3, llava, nomic)
 # backend API
