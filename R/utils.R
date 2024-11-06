@@ -210,8 +210,13 @@ get_Rd <- function(topic, package = NULL) {
     tools::Rd_db(package)[[filename]]
 }
 
+Rd_for_tag <- function(Rd, tag) {
+    tagstr <- paste0("\\", tag)
+    Find(\(x) attr(x, "Rd_tag") == tagstr, Rd)
+}
+
 Rd_args <- function(Rd) {
-    Rd_parse_args(Find(\(x) attr(x, "Rd_tag") == "\\arguments", Rd))
+    Rd_parse_args(Rd_for_tag("arguments"))
 }
 
 Rd_src <- function(Rd) {
@@ -229,11 +234,11 @@ Rd_parse_args <- function(args) {
 }
 
 Rd_description <- function(Rd) {
-    Rd_src(Find(function(x) attr(x, "Rd_tag") == "\\description", Rd))
+    Rd_src(Rd_for_tag("description"))
 }
 
 Rd_value <- function(Rd) {
-    Rd_src(Find(function(x) attr(x, "Rd_tag") == "\\value", Rd))
+    Rd_src(Rd_for_tag("value"))
 }
 
 Rd_for_function <- function(FUN, name = deparse(substitute(FUN))) {
