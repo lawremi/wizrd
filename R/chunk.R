@@ -36,6 +36,16 @@ PDFChunking := new_class(HierarchicalChunking)
 
 RdChunking := new_class(Chunking)
 
+ScalarString := new_class(
+    class_character,
+    validator = \(self) {
+        if (length(self) != 1L || is.na(self))
+            "must be a single, non-NA string"
+    })
+
+File := new_class(ScalarString)
+Text := new_class(ScalarString)
+
 chunk := new_generic(c("x", "by"))
 
 method(chunk, list(class_any, NULL)) <- function(x, by) x
@@ -66,7 +76,7 @@ method(default_chunking, class_character) <- function(x) {
 }
 
 method(chunk, list(class_any, class_missing)) <- function(x, by) {
-    chunk(x, chunking(x))
+    chunk(x, default_chunking(x))
 }
 
 is_text <- function(x)
@@ -78,8 +88,8 @@ chunk_text_or_file <- function(x, by) {
     if (is_file) {
         if (file.info(x)[,"isdir"])
             chunk(list.files(x, full.names = TRUE), by)
-        else chunk_file(x, by)
-    } else chunk_text(x, by)
+        else chunk(File(x), by)
+    } else chunk(if(is.character(x)) Text(x) else x, by)
 }
 
 method(chunk, list(class_character | class_list, Chunking | class_list)) <-
@@ -94,19 +104,14 @@ method(chunk, list(class_character | class_list, Chunking | class_list)) <-
                    text = do.call(rbind, chunks))
     }
 
-chunk_file := new_generic(c("x", "by"))
-
-method(chunk_file, list(class_character, class_any)) <- function(x, by) {
-    chunk_text(readLines(x) |> paste(collapse = "\n"), by)
+method(chunk, list(File, class_any)) <- function(x, by) {
+    chunk(readLines(x) |> paste(collapse = "\n"), by)
 }
 
-chunk_text := new_generic(c("x", "by"))
-
-method(chunk_text, list(class_character, class_any)) <- function(x, by) {
-    stopifnot(length(x) == 1L && !is.na(x))
+method(chunk, list(Text, class_any)) <- function(x, by) {
     path <- tempfile()
     writeLines(x, path)
-    chunk_file(path, by)
+    chunk(path, by)
 }
 
 chunk_starts <- function(by, len) {
@@ -114,9 +119,8 @@ chunk_starts <- function(by, len) {
     starts[len - starts >= by@overlap]
 }
 
-method(chunk_text, list(class_character, CharacterChunking)) <- function(x, by)
+method(chunk, list(Text, CharacterChunking)) <- function(x, by)
 {
-    stopifnot(length(x) == 1L && !is.na(x))
     starts <- chunk_starts(by, nchar(x))
     text <- vapply(starts, \(s) substring(x, s, s + by@size - 1L), character(1L))
     data.frame(text)
@@ -132,24 +136,23 @@ chunk_elements <- function(x, by, pattern) {
     data.frame(text)
 }
 
-method(chunk_text, list(class_character, WordChunking)) <- function(x, by)
+method(chunk, list(Text, WordChunking)) <- function(x, by)
 {
     chunk_elements(x, by, "\\s+")
 }
 
-method(chunk_text, list(class_character, ParagraphChunking)) <- function(x, by)
+method(chunk, list(Text, ParagraphChunking)) <- function(x, by)
 {
     chunk_elements(x, by, "\n(\\s*\n)+")
 }
 
-method(chunk_text, list(class_character, RMarkdownChunking)) <- function(x, by)
+method(chunk, list(Text, RMarkdownChunking)) <- function(x, by)
 {
-    stopifnot(length(x) == 1L && !is.na(x))
     require_ns("parsermd", "chunk RMarkdown")
     chunk(parsermd::parse_rmd(x), by)
 }
 
-method(chunk_text, list(class_character, QuartoChunking)) <- function(x, by)
+method(chunk, list(Text, QuartoChunking)) <- function(x, by)
 {
     stopifnot(length(x) == 1L && !is.na(x))
     require_ns("parsermd", "chunk Quarto")
@@ -164,7 +167,7 @@ method(chunk, list(rmd_chunk | rmd_markdown, Chunking)) <- function(x, by) {
     data.frame(text = chunk(parsermd::as_document(x), by))
 }
 
-method(chunking, rmd_ast) <- function(x) MarkdownChunking()
+method(default_chunking, rmd_ast) <- function(x) MarkdownChunking()
 
 method(chunk, list(rmd_ast, MarkdownChunking)) <- function(x, by) {
     df <- as.data.frame(x)
@@ -179,19 +182,16 @@ method(chunk, list(rmd_ast, MarkdownChunking)) <- function(x, by) {
     data.frame(metadata, text = do.call(rbind, chunks))
 }
 
-method(chunk_file, list(class_character, HTMLChunking)) <- function(x, by) {
-    stopifnot(length(x) == 1L && !is.na(x))
+method(chunk, list(File, HTMLChunking)) <- function(x, by) {
     require_ns("rmarkdown", "chunk HTML")
     output <- tempfile(fileext = "md")
     rmarkdown::pandoc_convert(x, "md", "html", output)
-    chunk_file(output, by@section_chunking)
+    chunk(output, by@section_chunking)
 }
 
-method(chunk_file, list(class_character, PDFChunking)) <- function(x, by) {
-    stopifnot(length(x) == 1L && !is.na(x))
+method(chunk, list(File, PDFChunking)) <- function(x, by) {
     require_ns("pdftools", "chunk PDF")
-    chunk_text(paste(pdftools::pdf_text(x), collapse = "\n"),
-               by@section_chunking)
+    chunk(paste(pdftools::pdf_text(x), collapse = "\n"), by@section_chunking)
 }
 
 packageIQR <- new_S3_class("packageIQR")
@@ -206,7 +206,10 @@ method(chunk, list(packageIQR, class_list)) <- function(x, by) {
     r <- x$results
     path <- file.path(r[,"LibPath"], r[,"Package"], "doc", r[,"Item"]) |>
         outer(names(by), \(x, y) paste0(x, ".", y))
-    chunk(path[file.exists(path)], by)
+    path_existant <- path[file.exists(path)]
+    path_existant <-
+        path_existant[!duplicated(tools::file_path_sans_ext(path_existant))]
+    chunk(path_existant, by)
 }
 
 Rd <- new_S3_class("Rd")
