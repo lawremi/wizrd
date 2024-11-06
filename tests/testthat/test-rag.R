@@ -1,5 +1,5 @@
 test_that("RAG works with Rd", {
-    chunks <- chunk_Rd("S7")
+    chunks <- chunk(tools::Rd_db("S7"))
     store <- text_store(nomic(), chunks)
     file <- tempfile("text", fileext = ".rds")
     persist(store, file)

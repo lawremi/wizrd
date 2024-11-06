@@ -71,7 +71,7 @@ ext_to_chunking(Rmd = RMarkdownChunking(), Qmd = QuartoChunking(),
 
 default_chunking := new_generic("x")
 
-method(default_chunking, class_character) <- function(x) {
+method(default_chunking, class_character | class_list) <- function(x) {
     ext_to_chunking()
 }
 
@@ -83,8 +83,7 @@ is_text <- function(x)
     if (is.character(x)) grepl("\n", x) else rep(TRUE, length(x))
 
 chunk_text_or_file <- function(x, by) {
-    stopifnot(length(x) == 1L && !is.na(x))
-    is_file <- !is_text(x)
+    is_file <- is.character(x) && !is_text(x)
     if (is_file) {
         if (file.info(x)[,"isdir"])
             chunk(list.files(x, full.names = TRUE), by)
@@ -101,7 +100,7 @@ method(chunk, list(class_character | class_list, Chunking | class_list)) <-
         chunks <- Map(chunk_text_or_file, x, by)
         source <- names(x) %||% ifelse(is_text(x), seq_along(x), x)
         data.frame(source = rep(source, sapply(chunks, nrow)),
-                   text = do.call(rbind, chunks))
+                   do.call(rbind, unname(chunks)))
     }
 
 method(chunk, list(File, class_any)) <- function(x, by) {
@@ -224,8 +223,8 @@ method(chunk, list(Rd, RdChunking)) <- function(x, by) {
                      fixed = TRUE)
     text <- c(file = Rd_src(x),
               vapply(x[names(x) %in% Rd_sections], Rd_src, character(1L)))
-    data.frame(text = unlist(chunks, use.names = FALSE),
-               aliases = paste(Rd_aliases(f), collapse = ","),
+    data.frame(text = unname(unlist(text, use.names = FALSE)),
+               aliases = paste(Rd_aliases(x), collapse = ","),
                section = names(text))
 }
 
