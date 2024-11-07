@@ -221,10 +221,11 @@ method(default_chunking, Rd) <- function(x) RdChunking()
 method(chunk, list(Rd, RdChunking)) <- function(x, by) {
     names(x) <- gsub("\\", "", vapply(x, attr, character(1L), "Rd_tag"),
                      fixed = TRUE)
+    aliases <- paste(Rd_aliases(x), collapse = ",")
     text <- c(file = Rd_src(x),
               vapply(x[names(x) %in% Rd_sections], Rd_src, character(1L)))
-    data.frame(text = unname(unlist(text, use.names = FALSE)),
-               aliases = paste(Rd_aliases(x), collapse = ","),
+    labeled_text <- paste0(aliases, rep(":", length(text)), text)
+    data.frame(text = unlist(labeled_text, use.names = FALSE),
                section = names(text))
 }
 
