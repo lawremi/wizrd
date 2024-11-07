@@ -213,22 +213,8 @@ method(chunk, list(packageIQR, class_list)) <- function(x, by) {
 
 Rd <- new_S3_class("Rd")
 
-Rd_sections <- c("description", "usage", "arguments", "details", "section",
-                 "value", "examples")
-
 method(default_chunking, Rd) <- function(x) RdChunking()
 
 method(chunk, list(Rd, RdChunking)) <- function(x, by) {
-    names(x) <- gsub("\\", "", vapply(x, attr, character(1L), "Rd_tag"),
-                     fixed = TRUE)
-    aliases <- paste(Rd_aliases(x), collapse = ",")
-    text <- c(file = Rd_src(x),
-              vapply(x[names(x) %in% Rd_sections], Rd_src, character(1L)))
-    labeled_text <- paste0(aliases, rep(":", length(text)), text)
-    data.frame(text = unlist(labeled_text, use.names = FALSE),
-               section = names(text))
-}
-
-Rd_aliases <- function(x) {
-    unlist(Filter(\(xi) attr(xi, "Rd_tag") == "\\alias", x), use.names = FALSE)
+    data.frame(text = Rd_src(x))
 }
