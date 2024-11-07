@@ -460,3 +460,16 @@ method(on_restore, S7_object) <- function(x, ...) {
 R6_private <- function(x) {
     x$.__enclos_env__$private
 }
+
+rbind_list <- function(x) {
+    all_columns <- unique(unlist(lapply(x, names)))
+
+    do.call(rbind, lapply(x, function(df) {
+        ensure_cols(df, all_columns)[all_columns]
+    }))
+}
+
+ensure_cols <- function(x, cols) {
+    x[setdiff(cols, names(x))] <- list(rep(NA, nrow(x)))
+    x
+}

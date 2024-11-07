@@ -48,7 +48,7 @@ Text := new_class(ScalarString)
 
 chunk := new_generic(c("x", "by"))
 
-method(chunk, list(class_any, NULL)) <- function(x, by) x
+method(chunk, list(class_any, NULL)) <- function(x, by) data.frame(text = x)
 
 ext_to_chunking <- local({
     map <- list()
@@ -100,7 +100,7 @@ method(chunk, list(class_character | class_list, Chunking | class_list)) <-
         chunks <- Map(chunk_text_or_file, x, by)
         source <- names(x) %||% ifelse(is_text(x), seq_along(x), x)
         data.frame(source = rep(source, sapply(chunks, nrow)),
-                   do.call(rbind, unname(chunks)))
+                   rbind_list(unname(chunks)) |> ensure_cols("text"))
     }
 
 method(chunk, list(File, class_any)) <- function(x, by) {
@@ -201,8 +201,9 @@ method(chunk, list(packageIQR, class_list)) <- function(x, by) {
     if (x$type != "vignette")
         stop("Only 'packageIQR' objects of type 'vignette' are supported")
     assert_named(by)
-    
     r <- x$results
+    if (nrow(r) == 0L)
+        return(chunk(character(), by))
     path <- file.path(r[,"LibPath"], r[,"Package"], "doc", r[,"Item"]) |>
         outer(names(by), \(x, y) paste0(x, ".", y))
     path_existant <- path[file.exists(path)]

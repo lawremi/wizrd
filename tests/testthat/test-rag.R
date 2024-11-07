@@ -11,5 +11,8 @@ test_that("RAG works with Rd", {
 
 test_that("RAG works with vignettes", {
     vignettes <- utils::vignette(package = "S7")
-    chunk(vignettes)
+    chunks <- chunk(vignettes)
+    model <- llama3() |> accept_as(results_augmented_query_to(store))
+    ans <- predict(model, "Short example of defining a new property with S7")
+    expect_match(ans, "new_property")    
 })
