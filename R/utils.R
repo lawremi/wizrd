@@ -220,7 +220,14 @@ Rd_args <- function(Rd) {
 }
 
 Rd_src <- function(Rd) {
-    paste(as.character(attr(Rd, "srcref"), useSource = TRUE), collapse="\n")
+    src <- if (is.list(Rd)) {
+        vapply(Rd, Rd_src, character(1L))
+    } else Rd
+    src <- paste(src, collapse = "")
+    tag <- attr(Rd, "Rd_tag")
+    if (!is.null(tag) && startsWith(tag, "\\"))
+        src <- paste0(tag, "{", src, "}")
+    src
 }
 
 Rd_parse_args <- function(args) {
