@@ -46,9 +46,16 @@ ScalarString := new_class(
 File := new_class(ScalarString)
 Text := new_class(ScalarString)
 
+method(as.data.frame, Text) <-
+    function(x, row.names = NULL, optional = FALSE, ...) {
+        as.data.frame(S7_data(x), row.names = row.names,
+                      optional = optional, ...)
+    }
+
 chunk := new_generic(c("x", "by"))
 
-method(chunk, list(class_any, NULL)) <- function(x, by) data.frame(text = x)
+method(chunk, list(Text | class_character, NULL)) <- function(x, by)
+    data.frame(text = x)
 
 ext_to_chunking <- local({
     map <- list()
@@ -104,13 +111,13 @@ method(chunk, list(class_character | class_list, Chunking | class_list)) <-
     }
 
 method(chunk, list(File, class_any)) <- function(x, by) {
-    chunk(readLines(x) |> paste(collapse = "\n"), by)
+    chunk(Text(readLines(x) |> paste(collapse = "\n")), by)
 }
 
 method(chunk, list(Text, class_any)) <- function(x, by) {
-    path <- tempfile()
-    writeLines(x, path)
-    chunk(path, by)
+    file <- tempfile()
+    writeLines(x, file)
+    chunk(File(file), by)
 }
 
 chunk_starts <- function(by, len) {
@@ -162,8 +169,8 @@ rmd_ast <- new_S3_class("rmd_ast")
 rmd_chunk <- new_S3_class("rmd_chunk")
 rmd_markdown <- new_S3_class("rmd_markdown")
 
-method(chunk, list(rmd_chunk | rmd_markdown, Chunking)) <- function(x, by) {
-    data.frame(text = chunk(parsermd::as_document(x), by))
+method(chunk, list(rmd_chunk | rmd_markdown, class_any)) <- function(x, by) {
+    parsermd::as_document(x) |> paste(collapse = "\n") |> Text() |> chunk(by)
 }
 
 method(default_chunking, rmd_ast) <- function(x) MarkdownChunking()
@@ -173,12 +180,13 @@ method(chunk, list(rmd_ast, MarkdownChunking)) <- function(x, by) {
     leaf_types <- c("rmd_chunk", "rmd_markdown")
     df_leaves <- subset(df, type %in% leaf_types)
     chunks <- lapply(df_leaves$ast, chunk, by@section_chunking)
-    meta_cols <- c(intersect(names(df_leaves), paste0("sec_h", 1:6)), "label")
-    metadata <- df_leaves[rep(seq_len(nrow(df_leaves)), sapply(chunks, nrow)),
-                          meta_cols]
-    metadata$title <- unlist(subset(df, type == "rmd_yaml_list")$ast,
-                             recursive = FALSE)$title
-    data.frame(metadata, text = do.call(rbind, chunks))
+    meta_cols <- c(paste0("sec_h", 1:6), "label")
+    expand_ind <- rep(seq_len(nrow(df_leaves)), sapply(chunks, nrow))
+    metadata <- df_leaves |> ensure_cols(meta_cols) |> _[expand_ind, meta_cols]
+    title <- unlist(subset(df, type == "rmd_yaml_list")$ast,
+                    recursive = FALSE)$title
+    metadata <- cbind(title, metadata)
+    data.frame(metadata, do.call(rbind, chunks))
 }
 
 method(chunk, list(File, HTMLChunking)) <- function(x, by) {

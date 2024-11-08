@@ -466,7 +466,7 @@ rbind_list <- function(x) {
 
     do.call(rbind, lapply(x, function(df) {
         ensure_cols(df, all_columns)[all_columns]
-    }))
+    })) |> as.data.frame()
 }
 
 ensure_cols <- function(x, cols) {
