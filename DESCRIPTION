@@ -20,7 +20,7 @@ License: MIT
 Imports:
     tools,
     S7,
-    httr2,
+    httr2 (>= 1.0.4),
     jsonlite,
     checkmate,
     glue
