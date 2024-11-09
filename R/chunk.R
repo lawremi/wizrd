@@ -169,8 +169,12 @@ rmd_ast <- new_S3_class("rmd_ast")
 rmd_chunk <- new_S3_class("rmd_chunk")
 rmd_markdown <- new_S3_class("rmd_markdown")
 
-method(chunk, list(rmd_chunk | rmd_markdown, class_any)) <- function(x, by) {
+chunk_rmd <- function(x, by) {
     parsermd::as_document(x) |> paste(collapse = "\n") |> Text() |> chunk(by)
+}
+
+method(chunk, list(rmd_chunk | rmd_markdown, class_any)) <- function(x, by) {
+    chunk_rmd(x, by)
 }
 
 method(default_chunking, rmd_ast) <- function(x) MarkdownChunking()
@@ -179,14 +183,17 @@ method(chunk, list(rmd_ast, MarkdownChunking)) <- function(x, by) {
     df <- as.data.frame(x)
     leaf_types <- c("rmd_chunk", "rmd_markdown")
     df_leaves <- subset(df, type %in% leaf_types)
-    chunks <- lapply(df_leaves$ast, chunk, by@section_chunking)
-    meta_cols <- c(paste0("sec_h", 1:6), "label")
-    expand_ind <- rep(seq_len(nrow(df_leaves)), sapply(chunks, nrow))
-    metadata <- df_leaves |> ensure_cols(meta_cols) |> _[expand_ind, meta_cols]
+    sec_cols <- paste0("sec_h", 1:6)
+    grp_cols <- intersect(names(df_leaves), sec_cols)
+    chunks <- aggregate(df_leaves["ast"], df_leaves[grp_cols],
+                        \(ast) chunk_rmd(ast, by@section_chunking),
+                        simplify = FALSE)
+    expand_ind <- rep(seq_len(nrow(chunks)), sapply(chunks$ast, nrow))
+    meta <- chunks[expand_ind, grp_cols, drop = FALSE] |>
+        ensure_cols(sec_cols) |> _[sec_cols]
     title <- unlist(subset(df, type == "rmd_yaml_list")$ast,
                     recursive = FALSE)$title
-    metadata <- cbind(title, metadata)
-    data.frame(metadata, do.call(rbind, chunks))
+    cbind(title = rep(title, nrow(meta)), meta, do.call(rbind, chunks$ast))
 }
 
 method(chunk, list(File, HTMLChunking)) <- function(x, by) {

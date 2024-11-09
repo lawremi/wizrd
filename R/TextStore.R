@@ -84,7 +84,7 @@ method(textify,
             ResultsAugmentedFormat)) <- function(x, format)
 {
     results <- fetch(x, format@store, format@params)
-    paste0("Using these items, in decreasing order of relevance:\n",
+    paste0("Using this information:\n",
            textify(results),
            "\n\nRespond to this prompt:\n",
            textify(x))

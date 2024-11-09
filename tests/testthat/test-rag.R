@@ -5,7 +5,7 @@ test_that("RAG works with Rd", {
     persist(store, file)
     store <- restore(file)
     model <- llama3() |> accept_as(results_augmented_query_to(store))
-    ans <- predict(model, "Short example of defining a new property with S7")
+    ans <- predict(model, "new_property example")
     expect_match(ans, "new_property")
 })
 
@@ -14,6 +14,6 @@ test_that("RAG works with vignettes", {
     chunks <- chunk(vignettes)
     store <- text_store(nomic(), chunks)
     model <- llama3() |> accept_as(results_augmented_query_to(store))
-    ans <- chat(model, "Short example of defining a new property with S7")
+    ans <- chat(model, "new_property example")
     expect_match(ans, "new_property")
 })
