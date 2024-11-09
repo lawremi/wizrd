@@ -8,10 +8,10 @@ Authors@R: c(
 	   )
 Description: Ride the LLM hype llama with an abstraction for creating
 	     specialized agents on top of various LLM backends,
-	     commercially hosted or local. Craft and optimize
-	     parameterized prompts. Chat using text and images. Stream
-	     chat responses. Generate embeddings and realize the RAG
-	     to riches dream. Implement tools using R functions and
+	     commercially hosted or local. Craft parameterized
+	     prompts. Chat using text and images. Stream chat
+	     responses. Generate embeddings and realize the RAG to
+	     riches dream. Implement tools using R functions and
 	     instruct the model to call them. Construct an agent by
 	     wrapping a model in an R function. Use cases include
 	     generating code, guiding data exploration, and creating

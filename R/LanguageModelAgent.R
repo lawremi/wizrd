@@ -5,7 +5,7 @@ LanguageModelAgent <- new_class("LanguageModelAgent", Tool,
 
 agent_fun <- function(args) {
     body <- quote({
-        self <- sys.function(-1L)
+        self <- sys.function()
         if (!inherits(self, LanguageModelAgent))
             stop("agent function must be a LanguageModelAgent")
         predict(bind(self@model, self), mget(names(args)))
@@ -13,8 +13,14 @@ agent_fun <- function(args) {
     as.function(c(list(body), args))
 }
 
-agent <- function(x, args = alist(x =), signature = any_signature(args),
-                  name = x@name, description = NULL, examples = list())
+## TODO: Move to a builder API that uses the same verbs as models:
+##       accept_as(), output_as(), instruct(), etc. Actually, maybe
+##       that applies to ALL tools. Then, by default, we are just
+##       wrapping the Model as current configured, with the builder
+##       API overriding that behavior.
+
+agent <- function(model, args = alist(x =), signature = any_signature(args),
+                  name = model@name, description = NULL, examples = list())
 {
     LanguageModelAgent(agent_fun(args), name = name,
                        description = description,
