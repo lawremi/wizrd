@@ -67,7 +67,7 @@ VectorIndexRetrievalParams := new_class(
 
 ## Is this the right way to do RAG? Or should we provide the model a
 ## tool that performs a search?
-ResultsAugmentedFormat <- new_class("ResultsAugmentedFormat", PlainTextFormat,
+ResultsAugmentedFormat <- new_class("ResultsAugmentedFormat", TextFormat,
                                     properties = list(
                                         store = TextStore,
                                         params = VectorIndexRetrievalParams

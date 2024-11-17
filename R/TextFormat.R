@@ -1,11 +1,11 @@
 TextFormat <- new_class("TextFormat",
                         properties = list(
                             examples = class_list
-                        ))
+                        ), abstract = TRUE)
 
 PlainTextFormat <- new_class("PlainTextFormat", TextFormat)
 
-JSONFormat <- new_class("JSONFormat", PlainTextFormat,
+JSONFormat <- new_class("JSONFormat", TextFormat,
                         properties = list(
                             schema = new_property(
                                 class_list,
@@ -17,17 +17,17 @@ JSONFormat <- new_class("JSONFormat", PlainTextFormat,
                             ),
                             schema_class = union_classes | class_data.frame))
 
-CSVFormat <- new_class("CSVFormat", PlainTextFormat,
+CSVFormat <- new_class("CSVFormat", TextFormat,
                        properties = list(
                            col_classes = class_character,
                            examples = new_list_property(
                                of = class_data.frame,
                            )))
 
-CodeFormat <- new_class("CodeFormat", PlainTextFormat,
+CodeFormat <- new_class("CodeFormat", TextFormat,
                         properties = list(language = nullable(prop_string)))
 
-GlueFormat <- new_class("GlueFormat", PlainTextFormat,
+GlueFormat <- new_class("GlueFormat", TextFormat,
                         properties = list(template = prop_string))
 
 fits_schema_class <- function(x) {
@@ -94,7 +94,7 @@ accept_as <- function(x, schema) {
 textify <- new_generic("textify", c("x", "format"))
 
 method(textify, list(class_any, class_missing)) <- function(x, format) {
-    textify(x, TextFormat())
+    textify(x, PlainTextFormat())
 }
 
 method(textify, list(class_any, TextFormat)) <- function(x, format) {

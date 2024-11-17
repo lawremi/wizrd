@@ -103,7 +103,7 @@ method(instructions,
     NULL
 }
 
-describe_examples <- function(ex, format = TextFormat()) {
+describe_examples <- function(ex, format = PlainTextFormat()) {
     if (length(ex) > 0L) {
         ex <- vapply(ex, textify, character(1L), format)
         if (is.null(names(ex)))
