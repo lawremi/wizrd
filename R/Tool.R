@@ -210,3 +210,21 @@ tool_output_json_format <- function(tool) {
     JSONFormat(schema = schema,
                schema_class = tool@signature@value)
 }
+
+describe_tool <- function(x) {
+    paste(c(x@description, describe_tool_examples(x)),
+          collapse = "\n\n")
+}
+
+describe_tool_examples <- function(tool) {
+    if (length(ex) > 0L) {
+        if (is.null(names(ex)))
+            names(ex) <- ""
+        paste0("Example(s):\n\n",
+               paste0(ToolCall(tool_name = tool@name, arguments = props(ex)),
+                      ifelse(nzchar(names(ex)),
+                             paste(" returns:" names(ex)),
+                             ""),
+                      collapse = "\n\n"))
+    }
+}

@@ -219,30 +219,11 @@ method(openai_encode_content_part, ImageURI) <- function(x) {
 
 openai_encode_tool <- new_generic("openai_encode_tool", "x")
 
-example_descriptions <- function(x) {
-    vapply(x@tool@examples, function(ex) {
-              output <- do.call(x, ex)
-              paste0("Input: ", textify(ex, x@io@input), "\n",
-                     "Output: ", textify(output, x@io@output))
-    }, character(1L))
-}
-
-openai_tool_description <- function(x) {
-    ex_descs <- example_descriptions(x)
-    paste(c(x@tool@description,
-            if (inherits(x@io@output, JSONFormat) &&
-                    length(x@io@output@schema) > 0L)
-                c("Return value schema:",
-                  toJSON(x@io@output@schema, auto_unbox = TRUE)),
-            if (length(ex_descs) > 0L) c("Example(s):", ex_descs)),
-          collapse = "\n\n")
-}
-
 method(openai_encode_tool, ToolBinding) <- function(x) {
     stopifnot(inherits(x@io@input, JSONFormat))
     list(type = "function",
          `function` = list(name = x@tool@name,
-                           description = openai_tool_description(x),
+                           description = describe_tool(x@tool),
                            parameters = x@io@input@schema))
 }
 

@@ -86,14 +86,10 @@ method(tool_instructions, LanguageModel) <- function(x) {
            "the user explicitly requests or ",
            "the task requires precise computation or external data.\n\n",
            paste(unlist(lapply(x@tools, \(binding) {
-               if (!is.null(binding@instructions) ||
-                       length(binding@tool@examples) > 0L)
+               if (!is.null(binding@instructions))
                    paste0("Specific instructions for '", binding@tool@name,
                           "':\n",
-                          paste(c(binding@instructions,
-                                  describe_examples(binding@tool@examples,
-                                                    binding@io@input)),
-                                collapse = "\n"))
+                          paste(binding@instructions, collapse = "\n"))
            })), collapse = "\n\n"))
 }
 
