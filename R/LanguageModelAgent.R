@@ -1,71 +1,48 @@
-LanguageModelAgent <- new_class("LanguageModelAgent", Tool,
-                                properties = list(
-                                    model = LanguageModel
-                                ))
+LanguageModelAgent := new_class(
+    Tool,
+    properties = list(
+        model = new_property(
+            LanguageModel,
+            setter = \(self, value) {
+                self@signature <- agent_signature(value)
+                self@model <- value
+                self
+            }
+        ),
+        signature = new_property(
+            ToolSignature,
+            setter = \(self, value) {
+                S7_data(self) <- agent_fun(value)
+                self@signature <- value
+                self
+            }
+        )
+    )
+)
 
-agent_fun <- function(args) {
-    body <- quote({
+agent_fun <- function(sig) {
+    args <- formals(signature@parameters)
+    if (length(args) != 1L)
+        stop("'signature' must have a single parameter")
+    predict_call <- as.call(c(quote(predict), quote(self@model),
+                              as.name(names(args))))
+    body <- substitute({
         self <- sys.function()
         if (!inherits(self, LanguageModelAgent))
             stop("agent function must be a LanguageModelAgent")
-        predict(bind(self@model, self), mget(names(args)))
-    })
-    as.function(c(list(body), args))
+        PREDICT_CALL
+    }, list(PREDICT_CALL = predict_call))
+    as.function(c(body, args))
 }
 
-## TODO: Move to a builder API that uses the same verbs as models:
-##       accept_as(), output_as(), instruct(), etc. Actually, maybe
-##       that applies to ALL tools. Then, by default, we are just
-##       wrapping the Model as current configured, with the builder
-##       API overriding that behavior.
+agent_signature <- function(model) {
+    parameters <- list(x = convert(model@io@input, S7_property))
+    value <- convert(model@io@output, S7_class)
+    ToolSignature(parameters = parameters, value = value)
+}
 
-agent <- function(model, args = alist(x =), signature = any_signature(args),
-                  name = model@name, description = NULL, examples = list())
+agent <- function(model, name = model@name)
 {
-    LanguageModelAgent(agent_fun(args), name = name,
-                       description = description,
-                       signature = signature, examples = examples, model = model)
-}
-
-method(bind, list(LanguageModel, LanguageModelAgent)) <- function(x, to)
-{
-    x@instructions <- instructions(to, x)
-    x@io <- agent_io_binding(x, to)
-    x
-}
-
-method(instructions, list(LanguageModelAgent, LanguageModel)) <- function(on, to)
-{
-    paste0(c(
-        "You are an agent named '", on@name, "'. ",
-        "You are represented by an R function.",
-        if (!is.null(on@description))
-            paste0("\n\nYour task is:\n", on@description, "\n\n"), 
-        "The user will pass a list of arguments to you.",
-        "You will perform your task on the input and return the result.\n\n"
-    ), collapse = "")
-}
-
-agent_input_format <- new_generic("agent_input_format", "x",
-                                  function(x, tool, ...) S7_dispatch())
-
-method(agent_input_format, LanguageModel) <- function(x, tool) {
-    tool_input_format(tool)
-}
-
-agent_output_format <- new_generic("agent_output_format", "x",
-                                   function(x, tool, ...) S7_dispatch())
-
-method(agent_output_format, LanguageModel) <- function(x, tool) {
-    tool_output_format(tool)
-}
-
-agent_io_binding <- function(x, tool) {
-    TextProtocol(input = agent_input_format(x, tool),
-                 output = agent_output_format(x, tool))
-}
-
-become <- function(model, tool) {
-    do.call(LanguageModelAgent,
-            c(agent_fun(function_formals(tool)), props(tool), model = model))
+    LanguageModelAgent(name = name, model = model,
+                       description = model@instructions)
 }

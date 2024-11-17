@@ -473,3 +473,8 @@ ensure_cols <- function(x, cols) {
     x[setdiff(cols, names(x))] <- list(rep(NA, nrow(x)))
     x
 }
+
+## To S7?
+method(convert, list(S7_class, S7_property)) <- function(from, to, ...) {
+    new_property(from, ...)
+}

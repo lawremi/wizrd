@@ -91,6 +91,34 @@ accept_as <- function(x, schema) {
     x
 }
 
+method(convert, list(PlainTextFormat, S7_property)) <- function(from, to) {
+    prop_string
+}
+
+method(convert, list(PlainTextFormat, S7_class)) <- function(from, to) {
+    class_character
+}
+
+method(convert, list(GlueFormat, S7_class)) <- function(from, to) {
+    m <- regmatches(from@template,
+                    gregexec("\\{(.*?)\\}", from@template))[[1L]][2L,]
+    new_class("glue_vars",
+              properties = setNames(rep(list(prop_string), length(m)), m))
+}
+
+method(convert, list(class_data.frame, S7_property)) <- function(from, to, ...) {
+    row_class <- new_class("row", properties = lapply(from, class_object), ...)
+    new_list_property(of = row_class)
+}
+
+method(convert, list(JSONFormat, S7_class)) <- function(from, to) {
+    convert(from@schema_class, S7_class)
+}
+
+method(convert, list(TextFormat, S7_property)) <- function(from, to) {
+    convert(convert(from, S7_class), S7_property)
+}
+
 textify <- new_generic("textify", c("x", "format"))
 
 method(textify, list(class_any, class_missing)) <- function(x, format) {
