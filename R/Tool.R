@@ -44,7 +44,7 @@ any_signature <- function(FUN) {
     params[] <- list(class_any)
     if (!is.null(params$"..."))
         params$"..." <- class_list
-    tool_signature(class_any, params)
+    ToolSignature(value = class_any, parameters = params)
 }
 
 norm_examples <- function(FUN, examples, signature) {
@@ -116,7 +116,23 @@ equip <- function(x, tool, instructions = NULL) {
 }
 
 unequip <- function(x, name) {
+    stopifnot(inherits(x, Tool))
     x@tools[[name]] <- NULL
+    x
+}
+
+can_accept_as <- function(`_x`, `_parameters` = list(...), ...) {
+    x <- `_x`
+    parameters <- `_parameters`
+    stopifnot(inherits(x, Tool))
+    x@signature@parameters <- match.call(x, as.call(c(x, parameters)),
+                                         expand.dots = FALSE)[-1L]
+    x
+}
+
+can_output_as <- function(x, type) {
+    stopifnot(inherits(x, Tool))
+    x@signature@value <- type
     x
 }
 

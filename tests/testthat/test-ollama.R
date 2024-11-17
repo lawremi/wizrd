@@ -64,8 +64,8 @@ test_that("models can call R functions as tools", {
     output <- predict(model, "What is the mean of var?")
     expect_equal(jsonlite::fromJSON(output)$mean, mean(var))
 
-    sig <- tool_signature(x = class_name)
-    model <- model |> unequip("get_mean") |> equip(tool(mean, signature = sig))
+    model <- model |> unequip("get_mean") |>
+        equip(tool(mean) |> can_accept_as(class_name))
     output <- predict(model, "What is the mean of var?")
     expect_equal(jsonlite::fromJSON(output)$mean, mean(var))
 
@@ -73,10 +73,10 @@ test_that("models can call R functions as tools", {
     output <- predict(model, "What is the mean of `var`?")
     expect_equal(jsonlite::fromJSON(output)$mean, mean(var))
 
-    sig <- tool_signature(class_data.frame, x = class_formula,
-                          data = class_name, FUN = class_name,
-                          subset = class_call)
-    aggregate_tool <- tool(method(aggregate, class_formula), sig, "aggregate")
+    aggregate_tool <- tool(method(aggregate, class_formula)) |>
+        can_accept_as(x = class_formula, data = class_name, FUN = class_name,
+                      subset = class_call) |>
+        can_output_as(class_data.frame)
     model <- unequip("mean") |> equip(model, aggregate_tool)
     output <- predict(model, "Mean of MPG.city for each Manufacturer in the Cars93 dataset")
     expect_equal(as.numeric(output), mean(var))
