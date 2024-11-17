@@ -191,5 +191,6 @@ tool_output_json_format <- function(tool) {
     if (!is.null(desc))
         schema$description <- paste(desc, collapse = " ")
     
-    JSONFormat(schema = schema)
+    JSONFormat(schema = schema,
+               schema_class = tool@signature@value)
 }
