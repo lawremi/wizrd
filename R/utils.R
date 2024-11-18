@@ -478,3 +478,5 @@ ensure_cols <- function(x, cols) {
 method(convert, list(S7_class, S7_property)) <- function(from, to, ...) {
     new_property(from, ...)
 }
+
+method(as.environment, S7_object) <- function(x) as.environment(props(x))
