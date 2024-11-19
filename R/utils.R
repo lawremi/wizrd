@@ -129,7 +129,7 @@ new_list_property <- function(..., validator = NULL,
     prop <- new_property(class_list, ..., validator = function(value) {
         c(if (!identical(of, class_any) &&
                   !all(vapply(value, S7:::class_inherits, logical(1L), of)))
-            paste("must only contain elements of class", of@name),
+            paste("must only contain elements of class", S7:::class_desc(of)),
           if (isTRUE(named) && is.null(names(value)))
               "must have names",
           if (identical(named, FALSE) && !is.null(names(value)))
