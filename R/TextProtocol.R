@@ -2,10 +2,10 @@ TextProtocol <- new_class("TextProtocol",
                           properties = list(
                               input = new_property(
                                   TextFormat,
-                                  default = quote(PlainTextFormat())),
+                                  default = PlainTextFormat()),
                               output = new_property(
                                   TextFormat,
-                                  default = quote(PlainTextFormat()))
+                                  default = PlainTextFormat())
                           ))
 
 method(print, TextProtocol) <- function(x, ...) {
