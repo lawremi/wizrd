@@ -22,6 +22,7 @@ method(print, ToolSignature) <- function(x, ...) {
 }
 
 dodge_dots <- function(x) {
-    names(x)[names(x) == "..."] <- "_dots"
+    if (!is.null(x))
+        names(x)[names(x) == "..."] <- "_dots"
     x
 }

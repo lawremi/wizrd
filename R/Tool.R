@@ -223,7 +223,7 @@ describe_tool_examples <- function(tool) {
         paste0("Example(s):\n\n",
                paste0(ToolCall(tool_name = tool@name, arguments = props(ex)),
                       ifelse(nzchar(names(ex)),
-                             paste(" returns:" names(ex)),
+                             paste(" returns:", names(ex)),
                              ""),
                       collapse = "\n\n"))
     }
