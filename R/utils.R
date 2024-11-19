@@ -146,6 +146,34 @@ new_list_property <- function(..., validator = NULL,
     prop
 }
 
+new_data_frame_property <- function(..., validator = NULL,
+                                    colnames = colnames(prototype),
+                                    default = prototype %||% data.frame(),
+                                    prototype = NULL)
+{
+    types <- lapply(prototype, class_object)
+    prop <- new_property(class_data.frame, ..., validator = function(value) {
+        c(if (!is.null(colnames) &&
+                  !identical(colnames(value), colnames))
+            paste("colnames() must be", deparse(colnames))
+          else if (!is.null(prototype)) {
+                wrong_type <- !mapply(inherits, value, types)
+                if (any(wrong_type))
+                    paste(colnames(value)[wrong_type], "must be a",
+                          vapply(types[wrong_type], S7:::class_desc,
+                                 character(1L)),
+                          collapse = ", ")
+          },
+        if (!is.null(validator))
+            validator(value)
+        )
+    }, default = default)
+    prop$prototype <- prototype
+    prop$colnames <- colnames
+    class(prop) <- c("data_frame_S7_property", class(prop))
+    prop
+}
+
 zip <- function(...) {
     Map(list, ...)
 }
@@ -379,6 +407,8 @@ scalar_S7_property <- new_S3_class(c("scalar_S7_property", "S7_property"))
 string_S7_property <- new_S3_class(c("string_S7_property", "S7_property"))
 list_S7_property <- new_S3_class(c("list_S7_property", "S7_property"))
 numeric_S7_property <- new_S3_class(c("numeric_S7_property", "S7_property"))
+data_frame_S7_property <- new_S3_class(c("data_frame_S7_property",
+                                         "S7_property"))
 
 class_json <- new_S3_class("json") # from jsonlite
 

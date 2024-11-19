@@ -107,12 +107,17 @@ method(convert, list(GlueFormat, S7_class)) <- function(from, to) {
 }
 
 method(convert, list(class_data.frame, S7_property)) <- function(from, to, ...) {
-    row_class <- new_class("row", properties = lapply(from, class_object), ...)
-    new_list_property(of = row_class)
+    new_data_frame_property(prototype = from)
 }
 
 method(convert, list(JSONFormat, S7_class)) <- function(from, to) {
-    convert(from@schema_class, S7_class)
+    if (is.data.frame(from@schema_class))
+        class_data.frame
+    else from@schema_class
+}
+
+method(convert, list(JSONFormat, S7_property)) <- function(from, to) {
+    convert(from@schema_class, S7_property)
 }
 
 method(convert, list(TextFormat, S7_property)) <- function(from, to) {
@@ -256,6 +261,11 @@ method(dejsonify, list(class_data.frame, class_data.frame)) <- function(x, spec)
 {
     x[colnames(spec)] # JSON schema does not ensure order
 }
+
+method(dejsonify, list(class_data.frame, data_frame_S7_property)) <-
+    function(x, spec) {
+        dejsonify(x, spec$prototype)
+    }
 
 method(dejsonify, list(class_any, S7_any)) <- function(x, spec) x
 

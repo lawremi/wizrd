@@ -168,6 +168,12 @@ method(as_json_schema, list_S7_property) <- function(from, description = NULL)
     c(schema, items = if (!is.null(from$of)) list(as_json_schema(from$of)))
 }
 
+method(as_json_schema, data_frame_S7_property) <- function(from,
+                                                           description = NULL)
+{
+    as_json_schema(from$prototype, description)
+}
+
 method(as_json_schema, numeric_S7_property) <- function(from,
                                                         description = NULL)
 {
