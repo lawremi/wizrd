@@ -8,7 +8,8 @@ ToolSignature := new_class(
                                        properties = dodge_dots(value))
                 self@parameters <- value
                 self
-            }
+            },
+            default = new_class("parameters")
         ),
         value = union_classes
     ))
