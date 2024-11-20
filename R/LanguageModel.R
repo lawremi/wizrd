@@ -13,16 +13,6 @@ LanguageModel <- new_class("LanguageModel",
 chat <- new_generic("chat", "x")
 embed_text <- new_generic("embed_text", "x")
 
-## Vector databases / indexing methods to support
-## - RcppAnnoy
-## - duckdb (VSS extension)
-## - tiledb
-## - RSQLite (VSS extension)
-## - rsolr (KnnQParser)
-## - elastic
-## - RPostgres (PGVector extension)
-## - rredis/redux
-
 method(print, LanguageModel) <- function(x, ...) {
     cat(S7:::obj_desc(x))
     if (!is.null(x@name)) cat("", x@name)
