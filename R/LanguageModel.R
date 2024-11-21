@@ -155,7 +155,7 @@ tool_output_format <- new_generic("tool_output_format", "x",
                                   function(x, tool, ...) S7_dispatch())
 
 method(tool_output_format, LanguageModel) <- function(x, tool) {
-    tool_output_json_format(tool)
+    PlainTextFormat()
 }
 
 bind <- new_generic("bind", c("x", "to"))

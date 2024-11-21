@@ -218,6 +218,7 @@ tool_input_json_format <- function(tool) {
     JSONFormat(schema = schema, schema_class = sig_params)
 }
 
+## currently unused
 tool_output_json_format <- function(tool) {
     schema <- as_json_schema(tool@signature@value)
     desc <- c(tool@value_description, schema$description)
