@@ -1,6 +1,10 @@
 LanguageModelAgent := new_class(
     Tool,
     properties = list(
+        name = new_string_property(default = quote(model@name)),
+        description = nullable(new_string_property(
+            default = quote(model@instructions)
+        )),
         model = new_property(
             LanguageModel,
             setter = \(self, value) {

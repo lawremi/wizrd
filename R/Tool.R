@@ -21,10 +21,22 @@ validate_Tool <- function(self) {
 
 Tool <- new_class("Tool", class_function,
                   properties = list(
-                      name = prop_string,
+                      name = new_string_property(
+                          default = quote(deparse(substitute(.data)))
+                      ),
                       description = nullable(prop_string),
-                      signature = ToolSignature,
-                      param_descriptions = named(class_character),
+                      signature = new_property(
+                          ToolSignature,
+                          default = quote(any_signature(.data))
+                      ),
+                      param_descriptions = named(new_property(
+                          class_character,
+                          setter = \(self, value) {
+                              self@param_descriptions <-
+                                  norm_param_descriptions(value, self@signature)
+                              self
+                          }
+                      )),
                       value_description = nullable(prop_string),
                       examples = new_data_frame_property(
                           colnames = c("input", "output"),
