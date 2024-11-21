@@ -10,7 +10,7 @@ method(as.character, ToolCall) <- function(x) {
 }
 
 method(convert, list(ToolCall, class_call)) <- function(from, to) {
-    do.call(call, c(from@tool_name, from@arguments), quote = TRUE)
+    as.call(c(as.name(from@tool_name), from@arguments))
 }
 
 method(print, ToolCall) <- function(x, width = getOption("width"), ...) {
