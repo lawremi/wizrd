@@ -9,7 +9,7 @@ LanguageModel <- new_class("LanguageModel",
                                tools = new_list_property(of = ToolBinding),
                                params = LanguageModelParams,
                                examples = new_data_frame_property(
-                                   colnames = c("input", "output")
+                                   col.names = c("input", "output")
                                )
                            ))
 

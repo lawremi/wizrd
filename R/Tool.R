@@ -39,7 +39,7 @@ Tool <- new_class("Tool", class_function,
                       )),
                       value_description = nullable(prop_string),
                       examples = new_data_frame_property(
-                          colnames = c("input", "output"),
+                          col.names = c("input", "output"),
                           setter = \(self, value) {
                               self@examples <- norm_examples(value, self)
                               self
