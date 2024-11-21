@@ -17,6 +17,8 @@ method(convert, list(class_any, ChatMessage)) <- function(from, to,
     ChatMessage(role = role, object = from)
 }
 
+method(convert, list(ChatMessage, ChatMessage)) <- function(from, to) from
+
 method(textify, list(ChatMessage, TextFormat)) <- function(x, format) {
     set_props(x, content = textify(x@object, format))
 }
