@@ -48,6 +48,5 @@ agent_signature <- function(model) {
 
 agent <- function(model, name = model@name)
 {
-    LanguageModelAgent(name = name, model = model,
-                       description = model@instructions)
+    LanguageModelAgent(name = name, model = model)
 }
