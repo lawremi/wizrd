@@ -1,6 +1,6 @@
 assert_scalar <- function(scalar, class, arg = deparse(substitute(scalar)))
 {
-    if (length(scalar) != 1 || !S7:::class_inherits(scalar, class)) {
+    if (length(scalar) != 1L || !S7:::class_inherits(scalar, class)) {
         type_name <- if (identical(class, class_numeric)) "numeric"
                      else class$class
         msg <- sprintf("`%s` must be a single %s value", arg, type_name)
@@ -42,7 +42,8 @@ with_default <- function(prop, default) {
 }
 
 new_scalar_property <- function(class, ..., validator = NULL, default) {
-    assert_scalar(default, class)
+    if (!is.language(default))
+        assert_scalar(default, class)
     prop <- new_property(class, ..., validator = function(value) {
         if (is.null(value))
             return(NULL)
@@ -120,9 +121,9 @@ prop_int_nn <- new_int_property(min = 0L)
 prop_int_pos <- new_int_property(min = 1L)
 
 new_list_property <- function(..., validator = NULL,
-                              default = setNames(
-                                  list(),
-                                  if (isTRUE(named)) character()),
+                              default = if (isTRUE(named))
+                                  quote(setNames(list(), character()))
+                              else quote(list()),
                               of = class_any, named = NA,
                               min_length = 0L, max_length = Inf)
 {
