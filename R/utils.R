@@ -147,21 +147,22 @@ new_list_property <- function(..., validator = NULL,
     prop
 }
 
-zero_row_data_frame <- function(colnames) {
-    data.frame(matrix(nrow = 0L, ncol = length(colnames))) |> setNames(colnames)
+zero_row_data_frame <- function(col.names) {
+    data.frame(matrix(nrow = 0L, ncol = length(col.names))) |>
+        setNames(col.names)
 }
 
 new_data_frame_property <- function(..., validator = NULL,
-                                    colnames = colnames(prototype),
-                                    default = prototype %||%
-                                        zero_row_data_frame(colnames),
+                                    col.names = colnames(prototype),
+                                    default = substitute(prototype) %||%
+                                        zero_row_data_frame(col.names),
                                     prototype = NULL)
 {
     types <- lapply(prototype, class_object)
     prop <- new_property(class_data.frame, ..., validator = function(value) {
-        c(if (!is.null(colnames) &&
-                  !identical(colnames(value), colnames))
-            paste("colnames() must be", deparse(colnames))
+        c(if (!is.null(col.names) &&
+                  !identical(colnames(value), col.names))
+            paste("colnames() must be", deparse(col.names))
           else if (!is.null(prototype)) {
                 wrong_type <- !mapply(inherits, value, types)
                 if (any(wrong_type))
@@ -175,7 +176,7 @@ new_data_frame_property <- function(..., validator = NULL,
         )
     }, default = default)
     prop$prototype <- prototype
-    prop$colnames <- colnames
+    prop$col.names <- col.names
     class(prop) <- c("data_frame_S7_property", class(prop))
     prop
 }
