@@ -116,7 +116,8 @@ tool <- function(FUN, signature = any_signature(FUN),
                  name = deparse(substitute(FUN)),
                  description = NULL, param_descriptions = character(),
                  value_description = NULL,
-                 examples = zero_row_data_frame(c("input", "output")))
+                 examples = data.frame(input = character(),
+                                       output = character()))
 {
     force(name)
     FUN <- match.fun(FUN)
