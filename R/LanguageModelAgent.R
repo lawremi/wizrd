@@ -18,6 +18,7 @@ LanguageModelAgent := new_class(
             setter = \(self, value) {
                 S7_data(self) <- agent_fun(value)
                 self@signature <- value
+                self@examples <- self@model@examples
                 self
             }
         )
