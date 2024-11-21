@@ -145,7 +145,7 @@ can_accept_as <- function(`_x`, `_parameters` = list(...), ...) {
     parameters <- `_parameters`
     stopifnot(inherits(x, Tool))
     x@signature@parameters <- match.call(x, as.call(c(x, parameters)),
-                                         expand.dots = FALSE)[-1L]
+                                         expand.dots = FALSE)[-1L] |> as.list()
     x
 }
 

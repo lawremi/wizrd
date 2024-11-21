@@ -8,15 +8,15 @@ LanguageModelAgent := new_class(
         model = new_property(
             LanguageModel,
             setter = \(self, value) {
-                self@signature <- agent_signature(value)
                 self@model <- value
+                self@signature <- agent_signature(value)
                 self
             }
         ),
         signature = new_property(
             ToolSignature,
             setter = \(self, value) {
-                S7_data(self) <- agent_fun(value)
+                S7_data(self, check = FALSE) <- agent_fun(value)
                 self@signature <- value
                 self@examples <- self@model@examples
                 self
@@ -26,7 +26,7 @@ LanguageModelAgent := new_class(
 )
 
 agent_fun <- function(sig) {
-    args <- formals(signature@parameters)
+    args <- formals(sig@parameters)
     if (length(args) != 1L)
         stop("'signature' must have a single parameter")
     predict_call <- as.call(c(quote(predict), quote(self@model),
@@ -37,7 +37,7 @@ agent_fun <- function(sig) {
             stop("agent function must be a LanguageModelAgent")
         PREDICT_CALL
     }, list(PREDICT_CALL = predict_call))
-    as.function(c(body, args))
+    as.function(c(args, body))
 }
 
 agent_signature <- function(model) {
@@ -48,5 +48,7 @@ agent_signature <- function(model) {
 
 agent <- function(model, name = model@name)
 {
-    LanguageModelAgent(name = name, model = model)
+    LanguageModelAgent(name = name, model = model,
+                       ## FIXME: needed because S7 does not respect default
+                       description = model@instructions)
 }
