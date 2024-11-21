@@ -223,7 +223,7 @@ method(openai_encode_tool, ToolBinding) <- function(x) {
     stopifnot(inherits(x@io@input, JSONFormat))
     list(type = "function",
          `function` = list(name = x@tool@name,
-                           description = describe_tool(x@tool),
+                           description = describe_tool(x),
                            parameters = x@io@input@schema))
 }
 

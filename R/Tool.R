@@ -4,7 +4,7 @@ validate_Tool <- function(self) {
                               formal_names)
     extra_param_descs <- setdiff(names(self@param_descriptions), formal_names)
 
-    ex_problems <- unique(unlist(lapply(self@examples, \(ex) {
+    ex_problems <- unique(unlist(lapply(self@examples$input, \(ex) {
         if (!inherits(ex, self@signature@parameters))
             "examples must be instances of @signature@parameters"
     })))
@@ -26,7 +26,13 @@ Tool <- new_class("Tool", class_function,
                       signature = ToolSignature,
                       param_descriptions = named(class_character),
                       value_description = nullable(prop_string),
-                      examples = class_list
+                      examples = new_data_frame_property(
+                          colnames = c("input", "output"),
+                          setter = \(self, value) {
+                              self@examples <- norm_examples(value, self)
+                              self
+                          }
+                      )
                   ),
                   validator = validate_Tool)
 
@@ -47,14 +53,16 @@ any_signature <- function(FUN) {
     ToolSignature(value = class_any, parameters = params)
 }
 
-norm_examples <- function(FUN, examples, signature) {
-    lapply(examples, \(example) {
-        if (is.primitive(FUN))
-            FUN <- as_stub_closure(FUN)
-        mc <- match.call(FUN, as.call(c(FUN, example)), expand.dots = FALSE) |>
+norm_examples <- function(examples, self) {
+    FUN <- self
+    if (is.primitive(FUN))
+        FUN <- as_stub_closure(FUN)
+    examples$input <- lapply(examples$input, \(input) {
+        mc <- match.call(FUN, as.call(c(FUN, input)), expand.dots = FALSE) |>
             dodge_dots() |> as.list()
-        do.call(signature@parameters, mc[-1L])
+        do.call(self@signature@parameters, mc[-1L])
     })
+    examples
 }
 
 norm_param_descriptions <- function(descs, signature) {
@@ -96,12 +104,10 @@ tool <- function(FUN, signature = any_signature(FUN),
                  name = deparse(substitute(FUN)),
                  description = NULL, param_descriptions = character(),
                  value_description = NULL,
-                 examples = list())
+                 examples = zero_row_data_frame(c("input", "output")))
 {
     force(name)
     FUN <- match.fun(FUN)
-    examples <- norm_examples(FUN, examples, signature)
-    param_descriptions <- norm_param_descriptions(param_descriptions, signature)
     Tool(FUN, name = name, description = description, signature = signature,
          param_descriptions = param_descriptions,
          value_description = value_description,
@@ -197,8 +203,7 @@ tool_input_json_format <- function(tool) {
 
     schema <- tool_input_json_schema(sig_params, param_descs)
     
-    JSONFormat(schema = schema, schema_class = sig_params,
-               examples = tool@examples)
+    JSONFormat(schema = schema, schema_class = sig_params)
 }
 
 tool_output_json_format <- function(tool) {
@@ -211,20 +216,18 @@ tool_output_json_format <- function(tool) {
                schema_class = tool@signature@value)
 }
 
-describe_tool <- function(x) {
-    paste(c(x@description, describe_tool_examples(x)),
+describe_tool <- function(binding) {
+    paste(c(binding@tool@description, describe_tool_examples(binding)),
           collapse = "\n\n")
 }
 
-describe_tool_examples <- function(tool) {
-    if (length(ex) > 0L) {
-        if (is.null(names(ex)))
-            names(ex) <- ""
-        paste0("Example(s):\n\n",
-               paste0(ToolCall(tool_name = tool@name, arguments = props(ex)),
-                      ifelse(nzchar(names(ex)),
-                             paste(" returns:", names(ex)),
-                             ""),
-                      collapse = "\n\n"))
-    }
+describe_tool_examples <- function(binding) {
+    tool <- binding@tool
+    ex <- tool@examples
+    if (nrow(ex) == 0L)
+        return(NULL)
+    call <- lapply(ex$input, \(args) as.call(c(as.name(tool@name), props(args))))
+    value <- vapply(ex$output, textify, character(1L), binding@io@output)
+    ex_text <- paste0(call, " returns: ", value, collapse = "\n")
+    paste0("Example(s):\n", ex_text)
 }

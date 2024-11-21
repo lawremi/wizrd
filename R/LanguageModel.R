@@ -7,7 +7,10 @@ LanguageModel <- new_class("LanguageModel",
                                ),
                                io = TextProtocol,
                                tools = new_list_property(of = ToolBinding),
-                               params = LanguageModelParams
+                               params = LanguageModelParams,
+                               examples = new_data_frame_property(
+                                   colnames = c("input", "output")
+                               )
                            ))
 
 chat <- new_generic("chat", "x")
@@ -89,29 +92,22 @@ method(instructions,
     NULL
 }
 
-describe_examples <- function(ex, format = PlainTextFormat()) {
-    if (length(ex) > 0L) {
-        ex <- vapply(ex, textify, character(1L), format)
-        if (is.null(names(ex)))
-            names(ex) <- ""
-        paste0("Example(s):\n\n",
-               paste0(ifelse(nzchar(names(ex)),
-                             paste(names(ex), "would be encoded as:\n"),
-                             ""),
-                      ex,
-                      collapse = "\n\n"))
-    }
-}
-
-append_examples <- function(prompt, on) {
-    paste(c(prompt, describe_examples(on@examples, on)), collapse = "\n")
+describe_examples <- function(ex, io = TextProtocol()) {
+    if (nrow(ex) == 0L)
+        return(NULL)
+    ex_text <- 
+        paste0("Input: ", vapply(exi$input, textify, character(1L), io@input),
+               "\n",
+               "Output: ", vapply(exi$output, textify, character(1L), io@output),
+               collapse = "\n\n")
+    paste0("Example(s):\n\n", ex_text)
 }
 
 method(instructions, list(JSONFormat, LanguageModel)) <- function(on, to) {
     prompt <- paste0("Return only JSON, without any explanation or other text. ",
                      "If the user input is incompatible with the task, ",
                      "issue an informative refusal.\n")
-    append_examples(prompt, on)
+    prompt
 }
 
 json_type <- function(x) {
@@ -137,7 +133,7 @@ method(instructions, list(CSVFormat, LanguageModel)) <- function(on, to) {
                                        paste0(" (", json_type(on@col_classes),
                                               ")")),
                                 collapse = ", "))
-    append_examples(prompt, on)
+    prompt
 }
 
 method(instructions, list(CodeFormat, LanguageModel)) <- function(on, to) {
@@ -145,7 +141,7 @@ method(instructions, list(CodeFormat, LanguageModel)) <- function(on, to) {
                       "code. Do not wrap the code in ``` blocks.",
                       "Do not include any explanation or other text.\n"),
                     collapse = " ")
-    append_examples(prompt, on)
+    prompt
 }
 
 tool_input_format <- new_generic("tool_input_format", "x",

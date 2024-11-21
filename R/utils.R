@@ -146,9 +146,14 @@ new_list_property <- function(..., validator = NULL,
     prop
 }
 
+zero_row_data_frame <- function(colnames) {
+    data.frame(matrix(nrow = 0L, ncol = length(colnames))) |> setNames(colnames)
+}
+
 new_data_frame_property <- function(..., validator = NULL,
                                     colnames = colnames(prototype),
-                                    default = prototype %||% data.frame(),
+                                    default = prototype %||%
+                                        zero_row_data_frame(colnames),
                                     prototype = NULL)
 {
     types <- lapply(prototype, class_object)

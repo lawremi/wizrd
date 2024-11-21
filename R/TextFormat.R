@@ -1,7 +1,4 @@
-TextFormat <- new_class("TextFormat",
-                        properties = list(
-                            examples = class_list
-                        ), abstract = TRUE)
+TextFormat <- new_class("TextFormat", abstract = TRUE)
 
 PlainTextFormat <- new_class("PlainTextFormat", TextFormat)
 
@@ -19,10 +16,8 @@ JSONFormat <- new_class("JSONFormat", TextFormat,
 
 CSVFormat <- new_class("CSVFormat", TextFormat,
                        properties = list(
-                           col_classes = class_character,
-                           examples = new_list_property(
-                               of = class_data.frame,
-                           )))
+                           col_classes = class_character
+                       ))
 
 CodeFormat <- new_class("CodeFormat", TextFormat,
                         properties = list(language = nullable(prop_string)))
@@ -34,13 +29,11 @@ fits_schema_class <- function(x) {
     S7:::class_inherits(x, JSONFormat@properties$schema_class$class)
 }
 
-json_format <- function(schema = list(), examples = list())
+json_format <- function(schema = list())
 {
     schema_class <- if (fits_schema_class(schema)) schema else class_any
     schema <- box_json_schema(as_json_schema(schema))
-    examples <- lapply(examples, jsonify)
-    JSONFormat(schema = schema, schema_class = schema_class,
-               examples = examples)
+    JSONFormat(schema = schema, schema_class = schema_class)
 }
 
 as_col_classes <- new_generic("as_col_classes", "x")
@@ -51,11 +44,10 @@ method(as_col_classes, class_data.frame) <- function(x) {
     vapply(x, \(xi) class(xi)[1L], character(1L))
 }
 
-csv_format <- function(col_classes = NA, examples = list())
+csv_format <- function(col_classes = NA)
 {
     col_classes <- as_col_classes(col_classes)
-    examples <- lapply(examples, as.data.frame)
-    CSVFormat(col_classes = col_classes, examples = examples)
+    CSVFormat(col_classes = col_classes)
 }
 
 code_format <- function(language = "R") {
@@ -74,7 +66,7 @@ method(convert, list(TextFormat, TextFormat)) <- function(from, to) {
     from
 }
 
-output_as <- function(x, format, examples = list()) {
+output_as <- function(x, format) {
     x@io@output <- convert(format, TextFormat)
     x
 }
