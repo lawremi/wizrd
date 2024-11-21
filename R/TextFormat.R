@@ -91,11 +91,11 @@ method(convert, list(PlainTextFormat, S7_class)) <- function(from, to) {
     class_character
 }
 
-method(convert, list(GlueFormat, S7_class)) <- function(from, to) {
+method(convert, list(GlueFormat, S7_property)) <- function(from, to) {
     m <- regmatches(from@template,
                     gregexec("\\{(.*?)\\}", from@template))[[1L]][2L,]
-    new_class("glue_vars",
-              properties = setNames(rep(list(prop_string), length(m)), m))
+    prototype <- setNames(rep(list(character()), length(m)), m)
+    new_data_frame_property(prototype = prototype)
 }
 
 method(convert, list(class_data.frame, S7_property)) <- function(from, to, ...) {
