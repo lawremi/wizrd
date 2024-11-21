@@ -250,7 +250,7 @@ Rd_for_tag <- function(Rd, tag) {
 }
 
 Rd_args <- function(Rd) {
-    Rd_parse_args(Rd_for_tag("arguments"))
+    Rd_parse_args(Rd_for_tag(Rd, "arguments"))
 }
 
 Rd_src <- function(Rd) {
@@ -275,11 +275,11 @@ Rd_parse_args <- function(args) {
 }
 
 Rd_description <- function(Rd) {
-    Rd_src(Rd_for_tag("description"))
+    Rd_src(Rd_for_tag(Rd, "description"))
 }
 
 Rd_value <- function(Rd) {
-    Rd_src(Rd_for_tag("value"))
+    Rd_src(Rd_for_tag(Rd, "value"))
 }
 
 Rd_for_function <- function(FUN, name = deparse(substitute(FUN))) {
