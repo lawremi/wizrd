@@ -42,7 +42,7 @@ with_default <- function(prop, default) {
 }
 
 new_scalar_property <- function(class, ..., validator = NULL, default) {
-    if (!is.language(default))
+    if (!is.null(default) && !is.language(default))
         assert_scalar(default, class)
     prop <- new_property(class, ..., validator = function(value) {
         if (is.null(value))
