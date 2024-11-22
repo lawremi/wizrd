@@ -16,6 +16,8 @@ Chat <- new_class("Chat",
                   ))
 
 method(predict, Chat) <- function(object, input, ...) {
+    if (is.list(input))
+        input <- list(input)
     last_output(chat(object, input, ...))
 }
 

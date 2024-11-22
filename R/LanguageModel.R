@@ -48,6 +48,8 @@ method(chat, LanguageModel) <- function(x, input = NULL, stream_callback = NULL,
 method(predict, LanguageModel) <- function(object, input, env = parent.frame(),
                                            ...)
 {
+    if (is.list(input))
+        input <- list(input)
     last_output(chat(object, input, env = env, ...))
 }
 
