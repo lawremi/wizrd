@@ -167,15 +167,19 @@ openai_response_chat_message <- function(x) {
         return(x)
     ## TODO: handle multiple choices (via callback?)
     msg <- x$choices[[1L]]$message
-    ChatMessage(content = msg$content, tool_calls = openai_tool_calls(msg),
+    if (getOption("httr2_verbosity", 0L) == 3L)
+        message(toJSON(msg))
+    ChatMessage(content = msg$content %||% character(),
+                tool_calls = openai_tool_calls(msg),
                 role = "assistant", refusal = msg$refusal)
 }
 
 openai_encode_message <- function(x) {
     content <- openai_encode_content(x@content)
-    stopifnot(test_list(content, names = "unnamed") ||
+    stopifnot(is.null(content) || test_list(content, names = "unnamed") ||
                   test_string(content))
-    message <- list(role = x@role, content = content)
+    message <- list(role = x@role)
+    message$content <- content
     if (x@role == "tool")
         message$tool_call_id <- x@participant
     else message$name <- x@participant
@@ -196,7 +200,7 @@ openai_encode_content <- new_generic("openai_encode_content", "x")
 method(openai_encode_content, class_character) <- function(x) {
     if (length(x) > 1L)
         openai_encode_content(as.list(x))
-    else x
+    else if (length(x) == 1L) x
 }
 
 method(openai_encode_content, MediaURI) <- function(x) {
