@@ -68,14 +68,16 @@ method(as_json_schema, S7_union) <- function(from, descriptions = NULL, ...) {
          title = paste(unlist(lapply(schemas, `[[`, "title")), collapse=" or "))
 }
 
-base_json_schema_type <- function(from) {
+json_schema_type := new_generic("from")
+
+method(json_schema_type, S7_base_class) <- function(from) {
     switch(from$class, logical = "boolean",
            integer = "integer", double = "number",
            complex =, raw =, character =,
            name =, call =, `function` =  "string")
 }
 
-s3_json_schema_type <- function(from) {
+method(json_schema_type, S7_S3_class) <- function(from) {
     string_classes <- c("Date", "factor", "POSIXt", "formula")
     if (any(string_classes %in% from$class)) {
         "string"
@@ -85,32 +87,47 @@ s3_json_schema_type <- function(from) {
         "array"
 }
 
+default_description := new_generic("from")
+
+method(default_description, S7_base_class) <- function(from) { 
+    switch(from$class, 
+           complex = "complex number",
+           name = "name of an R variable", call = "call to an R function",
+           `function` = "code defining an R function")
+}
+
+method(default_description, S7_S3_class) <- function(from) {
+    if ("formula" %in% from$class)
+        "R formula"
+}
+
 base_json_schema <- function(from, description = NULL, scalar = FALSE,
-                             named = FALSE, type_mapper = base_json_schema_type)
+                             named = FALSE)
 {
     schema <- list()
     type <- if (named && "list" %in% from$class)
                 "object"
             else if (!scalar) "array"
-            else type_mapper(from)
+            else json_schema_type(from)
     if (is.null(type))
         return(c(schema, description = description))
     schema$type <- type
     if (type == "array" && !scalar)
-        schema$items <- base_json_schema(from, scalar = TRUE,
-                                         type_mapper = type_mapper)
+        schema$items <- base_json_schema(from, scalar = TRUE)
     else if (type == "object")
         schema$patternProperties$"^.*$" <- list()
     
-    schema$description <- description
-    
-    schema$format <- if ("Date" %in% from$class)
-                         "date"
-                     else if ("POSIXt" %in% from$class)
-                         "date-time"
-                     else if ("raw" %in% from$class)
-                         "binary"
+    schema$description <- description %||% if (scalar) default_description(from)
 
+    if (scalar) {
+        schema$format <- if ("Date" %in% from$class)
+                             "date"
+        else if ("POSIXt" %in% from$class)
+            "date-time"
+        else if ("raw" %in% from$class)
+            "binary"
+    }
+    
     schema
 }
 
@@ -136,16 +153,13 @@ method(as_json_schema, S7_S3_class) <- function(from, description = NULL,
                               "matrix", "array")
     if (is.null(scalar))
         scalar <- !any(from$class %in% known_vector_classes)
-    base_json_schema(from, description, scalar,
-                     type_mapper = s3_json_schema_type)
+    base_json_schema(from, description, scalar)
 }
 
 method(as_json_schema, S7_property) <- function(from, description = NULL, ...) {
     schema <- as_json_schema(from$class, ...)
-    schema$description <- paste(c(schema$description,
-                                  description,
-                                  if (!is.null(from$validator)) deparse(body())
-                                  ), collapse = " ")
+    schema$description <- paste(c(schema$description, description),
+                                collapse = " ")
     schema
 }
 
