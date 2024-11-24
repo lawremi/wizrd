@@ -10,4 +10,6 @@ library(testthat)
 library(S7)
 library(wizrd)
 
+`:=` <- wizrd:::`:=`
+
 test_check("wizrd")
