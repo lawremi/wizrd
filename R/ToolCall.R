@@ -6,7 +6,7 @@ ToolCall <- new_class("ToolCall",
                       ))
 
 method(as.character, ToolCall) <- function(x) {
-    as.character(convert(x, class_call))
+    deparse(convert(x, class_call))
 }
 
 method(convert, list(ToolCall, class_call)) <- function(from, to) {
@@ -14,6 +14,6 @@ method(convert, list(ToolCall, class_call)) <- function(from, to) {
 }
 
 method(print, ToolCall) <- function(x, width = getOption("width"), ...) {
-    cli::ansi_strtrim(cat("<ToolCall> ", x@id, ":", sep = ""), width)
+    cat(cli::ansi_strtrim(paste0("<ToolCall> ", x@id, ": "), width))
     print(as.character(x), width = width, ...)
 }
