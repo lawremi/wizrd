@@ -61,12 +61,13 @@ print_message_content <- function(x) {
 print_message_object <- function(x) {
     float <- float_for_role(x@role)
     if (length(x@object) > 0L &&
-            !identical(x@object, x@content)) {
+            (!identical(x@object, x@content) || x@role == "tool")) {
         opts <- options(max.print = 10L)
         on.exit(options(opts))
         str <- capture.output(print(x@object, width = cli::console_width() / 2L))
         cat(cli::boxx(str, float = float, header = x@participant %||% "",
                       border_style = "classic"))
+        cat("\n")
     }
 }
 
@@ -74,7 +75,7 @@ print_message_tool_calls <- function(x) {
     for (tool_call in x@tool_calls) {
         str <- capture.output(print(tool_call,
                                     width = cli::console_width() / 2L))
-        cat(cli::boxx(str, float = float, header = "Tool call",
+        cat(cli::boxx(str, float = "center", header = "Tool call",
                       border_style = "classic"))
     }
 }
