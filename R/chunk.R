@@ -1,6 +1,6 @@
 Chunking := new_class(abstract = TRUE)
 
-ElementChunking := new_class(
+TokenChunking := new_class(
     Chunking,
     properties = list(
         size = prop_number_pos,
@@ -11,11 +11,11 @@ ElementChunking := new_class(
             "@size must be greater than @overlap"
     })
 
-CharacterChunking := new_class(ElementChunking)
+CharacterChunking := new_class(TokenChunking)
 
-WordChunking := new_class(ElementChunking)
+WordChunking := new_class(TokenChunking)
 
-ParagraphChunking := new_class(ElementChunking)
+ParagraphChunking := new_class(TokenChunking)
 
 HierarchicalChunking := new_class(
     Chunking,
@@ -132,12 +132,12 @@ method(chunk, list(Text, CharacterChunking)) <- function(x, by)
     data.frame(text)
 }
 
-chunk_elements <- function(x, by, pattern) {
+chunk_elements <- function(x, by, pattern, perl = FALSE) {
     stopifnot(length(x) == 1L && !is.na(x))
-    words <- strsplit(x, pattern)[[1L]]
-    starts <- chunk_starts(length(words), by)
+    elements <- strsplit(x, pattern, perl = perl)[[1L]]
+    starts <- chunk_starts(length(elements), by)
     text <- vapply(starts, \(s) {
-        paste(words[seq(s, s + by@size - 1L)], collapse = " ")
+        paste(elements[seq(s, s + by@size - 1L)], collapse = " ")
     }, character(1L))
     data.frame(text)
 }
@@ -145,6 +145,15 @@ chunk_elements <- function(x, by, pattern) {
 method(chunk, list(Text, WordChunking)) <- function(x, by)
 {
     chunk_elements(x, by, "\\s+")
+}
+
+method(chunk, list(Text, SentenceChunking)) <- function(x, by)
+{
+    abbv <- c("Mr", "Mrs", "Dr", "Ms", "Prof", "Sr", "Jr", "St", "vs", "e\\.g",
+              "i\\.e", "U\\.S")
+    pattern <- sprintf("(?<!(?:%s)\\.)(?<=[?!.])\\s+",
+                       paste(abbv, collapse = "|"))
+    chunk_elements(x, by, pattern, perl = TRUE)
 }
 
 method(chunk, list(Text, ParagraphChunking)) <- function(x, by)
