@@ -195,3 +195,11 @@ method(embed_text, LanguageModel) <- function(x, data, ndim = NULL) {
 method(on_restore, LanguageModel) <- function(x, ...) {
     set_props(x, backend = on_restore(x@backend, x@name, ...))
 }
+
+demonstrate <- function(x, examples = data.frame(input, output),
+                        input = character(), output = character())
+{
+    assert_data_frame(examples, col.names = c("input", "output"))
+    x@examples <- rbind(x@examples, examples)
+    x
+}
