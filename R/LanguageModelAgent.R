@@ -46,7 +46,7 @@ agent_signature <- function(model) {
     ToolSignature(parameters = parameters, value = value)
 }
 
-agent <- function(model, name = model@name)
+agentize <- function(model, name = model@name)
 {
     LanguageModelAgent(name = name, model = model,
                        ## FIXME: needed because S7 does not respect default

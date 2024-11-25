@@ -8,10 +8,10 @@ importFrom(glue, glue)
 export(language_model, ollama_model, llama_cpp_model, openai_model,
        azure_openai_model, llama_cpp_model_from_ollama)
 # other constructors
-export(chat, tool, results_augmented_query_to, text_store, agent)
+export(chat, tool, results_augmented_query_to, text_store)
 # builders
 export(equip, unequip, instruct, output_as, accept_as, can_accept_as,
-       can_output_as, demonstrate)
+       can_output_as, demonstrate, agentize)
 # accessors
 export(last_output)
 # operations
