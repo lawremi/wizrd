@@ -11,9 +11,13 @@ TokenChunking := new_class(
             "@size must be greater than @overlap"
     })
 
-CharacterChunking := new_class(TokenChunking)
+## Algorithms for text chunking:
 
-WordChunking := new_class(TokenChunking)
+## Find token breaks and align to semantic boundaries, like sentences
+## or paragraphs. Restrict to a given token count, and allow for a
+## specified overlap with the previous chunk.
+
+SentenceChunking := new_class(TokenChunking)
 
 ParagraphChunking := new_class(TokenChunking)
 
@@ -25,7 +29,7 @@ HierarchicalChunking := new_class(
 )
 
 MarkdownChunking := new_class(HierarchicalChunking)
-    
+
 RMarkdownChunking := new_class(MarkdownChunking)
 
 QuartoChunking := new_class(MarkdownChunking)
@@ -125,26 +129,20 @@ chunk_starts <- function(by, len) {
     starts[len - starts >= by@overlap]
 }
 
-method(chunk, list(Text, CharacterChunking)) <- function(x, by)
-{
-    starts <- chunk_starts(by, nchar(x))
-    text <- vapply(starts, \(s) substring(x, s, s + by@size - 1L), character(1L))
-    data.frame(text)
-}
-
-chunk_elements <- function(x, by, pattern, perl = FALSE) {
+chunk_tokens <- function(x, by, pattern, perl = FALSE) {
     stopifnot(length(x) == 1L && !is.na(x))
-    elements <- strsplit(x, pattern, perl = perl)[[1L]]
-    starts <- chunk_starts(length(elements), by)
+    
+    tokens <- strsplit(x, pattern, perl = perl)[[1L]]
+    starts <- chunk_starts(length(tokens), by)
     text <- vapply(starts, \(s) {
-        paste(elements[seq(s, s + by@size - 1L)], collapse = " ")
+        paste(tokens[seq(s, s + by@size - 1L)], collapse = " ")
     }, character(1L))
     data.frame(text)
 }
 
-method(chunk, list(Text, WordChunking)) <- function(x, by)
+method(chunk, list(Text, TokenChunking)) <- function(x, by)
 {
-    chunk_elements(x, by, "\\s+")
+    chunk_tokens(x, by, "\\s+")
 }
 
 method(chunk, list(Text, SentenceChunking)) <- function(x, by)
@@ -153,12 +151,12 @@ method(chunk, list(Text, SentenceChunking)) <- function(x, by)
               "i\\.e", "U\\.S")
     pattern <- sprintf("(?<!(?:%s)\\.)(?<=[?!.])\\s+",
                        paste(abbv, collapse = "|"))
-    chunk_elements(x, by, pattern, perl = TRUE)
+    chunk_tokens(x, by, pattern, perl = TRUE)
 }
 
 method(chunk, list(Text, ParagraphChunking)) <- function(x, by)
 {
-    chunk_elements(x, by, "\n(\\s*\n)+")
+    chunk_tokens(x, by, "\n(\\s*\n)+")
 }
 
 method(chunk, list(Text, RMarkdownChunking)) <- function(x, by)
