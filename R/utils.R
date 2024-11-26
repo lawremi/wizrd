@@ -517,3 +517,25 @@ method(convert, list(S7_class, S7_property)) <- function(from, to, ...) {
 }
 
 method(as.environment, S7_object) <- function(x) as.environment(props(x))
+
+## Easy to rewrite in C later if needed
+cumsum_breaks <- function(x, threshold) {
+    stopifnot(threshold >= 0L)
+    cur_size <- 0L
+    breaks <- integer()
+    for (i in seq_along(x)) {
+        cur_size <- cur_size + x[i]
+        if (cur_size > threshold) {
+            if (cur_size != x[i])
+                breaks <- c(breaks, i - 1L)
+            cur_size <- x[i]
+            if (cur_size > threshold) {
+                breaks <- c(breaks, i)
+                cur_size <- 0L
+            }
+        }
+    }
+    if (x[i] <= threshold)
+        breaks <- c(breaks, i)
+    breaks
+}
