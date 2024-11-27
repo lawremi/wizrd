@@ -518,24 +518,41 @@ method(convert, list(S7_class, S7_property)) <- function(from, to, ...) {
 
 method(as.environment, S7_object) <- function(x) as.environment(props(x))
 
-## Easy to rewrite in C later if needed
-cumsum_breaks <- function(x, threshold) {
+## Unused simple version that could go into base R
+cumsum_breaks_simple <- function(x, threshold) {
     stopifnot(threshold >= 0L)
     cur_size <- 0L
     breaks <- integer()
     for (i in seq_along(x)) {
         cur_size <- cur_size + x[i]
-        if (cur_size > threshold) {
-            if (cur_size != x[i])
-                breaks <- c(breaks, i - 1L)
+        if (cur_size > threshold && i > 1L) {
+            breaks <- c(breaks, i - 1L)
             cur_size <- x[i]
-            if (cur_size > threshold) {
-                breaks <- c(breaks, i)
-                cur_size <- 0L
-            }
         }
     }
-    if (x[i] <= threshold)
-        breaks <- c(breaks, i)
-    breaks
+    c(breaks, length(x))
+}
+
+cumsum_breaks <- function(x, threshold, max_overlap = 0L) {
+    stopifnot(threshold >= 0L, max_overlap <= threshold)
+    cur_size <- 0L
+    starts <- 1L
+    ends <- integer()
+    for (i in seq_along(x)) {
+        cur_size <- cur_size + x[i]
+        if (cur_size > threshold && i > 1L) {
+            ends <- c(ends, i - 1L)
+            max_overlap_i <- min(max_overlap, threshold - x[i])
+            cur_overlap <- 0L
+            j <- i - 1L
+            while (j > 0L && cur_overlap + x[j] <= max_overlap_i) {
+                cur_overlap <- cur_overlap + x[j]
+                j <- j - 1L
+            }
+            starts <- c(starts, j + 1L)
+            cur_size <- cur_overlap + x[i]
+        }
+    }
+    ends <- c(ends, length(x))
+    data.frame(starts, ends)
 }
