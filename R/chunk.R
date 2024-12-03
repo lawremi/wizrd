@@ -75,7 +75,7 @@ ext_to_chunking <- local({
     }
 })
 
-ext_to_chunking(SentenceAlignedTokenChunking(),
+ext_to_chunking(SentenceAlignedTokenChunking(), md = MarkdownChunking(),
                 Rmd = RMarkdownChunking(), Qmd = QuartoChunking(),
                 Rd = RdChunking(), html = HTMLChunking(), pdf = PDFChunking())
 
