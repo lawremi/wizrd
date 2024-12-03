@@ -3,8 +3,8 @@ Chunking := new_class(abstract = TRUE)
 TokenChunking := new_class(
     Chunking,
     properties = list(
-        token_limit = prop_number_pos,
-        max_overlap = prop_number_nn
+        token_limit = with_default(prop_number_pos, 512L),
+        max_overlap = with_default(prop_number_nn, 64L)
     ),
     validator = \(self) {
         if (self@token_limit < self@max_overlap)
@@ -22,7 +22,10 @@ SentenceAlignedTokenChunking := new_class(TokenChunking)
 HierarchicalChunking := new_class(
     Chunking,
     properties = list(
-        section_chunking = NULL | Chunking
+        section_chunking = new_property(
+            NULL | Chunking,
+            default = quote(SentenceAlignedTokenChunking())
+        )
     )
 )
 

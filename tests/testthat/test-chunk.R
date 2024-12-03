@@ -19,7 +19,7 @@ test_that("Token splitting works", {
     expect_identical(chunks$text, expected)
     
     # Small token limit
-    chunks <- chunk(text, token_limit = 5L)
+    chunks <- chunk(text, token_limit = 5L, max_overlap = 0L)
     expected <- c(
         "This is the first sentence. ",
         "This is the second sentence, which is longer. ",
@@ -29,7 +29,7 @@ test_that("Token splitting works", {
     expect_identical(chunks$text, expected)
     
     # Test 4: Large token limit (entire text fits in one chunk)
-    chunks <- chunk(text, token_limit = 50L)
+    chunks <- chunk(text, token_limit = 50L, max_overlap = 0L)
     expected <- c(
         "This is the first sentence. This is the second sentence, which is longer. Here is the third. Finally, the fourth sentence."
     )
@@ -37,13 +37,13 @@ test_that("Token splitting works", {
     
     # Test 5: Single sentence
     text <- "Just one short sentence."
-    chunks <- chunk(text, token_limit = 10L)
+    chunks <- chunk(text, token_limit = 10L, max_overlap = 0L)
     expected <- c("Just one short sentence.")
     expect_identical(chunks$text, expected)
     
     # Test 6: Complex text with punctuation
     text <- "Dr. Smith is here! Isn't that great? Mr. Johnson, however, is late."
-    chunks <- chunk(text, token_limit = 3L)
+    chunks <- chunk(text, token_limit = 3L, max_overlap = 0L)
     expected <- c(
         "Dr. ",
         "Smith is here! ",
