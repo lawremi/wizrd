@@ -17,7 +17,7 @@ export(last_output)
 # operations
 export(embed_text)
 # chunking
-export(chunk)
+export(chunk, default_chunking)
 # convenience models
 export(llama3, llava, nomic)
 # backend API
