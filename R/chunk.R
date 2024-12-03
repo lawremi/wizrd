@@ -3,12 +3,12 @@ Chunking := new_class(abstract = TRUE)
 TokenChunking := new_class(
     Chunking,
     properties = list(
-        size = prop_number_pos,
-        overlap = prop_number_nn
+        token_limit = prop_number_pos,
+        max_overlap = prop_number_nn
     ),
     validator = \(self) {
-        if (self@size < self@overlap)
-            "@size must be greater than @overlap"
+        if (self@token_limit < self@max_overlap)
+            "@token_limit must be greater than @max_overlap"
     })
 
 ## Algorithms for text chunking:
@@ -17,9 +17,7 @@ TokenChunking := new_class(
 ## or paragraphs. Restrict to a given token count, and allow for a
 ## specified overlap with the previous chunk.
 
-SentenceChunking := new_class(TokenChunking)
-
-ParagraphChunking := new_class(TokenChunking)
+SentenceAlignedTokenChunking := new_class(TokenChunking)
 
 HierarchicalChunking := new_class(
     Chunking,
@@ -77,7 +75,8 @@ ext_to_chunking <- local({
     }
 })
 
-ext_to_chunking(Rmd = RMarkdownChunking(), Qmd = QuartoChunking(),
+ext_to_chunking(SentenceAlignedTokenChunking(),
+                Rmd = RMarkdownChunking(), Qmd = QuartoChunking(),
                 Rd = RdChunking(), html = HTMLChunking(), pdf = PDFChunking())
 
 default_chunking := new_generic("x")
@@ -86,14 +85,15 @@ method(default_chunking, class_character | class_list) <- function(x) {
     ext_to_chunking()
 }
 
-method(chunk, list(class_any, class_missing)) <- function(x, by) {
-    chunk(x, default_chunking(x))
+method(chunk, list(class_any, class_missing)) <- function(x, by, ...) {
+    chunk(x, default_chunking(x), ...)
 }
 
 is_text <- function(x)
-    if (is.character(x)) grepl("\n", x) else rep(TRUE, length(x))
+    if (is.character(x)) tools::file_ext(x) == "" else rep(TRUE, length(x))
 
-chunk_text_or_file <- function(x, by) {
+chunk_text_or_file <- function(x, by, ...) {
+    props(by) <- list(...)
     is_file <- is.character(x) && !is_text(x)
     if (is_file) {
         if (file.info(x)[,"isdir"])
@@ -103,12 +103,12 @@ chunk_text_or_file <- function(x, by) {
 }
 
 method(chunk, list(class_character | class_list, Chunking | class_list)) <-
-    function(x, by) {
+    function(x, by, ...) {
         by <- if (is.list(by)) {
             path <- ifelse(is_text(x), names(x) %||% list(NULL), x)
             by[match(tolower(tools::file_ext(path)), tolower(names(by)))]
         } else list(by)
-        chunks <- Map(chunk_text_or_file, x, by)
+        chunks <- Map(chunk_text_or_file, x, by, MoreArgs = list(...))
         source <- names(x) %||% ifelse(is_text(x), seq_along(x), x)
         data.frame(source = rep(source, sapply(chunks, nrow)),
                    rbind_list(unname(chunks)) |> ensure_cols("text"))
@@ -125,38 +125,42 @@ method(chunk, list(Text, class_any)) <- function(x, by) {
 }
 
 chunk_starts <- function(by, len) {
-    starts <- seq(1L, len, by = by@size - by@overlap)
-    starts[len - starts >= by@overlap]
-}
-
-chunk_tokens <- function(x, by, pattern, perl = FALSE) {
-    stopifnot(length(x) == 1L && !is.na(x))
-    
-    tokens <- strsplit(x, pattern, perl = perl)[[1L]]
-    starts <- chunk_starts(length(tokens), by)
-    text <- vapply(starts, \(s) {
-        paste(tokens[seq(s, s + by@size - 1L)], collapse = " ")
-    }, character(1L))
-    data.frame(text)
+    starts <- seq(1L, len, by = by@token_limit - by@max_overlap)
+    starts[len - starts >= by@max_overlap]
 }
 
 method(chunk, list(Text, TokenChunking)) <- function(x, by)
 {
-    chunk_tokens(x, by, "\\s+")
+    stopifnot(length(x) == 1L && !is.na(x))
+
+    token_boundaries <- stringi::stri_locate_all_boundaries(text, type = "word")
+    starts <- chunk_starts(nrow(token_boundaries), by)
+    ends <- c(starts[-1L] - 1L, length(starts))
+    text <- substring(x, token_boundaries[starts, "start"],
+                      token_boundaries[ends, "end"])
+    
+    data.frame(text)
 }
 
-method(chunk, list(Text, SentenceChunking)) <- function(x, by)
+method(chunk, list(Text, SentenceAlignedTokenChunking)) <- function(x, by)
 {
-    abbv <- c("Mr", "Mrs", "Dr", "Ms", "Prof", "Sr", "Jr", "St", "vs", "e\\.g",
-              "i\\.e", "U\\.S")
-    pattern <- sprintf("(?<!(?:%s)\\.)(?<=[?!.])\\s+",
-                       paste(abbv, collapse = "|"))
-    chunk_tokens(x, by, pattern, perl = TRUE)
-}
+    require_ns("stringi", "generate sentence-aligned chunks")
+    sentence_boundaries <-
+        stringi::stri_locate_all_boundaries(text, type = "sentence")[[1L]]
+    token_boundaries <- stringi::stri_locate_all_words(text)[[1L]]
 
-method(chunk, list(Text, ParagraphChunking)) <- function(x, by)
-{
-    chunk_tokens(x, by, "\n(\\s*\n)+")
+    sentence_starts <- sentence_boundaries[, "start"]
+    sentence_ends <- sentence_boundaries[, "end"]
+    token_starts <- token_boundaries[, "start"]
+    token_indices <- findInterval(token_starts, sentence_starts)
+    token_counts <- tabulate(token_indices, nbins = length(sentence_starts))
+
+    chunk_indices <- cumsum_breaks(token_counts, by@token_limit, by@max_overlap) 
+    chunk_starts <- sentence_starts[chunk_indices$starts]
+    chunk_ends <- sentence_ends[chunk_indices$ends]
+    text <- substring(text, chunk_starts, chunk_ends)
+    
+    data.frame(text)
 }
 
 method(chunk, list(Text, RMarkdownChunking)) <- function(x, by)
