@@ -36,6 +36,13 @@ method(print, LanguageModel) <- function(x, ...) {
     print(x@backend)
 }
 
+method(perform_chat, LanguageModel) <- function(x, messages, stream_callback,
+                                                ...)
+{
+    perform_chat(x@backend, x@name, messages, x@tools, x@io,
+                 set_props(x@params, ...), stream_callback)
+}
+
 method(chat, LanguageModel) <- function(x, input = NULL, stream_callback = NULL,
                                         ..., env = parent.frame())
 {
@@ -48,8 +55,6 @@ method(chat, LanguageModel) <- function(x, input = NULL, stream_callback = NULL,
 method(predict, LanguageModel) <- function(object, input, env = parent.frame(),
                                            ...)
 {
-    if (is.list(input))
-        input <- list(input)
     last_output(chat(object, input, env = env, ...))
 }
 
@@ -202,4 +207,18 @@ demonstrate <- function(x, examples = data.frame(input, output),
     assert_data_frame(examples, col.names = c("input", "output"))
     x@examples <- rbind(x@examples, examples)
     x
+}
+
+talks_to := new_generic("x", function(x, target) S7_dispatch())
+
+method(talks_to, LanguageModel) <- function(x, target) {
+    ChatPipeline(list(x, target))
+}
+
+method(textify, list(class_any, LanguageModel)) <- function(x, format) {
+    textify(x, format@io@input)
+}
+
+method(detextify, list(class_any, LanguageModel)) <- function(x, format) {
+    detextify(x, format@io@output)
 }

@@ -11,7 +11,7 @@ export(language_model, ollama_model, llama_cpp_model, openai_model,
 export(chat, tool, results_augmented_query_to, text_store)
 # builders
 export(equip, unequip, instruct, output_as, accept_as, can_accept_as,
-       can_output_as, demonstrate, agentize)
+       can_output_as, demonstrate, agentize, talks_to)
 # accessors
 export(last_output)
 # operations

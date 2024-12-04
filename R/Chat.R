@@ -4,7 +4,7 @@ Chat_roles <- function(self) vapply(self@messages, prop, character(1L), "role")
 
 Chat <- new_class("Chat",
                   properties = list(
-                      model = LanguageModel,
+                      model = LanguageModel | LanguageModelPipeline,
                       messages = new_list_property(of = ChatMessage),
                       contents = new_property(class_list,
                                               getter = Chat_contents),
@@ -16,16 +16,13 @@ Chat <- new_class("Chat",
                   ))
 
 method(predict, Chat) <- function(object, input, ...) {
-    if (is.list(input))
-        input <- list(input)
     last_output(chat(object, input, ...))
 }
 
 append_input <- function(chat, input) {
-    if (!is.list(input))
-        input <- list(input)
-    input <- lapply(input, \(i)
-                    convert(i, ChatMessage) |> textify(chat@model@io@input))
+    if (!is.list(input) || !inherits(input[[1L]], ChatMessage))
+        x <- list(convert(input, ChatMessage))
+    input <- lapply(input, textify, chat@model)
     chat@messages <- c(chat@messages, input)
     chat
 }
@@ -34,9 +31,7 @@ method(chat, Chat) <- function(x, input = NULL, stream_callback = NULL, ...) {
     if (length(input) == 0L)
         return(x)
     x <- append_input(x, input)
-    m <- x@model
-    output <- perform_chat(m@backend, m@name, x@messages, m@tools, m@io,
-                           set_props(m@params, ...), stream_callback)
+    output <- perform_chat(x@model, x@messages, stream_callback, ...)
     handle_output(x, output)
 }
 
@@ -115,7 +110,7 @@ handle_tool_calls <- function(x) {
 }
 
 handle_output <- function(x, output) {
-    append_messages(x, detextify(output, x@model@io@output)) |>
+    append_messages(x, detextify(output, x@model)) |>
         handle_tool_calls()
 }
 
