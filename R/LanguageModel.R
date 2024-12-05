@@ -209,12 +209,6 @@ demonstrate <- function(x, examples = data.frame(input, output),
     x
 }
 
-talks_to := new_generic("x", function(x, target) S7_dispatch())
-
-method(talks_to, LanguageModel) <- function(x, target) {
-    ChatPipeline(list(x, target))
-}
-
 method(textify, list(class_any, LanguageModel)) <- function(x, format) {
     textify(x, format@io@input)
 }
