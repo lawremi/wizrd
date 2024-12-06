@@ -1,42 +1,50 @@
-LanguageModelPipeline := new_class(
+ChatPipeline := new_class(
     class_list,
     validator = \(self) {
-        if (!all(sapply(self, inherits, LanguageModel)))
-            "all elements must inherit from LanguageModel"
+        if (!all(sapply(self, S7:::class_inherits, Chat | LanguageModel)))
+            paste("all elements must inherit from Chat or LanguageModel")
     }
 )
 
-method(print, LanguageModelPipeline) <- function(x, ...) {
+method(print, ChatPipeline) <- function(x, ...) {
     cat(S7:::obj_desc(x)); cat(" ")
-    cat(paste(names(x) %||% sapply(x, prop, "name"), collapse = " |> "))
+    cat(paste(names(x) %||% seq_along(x), collapse = " |> "))
     cat("\n")
 }
 
-method(convert, list(LanguageModel, LanguageModelPipeline)) <- function(from, to)
+method(predict, ChatPipeline) <- predict_via_chat
+
+method(chat, ChatPipeline) <- function(x, input = NULL,
+                                       stream_callback = NULL,
+                                       ..., env = parent.frame())
 {
-    LanguageModelPipeline(list(from))
+    chat(Chat(model = x, env = env), input, stream_callback, ...)
 }
 
-c_LanguageModelPipeline <- function(...) {
-    pipelines <- lapply(list(...), convert, LanguageModelPipeline)
-    LanguageModelPipeline(unlist(pipelines))
-}
-
-# separate registration due to S7 issue #510
-method(c, LanguageModel) <- c_LanguageModelPipeline
-method(c, LanguageModelPipeline) <- c_LanguageModelPipeline
-
-method(predict, LanguageModelPipeline) <- method(predict, LanguageModel)
-
-method(perform_chat, LanguageModelPipeline) <- function(x, messages,
-                                                        stream_callback, ...)
+method(perform_chat, ChatPipeline) <- function(x, messages, stream_callback, env,
+                                               ...)
 {
     stopifnot(is.null(stream_callback))
-    Reduce(predict, x, init = messages, ...)
+
+    next_input <- messages
+    ChatPipeline(lapply(x, \(xi) {
+        if (inherits(xi, Chat)) {
+            cht <- chat(xi, next_input, ...)
+            next_input <<- last_output(cht)
+            cht
+        } else {
+            next_intput <<- predict(xi, next_input, env = env, ...)
+            xi
+        }
+    }))
 }
 
-method(textify, list(class_any, LanguageModelPipeline)) <-
-    function(x, format) x
+method(textify, list(class_any, ChatPipeline)) <- function(x, format) x
+method(detextify, list(class_any, ChatPipeline)) <- function(x, format) x
 
-method(detextify, list(class_any, LanguageModelPipeline)) <-
-    function(x, format) x
+c_ChatPipeline <- function(...) {
+    ChatPipeline(unlist(list(...), recursive = FALSE))
+}
+
+method(c, ChatPipeline) <- c_ChatPipeline
+method(c, LanguageModel) <- c_ChatPipeline

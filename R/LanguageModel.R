@@ -37,7 +37,7 @@ method(print, LanguageModel) <- function(x, ...) {
 }
 
 method(perform_chat, LanguageModel) <- function(x, messages, stream_callback,
-                                                ...)
+                                                env, ...)
 {
     perform_chat(x@backend, x@name, messages, x@tools, x@io,
                  set_props(x@params, ...), stream_callback)
@@ -52,11 +52,12 @@ method(chat, LanguageModel) <- function(x, input = NULL, stream_callback = NULL,
          stream_callback, ...)
 }
 
-method(predict, LanguageModel) <- function(object, input, env = parent.frame(),
-                                           ...)
+predict_via_chat <- function(object, input, env = parent.frame(), ...)
 {
     last_output(chat(object, input, env = env, ...))
 }
+
+method(predict, LanguageModel) <- predict_via_chat
 
 instruct <- function(x, ...) {
     set_props(x, instructions = paste0(...))

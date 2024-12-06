@@ -4,7 +4,7 @@ Chat_roles <- function(self) vapply(self@messages, prop, character(1L), "role")
 
 Chat <- new_class("Chat",
                   properties = list(
-                      model = LanguageModel | LanguageModelPipeline,
+                      model = LanguageModel | ChatPipeline,
                       messages = new_list_property(of = ChatMessage),
                       contents = new_property(class_list,
                                               getter = Chat_contents),
@@ -34,7 +34,7 @@ method(chat, Chat) <- function(x, input = NULL, stream_callback = NULL, ...) {
     if (length(input) == 0L)
         return(x)
     x <- append_input(x, input)
-    output <- perform_chat(x@model, x@messages, stream_callback, ...)
+    output <- perform_chat(x@model, x@messages, stream_callback, x@env, ...)
     handle_output(x, output)
 }
 
@@ -129,3 +129,5 @@ readline_chat <- function(model, env = parent.frame()) {
     }
     invisible(ctx)
 }
+
+method(c, Chat) <- c_ChatPipeline
