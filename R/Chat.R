@@ -12,7 +12,10 @@ Chat <- new_class("Chat",
                                              getter = Chat_objects),
                       roles = new_property(class_list,
                                            getter = Chat_roles),
-                      env = class_environment
+                      env = new_property(
+                          class_environment,
+                          default = quote(parent.frame())
+                      )
                   ))
 
 method(predict, Chat) <- function(object, input, ...) {
