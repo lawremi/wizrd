@@ -11,6 +11,8 @@ test_that("Pipelines work", {
     ans <- last_output(cht)
     expect_identical(ans, "Two")
 
-    nested_ans <- last_output(cht@model$namer)
-    expect_identical(ans, nested_ans)
+    nested_output <- last_output(cht@model$namer)
+    expect_identical(ans, nested_output)
+    nested_input <- wizrd:::last_input(cht@model$namer)
+    expect_identical(nested_input, "2")
 })

@@ -18,6 +18,14 @@ Chat <- new_class("Chat",
                       )
                   ))
 
+method(convert, list(LanguageModel, Chat)) <- function(from, to,
+                                                       messages = list(), ...)
+{
+    system_msg <- ChatMessage(role = "system",
+                              content = compile_instructions(from))
+    Chat(model = from, messages = c(system_msg, messages), ...)
+}
+
 method(predict, Chat) <- function(object, input, ...) {
     last_output(chat(object, input, ...))
 }
@@ -64,7 +72,7 @@ last_message <- function(x, role = NULL) {
 }
 
 last_prompt <- function(x) last_message(x, "user")
-last_input <- function(x) last_input(x)@object
+last_input <- function(x) last_prompt(x)@object
 
 last_response <- function(x) last_message(x, "assistant")
 last_output <- function(x) {

@@ -46,10 +46,7 @@ method(perform_chat, LanguageModel) <- function(x, messages, stream_callback,
 method(chat, LanguageModel) <- function(x, input = NULL, stream_callback = NULL,
                                         ..., env = parent.frame())
 {
-    system_msg <- ChatMessage(role = "system",
-                              content = compile_instructions(x))
-    chat(Chat(model = x, messages = list(system_msg), env = env), input,
-         stream_callback, ...)
+    chat(convert(x, Chat, env = env), input, stream_callback, ...)
 }
 
 predict_via_chat <- function(object, input, env = parent.frame(), ...)

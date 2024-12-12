@@ -30,8 +30,8 @@ method(perform_chat, ChatPipeline) <- function(x, messages, stream_callback, env
     messages <- head(messages, -1L)
     last_message <- NULL
     pipeline <- ChatPipeline(lapply(x, \(xi) {
-        if (inherits(xi, LanguageModel))
-            cht <- Chat(model = xi, messages = messages, env = env)
+        if (!inherits(xi, Chat))
+            cht <- convert(xi, Chat, messages = messages, env = env)
         else cht <- xi
         cht <- chat(cht, next_input, ...)
         last_message <<- last_message(cht)
