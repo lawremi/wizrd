@@ -26,20 +26,29 @@ method(perform_chat, ChatPipeline) <- function(x, messages, stream_callback, env
 {
     stopifnot(is.null(stream_callback))
 
-    next_input <- messages
-    ChatPipeline(lapply(x, \(xi) {
-        if (inherits(xi, Chat)) {
-            cht <- chat(xi, next_input, ...)
-            next_input <<- last_output(cht)
+    next_input <- messages[[length(messages)]]
+    messages <- head(messages, -1L)
+    last_message <- NULL
+    pipeline <- ChatPipeline(lapply(x, \(xi) {
+        if (inherits(xi, LanguageModel))
+            cht <- Chat(model = xi, messages = messages, env = env)
+        else cht <- xi
+        cht <- chat(cht, next_input, ...)
+        last_message <<- last_message(cht)
+        next_input <<- last_message@object
+        if (inherits(xi, Chat))
             cht
-        } else {
-            next_intput <<- predict(xi, next_input, env = env, ...)
-            xi
-        }
+        else xi
     }))
+    
+    Chat(model = pipeline, messages = c(messages, last_message))
 }
 
-method(textify, list(class_any, ChatPipeline)) <- function(x, format) x
+method(textify, list(class_any, ChatPipeline)) <- function(x, format) {
+    if (length(format) > 0L)
+        textify(x, format[[1L]])
+}
+
 method(detextify, list(class_any, ChatPipeline)) <- function(x, format) x
 
 c_ChatPipeline <- function(...) {

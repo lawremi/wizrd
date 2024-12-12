@@ -23,8 +23,9 @@ method(predict, Chat) <- function(object, input, ...) {
 }
 
 append_input <- function(chat, input) {
+    stopifnot(length(input) > 0L)
     if (!is.list(input) || !inherits(input[[1L]], ChatMessage))
-        x <- list(convert(input, ChatMessage))
+        input <- list(convert(input, ChatMessage))
     input <- lapply(input, textify, chat@model)
     chat@messages <- c(chat@messages, input)
     chat
@@ -112,9 +113,15 @@ handle_tool_calls <- function(x) {
     chat(x, msgs)
 }
 
-handle_output <- function(x, output) {
+handle_output := new_generic(c("x", "output"))
+
+method(handle_output, list(Chat, class_any)) <- function(x, output) {
     append_messages(x, detextify(output, x@model)) |>
         handle_tool_calls()
+}
+
+method(handle_output, list(Chat, Chat)) <- function(x, output) {
+    set_props(x, model = output@model, messages = output@messages)
 }
 
 readline_chat <- function(model, env = parent.frame()) {
@@ -131,3 +138,7 @@ readline_chat <- function(model, env = parent.frame()) {
 }
 
 method(c, Chat) <- c_ChatPipeline
+
+method(textify, list(class_any, Chat)) <- function(x, format) {
+    textify(x, format@model)
+}
