@@ -60,7 +60,7 @@ test_that("models can call R functions as tools", {
     model <- equip(model, get_mean, "Use to get the mean of an R variable")
     var <- 1:10
     model@instructions <-
-        "Only respond with JSON, not in markdown. No sentences."
+        "Always respond JSON, with field 'mean'. Only JSON. No text. No prefix."
     output <- predict(model, "What is the mean of var?")
     expect_equal(jsonlite::fromJSON(output)$mean, mean(var))
 
