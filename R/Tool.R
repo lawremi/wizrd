@@ -104,43 +104,38 @@ add_Rd <- function(tool) {
 
     if (is.null(tool@description))
         tool@description <- Rd_description(Rd)
-    args <- Rd_args(Rd) |> dodge_dots() |> as.character()
-    tool@param_descriptions[params_to_describe] <- args[params_to_describe]
+    args <- Rd_args(Rd) |> dodge_dots()
+    tool@param_descriptions[params_to_describe] <-
+        as.character(args[params_to_describe])
     if (is.null(tool@value_description))
         tool@value_description <- Rd_value(Rd)
 
     tool
 }
 
-tool <- function(FUN, signature = any_signature(FUN),
-                 name = deparse(substitute(FUN)),
-                 description = NULL, param_descriptions = character(),
-                 value_description = NULL,
-                 examples = data.frame(input = character(),
-                                       output = character()))
-{
-    force(name)
-    FUN <- match.fun(FUN)
-    Tool(FUN, name = name, description = description, signature = signature,
-         param_descriptions = param_descriptions,
-         value_description = value_description,
-         examples = examples) |> add_Rd()
+tool <- function(x, name = deparse(substitute(x)), ...) {
+    convert(x, Tool, name = name, ...)
 }
 
-equip <- function(x, tool, instructions = NULL) {
-    if (!inherits(tool, Tool) && is.function(tool))
-        tool <- eval(as.call(c(wizrd::tool, substitute(tool))))
+method(convert, list(class_function, Tool)) <- function(from, to, ...) {
+    Tool(from, ...) |> add_Rd()
+}
+
+equip <- function(x, tool, instructions = NULL, ...) {
+    stopifnot(inherits(x, LanguageModel))
+    if (!inherits(tool, Tool))
+        tool <- wizrd::tool(tool, name = deparse(substitute(tool)), ...)
     x@tools[[tool@name]] <- bind(tool, x, instructions)
     x
 }
 
 unequip <- function(x, name) {
-    stopifnot(inherits(x, Tool))
+    stopifnot(inherits(x, LanguageModel))
     x@tools[[name]] <- NULL
     x
 }
 
-can_accept_as <- function(`_x`, `_parameters` = list(...), ...) {
+can_accept_as <- function(`_x`, ..., `_parameters` = list(...)) {
     x <- `_x`
     parameters <- `_parameters`
     stopifnot(inherits(x, Tool))
