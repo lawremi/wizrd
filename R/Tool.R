@@ -202,6 +202,7 @@ tool_input_json_schema <- function(sig_params, param_descs) {
             param_schema <- list(description = "")
         param_schema
     }, schema$properties, param_descs)
+    schema$required <- NULL
     schema
 }
 
