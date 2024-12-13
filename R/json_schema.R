@@ -104,21 +104,20 @@ method(default_description, S7_S3_class) <- function(from) {
 base_json_schema <- function(from, description = NULL, scalar = FALSE,
                              named = FALSE)
 {
-    schema <- list()
+    schema <- setNames(list(), character())
     type <- if (named && "list" %in% from$class)
                 "object"
-            else if (!scalar) "array"
-            else json_schema_type(from)
+    else if (!scalar) "array"
+    else json_schema_type(from)    
+    schema$description <- description %||% if (scalar) default_description(from)
     if (is.null(type))
-        return(c(schema, description = description))
+        return(schema)
     schema$type <- type
     if (type == "array" && !scalar)
         schema$items <- base_json_schema(from, scalar = TRUE)
     else if (type == "object")
         schema$patternProperties$"^.*$" <- list()
     
-    schema$description <- description %||% if (scalar) default_description(from)
-
     if (scalar) {
         schema$format <- if ("Date" %in% from$class)
                              "date"
