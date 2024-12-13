@@ -268,7 +268,8 @@ Rd_src <- function(Rd) {
 Rd_parse_args <- function(args) {
     items <- Filter(\(x) attr(x, "Rd_tag") == "\\item", args)
     ans <- vapply(items, \(x) Rd_src(x[[2L]]), character(1L))
-    ans_names <- vapply(items, \(x) gsub("\\dots", "...", Rd_src(x[[1L]])),
+    ans_names <- vapply(items, \(x) gsub("\\dots{}", "...", Rd_src(x[[1L]]),
+                                         fixed = TRUE),
                         character(1L))
     ans_names_split <- strsplit(ans_names, ",", fixed = TRUE)
     setNames(rep(ans, lengths(ans_names_split)),
