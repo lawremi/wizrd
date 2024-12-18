@@ -1,3 +1,9 @@
+test_that("models can generate embeddings", {
+    model <- nomic()
+    embedding <- embed_text(model, c("test", "test"))
+    expect_equal(dim(embedding), c(2L, 768L))
+})
+
 test_that("RAG works with Rd", {
     chunks <- chunk(tools::Rd_db("S7"))
     store <- text_store(nomic(), chunks)
