@@ -75,6 +75,10 @@ class_glue <- new_S3_class("glue")
 
 method(convert, list(class_character | class_glue, TextFormat)) <-
     function(from, to) {
+        if (resembles_filename(from))
+            from <- read_as_string(from)
+        else if (resembles_hub_id(from))
+            from <- pull_langsmith_template(from)
         glue_format(from)
     }
 
