@@ -118,7 +118,7 @@ method(chunk, list(class_character | class_list, Chunking | class_list)) <-
     }
 
 method(chunk, list(File, class_any)) <- function(x, by) {
-    chunk(Text(readLines(x) |> paste(collapse = "\n")), by)
+    chunk(Text(read_as_string(x)), by)
 }
 
 method(chunk, list(Text, class_any)) <- function(x, by) {

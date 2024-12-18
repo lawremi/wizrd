@@ -144,7 +144,7 @@ method(textify, list(class_data.frame, TextFormat)) <- function(x, format) {
     con <- file()
     on.exit(close(con))
     utils::write.csv(x, con, row.names = FALSE)
-    paste(readLines(con), collapse = "\n")
+    read_as_string(con)
 }
 
 nativeRaster <- new_S3_class("nativeRaster")

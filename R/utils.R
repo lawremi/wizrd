@@ -557,3 +557,10 @@ cumsum_breaks <- function(x, threshold, max_overlap = 0L) {
     ends <- c(ends, length(x))
     data.frame(starts, ends)
 }
+
+resembles_filename <- function(x) tools::file_ext(x) != ""
+
+resembles_hub_id <- function(x) length(strsplit(x, "/")[[1L]]) == 2L
+
+read_as_string <- function(x) paste(readLines(x), collapse = "\n")
+
