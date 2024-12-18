@@ -1,5 +1,5 @@
 test_that("We can make a model callable as a tool", {
-    model <- openai_model() |> accept_as("Who created {language}?") |>
+    model <- openai_model() |> prompt_as("Who created {language}?") |>
         output_as(data.frame(first_name = character(), last_name = character()))
     agt <- convert(model, wizrd:::Tool)
     ans <- agt(list(language = "R"))

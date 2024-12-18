@@ -144,7 +144,7 @@ can_accept_as <- function(`_x`, ..., `_parameters` = list(...)) {
     x
 }
 
-can_output_as <- function(x, type) {
+can_return_as <- function(x, type) {
     stopifnot(inherits(x, Tool))
     x@signature@value <- type
     x

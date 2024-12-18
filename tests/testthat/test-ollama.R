@@ -76,7 +76,7 @@ test_that("models can call R functions as tools", {
     aggregate_tool <- tool(method(aggregate, class_formula)) |>
         can_accept_as(x = class_formula, data = class_name, FUN = class_name,
                       subset = class_call) |>
-        can_output_as(class_data.frame)
+        can_return_as(class_data.frame)
     model <- unequip("mean") |> equip(model, aggregate_tool)
     output <- predict(model, "Mean of MPG.city for each Manufacturer in the Cars93 dataset")
     expect_equal(as.numeric(output), mean(var))

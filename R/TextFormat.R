@@ -78,7 +78,7 @@ method(convert, list(class_character | class_glue, TextFormat)) <-
         glue_format(from)
     }
 
-accept_as <- function(x, schema) {
+prompt_as <- function(x, schema) {
     x@io@input <- convert(schema, TextFormat)
     x
 }
