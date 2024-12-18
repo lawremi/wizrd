@@ -189,6 +189,8 @@ method(textify, list(class_list | class_any | class_data.frame, JSONFormat)) <-
 
 method(textify, list(class_list | class_any | class_data.frame, GlueFormat)) <-
     function(x, format) {
+        if (is.character(x))
+            x <- list(input = x)
         glue(format@template, .envir = as.environment(x))
     }
 
