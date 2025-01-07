@@ -23,7 +23,8 @@ Imports:
     httr2 (>= 1.0.4),
     jsonlite,
     checkmate,
-    glue
+    glue,
+    cli
 Suggests:
     processx,
     base64enc,
