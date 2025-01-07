@@ -19,10 +19,12 @@ Chat <- new_class("Chat",
                   ))
 
 method(convert, list(LanguageModel, Chat)) <- function(from, to,
-                                                       messages = list(), ...)
+                                                       messages = list(),
+                                                       system_params = list(),
+                                                       ...)
 {
-    system_msg <- ChatMessage(role = "system",
-                              content = compile_instructions(from))
+    system_prompt <- textify_system_prompt(from, system_params)
+    system_msg <- ChatMessage(role = "system", content = system_prompt)
     Chat(model = from, messages = c(system_msg, messages), ...)
 }
 

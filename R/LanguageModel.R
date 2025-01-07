@@ -10,6 +10,14 @@ LanguageModel <- new_class("LanguageModel",
                                params = LanguageModelParams,
                                examples = new_data_frame_property(
                                    col.names = c("input", "output")
+                               ),
+                               system_prompt_format = new_property(
+                                   TextFormat,
+                                   default = paste(c("{tool_instructions}",
+                                                     "{output_instructions}",
+                                                     "{task_instructions}"),
+                                                   collapse = "\n\n") |>
+                                       GlueFormat() |> quote()
                                )
                            ))
 
@@ -44,9 +52,11 @@ method(perform_chat, LanguageModel) <- function(x, messages, stream_callback,
 }
 
 method(chat, LanguageModel) <- function(x, input = NULL, stream_callback = NULL,
-                                        ..., env = parent.frame())
+                                        system_params = list(),
+                                        env = parent.frame(), ...)
 {
-    chat(convert(x, Chat, env = env), input, stream_callback, ...)
+    chat(convert(x, Chat, env = env, system_params = system_params), input,
+         stream_callback, ...)
 }
 
 predict_via_chat <- function(object, input, env = parent.frame(), ...)
@@ -60,13 +70,14 @@ instruct <- function(x, ...) {
     set_props(x, instructions = paste0(...))
 }
 
-compile_instructions <- new_generic("compile_instructions", "x")
-
-method(compile_instructions, LanguageModel) <- function(x) {
-    paste(c(tool_instructions(x),
-            instructions(x@io@output, x),
-            x@instructions),
-          collapse = "\n\n")
+textify_system_prompt <- function(x, params = list()) {
+    all_params <- c(
+        tool_instructions = tool_instructions(x),
+        output_instructions = instructions(x@io@output, x),
+        task_instructions = x@instructions
+    )
+    all_params[names(params)] <- params
+    textify(all_params, x@system_prompt_format) |> trimws()
 }
 
 instructions <- new_generic("instructions", c("on", "to"))
@@ -75,7 +86,7 @@ tool_instructions <- new_generic("tool_instructions", "x")
 
 method(tool_instructions, LanguageModel) <- function(x) {
     if (length(x@tools) == 0L)
-        return(NULL)
+        return("")
     
     paste0("You have access to one or more tools named ",
            paste(names(x@tools), collapse = ", "),
@@ -91,11 +102,7 @@ method(tool_instructions, LanguageModel) <- function(x) {
            })), collapse = "\n\n"))
 }
 
-method(instructions,
-       list(TextFormat, LanguageModel)) <- function(on, to)
-{
-    NULL
-}
+method(instructions, list(TextFormat, LanguageModel)) <- function(on, to) ""
 
 describe_examples <- function(ex, io = TextProtocol()) {
     if (nrow(ex) == 0L)
