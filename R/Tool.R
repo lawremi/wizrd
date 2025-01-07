@@ -1,22 +1,23 @@
 validate_Tool <- function(self) {
-    formal_names <- names(tool_formals(self))
-    extra_sig_args <- setdiff(names(self@signature@parameters@properties),
-                              formal_names)
-    extra_param_descs <- setdiff(names(self@param_descriptions), formal_names)
-
-    ex_problems <- unique(unlist(lapply(self@examples$input, \(ex) {
+    example_problems <- unique(unlist(lapply(self@examples$input, \(ex) {
         if (!inherits(ex, self@signature@parameters))
             "examples must be instances of @signature@parameters"
     })))
-    
-    c(if (length(extra_sig_args))
-        paste("@signature@parameters contains extra args:",
-              paste(extra_sig_args, collapse = ", ")),
-      if (length(extra_param_descs))
-        paste("@param_descriptions contains extra args:",
-              paste(extra_param_descs, collapse = ", ")),
-      ex_problems
-      )
+
+    formal_names <- names(tool_formals(self))
+    extra_arg_problems <- if (!"..." %in% formal_names) {
+        extra_sig_args <- setdiff(names(self@signature@parameters@properties),
+                                  formal_names)
+        extra_param_descs <- setdiff(names(self@param_descriptions),
+                                     formal_names)
+        c(if (length(extra_sig_args))
+            paste("@signature@parameters contains extra args:",
+                  paste(extra_sig_args, collapse = ", ")),
+          if (length(extra_param_descs))
+              paste("@param_descriptions contains extra args:",
+                    paste(extra_param_descs, collapse = ", ")))
+    }
+    c(example_problems, extra_arg_problems)
 }
 
 Tool <- new_class("Tool", class_function,
@@ -139,8 +140,8 @@ can_accept_as <- function(`_x`, ..., `_parameters` = list(...)) {
     x <- `_x`
     parameters <- `_parameters`
     stopifnot(inherits(x, Tool))
-    x@signature@parameters <- match.call(x, as.call(c(x, parameters)),
-                                         expand.dots = FALSE)[-1L] |> as.list()
+    x@signature@parameters <- match.call(x, as.call(c(x, parameters)))[-1L] |>
+        as.list()
     x
 }
 
