@@ -41,16 +41,6 @@ PDFChunking := new_class(HierarchicalChunking)
 
 RdChunking := new_class(Chunking)
 
-ScalarString := new_class(
-    class_character,
-    validator = \(self) {
-        if (length(self) != 1L || is.na(self))
-            "must be a single, non-NA string"
-    })
-
-File := new_class(ScalarString)
-Text := new_class(ScalarString)
-
 method(as.data.frame, Text) <-
     function(x, row.names = NULL, optional = FALSE, ...) {
         as.data.frame(S7_data(x), row.names = row.names,
@@ -93,7 +83,7 @@ method(chunk, list(class_any, class_missing)) <- function(x, by, ...) {
 }
 
 is_text <- function(x)
-    if (is.character(x)) tools::file_ext(x) == "" else rep(TRUE, length(x))
+    if (is.character(x)) resembles_text(x) else rep(TRUE, length(x))
 
 chunk_text_or_file <- function(x, by, ...) {
     props(by) <- list(...)

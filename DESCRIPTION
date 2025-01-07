@@ -32,6 +32,7 @@ Suggests:
     RcppAnnoy,
     parsermd,
     pdftools,
+    whisker,
     knitr,
     rmarkdown,
     testthat (>= 3.0.0)
@@ -47,4 +48,4 @@ Collate: utils.R ToolCall.R TextFormat.R ChatMessage.R LanguageModelParams.R
 	 LanguageModel.R ChatPipeline.R Chat.R LanguageModelTool.R
 	 LanguageModelServer.R OpenAIAPIServer.R LlamaCppServer.R OllamaServer.R
 	 AzureOpenAIServer.R annoy.R TextStore.R openai.R become.R json_schema.R
-	 chunk.R zzz.R
+	 chunk.R langsmith-hub.R zzz.R

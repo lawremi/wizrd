@@ -221,3 +221,27 @@ method(textify, list(class_any, LanguageModel)) <- function(x, format) {
 method(detextify, list(class_any, LanguageModel)) <- function(x, format) {
     detextify(x, format@io@output)
 }
+
+prompt_as := new_generic(c("x", "format"))
+
+method(prompt_as, list(LanguageModel, class_any)) <- function(x, format) {
+    x@io@input <- convert(format, TextFormat)
+    x
+}
+
+interpret_format_string <- function(x) {
+    if (resembles_file(x))
+        File(x)
+    else if (resembles_hub_id(x))
+        HubID(x)
+    else as_glue(x)
+}
+
+method(prompt_as, list(LanguageModel, class_character)) <- function(x, format) {
+    prompt_as(x, interpret_format_string(format))
+}
+
+system_prompt_as <- function(x, format) {
+    x@system_prompt_format <- convert(format, TextFormat)
+    x
+}

@@ -558,7 +558,20 @@ cumsum_breaks <- function(x, threshold, max_overlap = 0L) {
     data.frame(starts, ends)
 }
 
-resembles_filename <- function(x) tools::file_ext(x) != ""
+ScalarString := new_class(
+    class_character,
+    validator = \(self) {
+        if (length(self) != 1L || is.na(self))
+            "must be a single, non-NA string"
+    })
+
+File := new_class(ScalarString)
+Text := new_class(ScalarString)
+HubID := new_class(ScalarString)
+
+resembles_file <- function(x) tools::file_ext(x) != ""
+
+resembles_text <- function(x) !resembles_file(x)
 
 resembles_hub_id <- function(x) length(strsplit(x, "/")[[1L]]) == 2L
 

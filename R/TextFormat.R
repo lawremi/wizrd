@@ -23,7 +23,12 @@ CodeFormat <- new_class("CodeFormat", TextFormat,
                         properties = list(language = nullable(prop_string)))
 
 GlueFormat <- new_class("GlueFormat", TextFormat,
-                        properties = list(template = prop_string))
+                        properties = list(template = class_character))
+
+whisker := new_class(ScalarString)
+
+WhiskerFormat := new_class(TextFormat,
+                           properties = list(template = whisker))
 
 fits_schema_class <- function(x) {
     S7:::class_inherits(x, JSONFormat@properties$schema_class$class)
@@ -71,20 +76,22 @@ output_as <- function(x, format) {
     x
 }
 
-class_glue <- new_S3_class("glue")
+method(convert, list(File, TextFormat)) <- function(from, to) {
+    convert(as_glue(read_as_string(from)), to)
+}
 
-method(convert, list(class_character | class_glue, TextFormat)) <-
-    function(from, to) {
-        if (resembles_filename(from))
-            from <- read_as_string(from)
-        else if (resembles_hub_id(from))
-            from <- pull_langsmith_template(from)
-        glue_format(from)
-    }
+method(convert, list(HubID, TextFormat)) <- function(from, to) {
+    convert(pull_langsmith_template(from), to)
+}
 
-prompt_as <- function(x, schema) {
-    x@io@input <- convert(schema, TextFormat)
-    x
+class_glue <- new_S3_class(c("glue", "character"))
+
+method(convert, list(class_glue, TextFormat)) <- function(from, to) {
+    GlueFormat(from)
+}
+
+method(convert, list(whisker, TextFormat)) <- function(from, to) {
+    WhiskerFormat(from)
 }
 
 method(convert, list(PlainTextFormat, S7_property)) <- function(from, to) {
@@ -191,12 +198,20 @@ method(textify, list(class_list | class_any | class_data.frame, JSONFormat)) <-
             unclass()
     }
 
-method(textify, list(class_list | class_any | class_data.frame, GlueFormat)) <-
-    function(x, format) {
-        if (is.character(x))
-            x <- list(input = x)
-        glue(format@template, .envir = as.environment(x))
-    }
+template_contexts <- class_list | class_data.frame | class_any
+
+method(textify, list(template_contexts, GlueFormat)) <- function(x, format) {
+    if (is.character(x))
+        x <- list(input = x)
+    glue(format@template, .envir = as.environment(x))
+}
+
+method(textify, list(template_contexts, WhiskerFormat)) <- function(x, format) {
+    require_ns("whisker", "instantiate whisker templates")
+    if (is.character(x))
+        x <- list(input = x)
+    whisker::whisker.render(format@template, as.environment(x))
+}
 
 ## Could this be done with S7?
 jsonic <- function(x) structure(x, class = "jsonic")
