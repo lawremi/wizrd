@@ -5,7 +5,7 @@ importFrom(stats, predict, setNames, aggregate)
 importFrom(glue, glue, as_glue)
 
 # model constructors
-export(language_model, ollama_model, llama_cpp_model, openai_model,
+export(ollama_model, llama_cpp_model, openai_model,
        azure_openai_model, llama_cpp_model_from_ollama)
 # other constructors
 export(chat, tool, results_augmented_query_to, text_store)
