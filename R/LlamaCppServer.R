@@ -65,12 +65,12 @@ install_llamafile <- function() {
     url <- llamafile_url()
 
     dest_file <- tempfile(fileext = ".zip")
-    download.file(url, dest_file, mode = "wb")
+    utils::download.file(url, dest_file, mode = "wb")
 
     user_dir <- tools::R_user_dir("wizrd", which = "cache")
     dir.create(user_dir, recursive = TRUE, showWarnings = FALSE)
     
-    unzip(dest_file, exdir = user_dir)
+    utils::unzip(dest_file, exdir = user_dir)
     unlink(dest_file)
 
     Sys.chmod(dir(llamafile_bin_dir(), full.names = TRUE), "755")
