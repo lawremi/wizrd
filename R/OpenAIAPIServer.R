@@ -240,7 +240,7 @@ method(perform_embedding, OpenAIAPIServer) <- function(x, model, data,
                                                        ndim = NULL)
 {
     assert_string(model)
-    assert_int(ndim, lower = 1L, null.ok = TRUE)
+    assert_integerish(ndim, lower = 1L, null.ok = TRUE)
     
     openai_embedding_body(model, data, ndim) |>
         openai_send_embedding_body(x) |>

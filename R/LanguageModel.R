@@ -187,7 +187,7 @@ interpret_symbols <-function(x) {
 }
 
 method(embed_text, LanguageModel) <- function(x, data, ndim = NULL) {
-    assert_int(ndim, null.ok = TRUE)
+    assert_integerish(ndim, null.ok = TRUE)
 
     if (length(data) == 0L)
         return(matrix(numeric(), ncol = ndim))
