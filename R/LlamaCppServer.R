@@ -1,4 +1,4 @@
-llamafile_version <- "0.8.13"
+llamafile_version <- "0.9.0"
 
 LlamaCppServer <- new_class("LlamaCppServer", OpenAIAPIServer,
                             properties = list(
