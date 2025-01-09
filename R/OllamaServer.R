@@ -92,9 +92,15 @@ ollama_model <- function(name, pull = NA, server = ollama_server(), ...) {
     language_model(server, name, ...)
 }
 
+ollama_dir <- function() {
+    file.path(home_dir(), ".ollama")
+}
+
 ollama_weights_path <- function(name) {
     assert_string(name)
-    lib <- path.expand("~/.ollama/models/manifests/registry.ollama.ai/library/")
+    ollama <- ollama_dir()
+    lib <- file.path(ollama, "models", "manifests", "registry.ollama.ai",
+                     "library")
     manifest_path <- file.path(lib, sub(":", .Platform$file.sep, name))
     if (!file.exists(manifest_path))
         stop("no manifest found for ", name)
@@ -102,7 +108,7 @@ ollama_weights_path <- function(name) {
     digest <- manifest$layers$digest[manifest$layers$mediaType ==
                                          "application/vnd.ollama.image.model"]
     stopifnot(length(digest) == 1L)
-    blobs <- path.expand("~/.ollama/models/blobs")
+    blobs <- file.path(ollama, "models", "blobs")
     file.path(blobs, sub(":", "-", digest))
 }
 

@@ -591,3 +591,11 @@ named_list <- function(...) {
         names(ans) <- as.character(seq_along(ans))
     ans
 }
+
+home_dir <- function() {
+    if (.Platform$OS.type == "windows") {
+        Sys.getenv("USERPROFILE")
+    } else {
+        path.expand("~")
+    }
+}
