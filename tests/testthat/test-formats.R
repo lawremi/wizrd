@@ -24,7 +24,7 @@ test_that("structured output works", {
 })
 
 test_that("glue templating works", {
-    ans <- llama3() |>
+    ans <- llama() |>
         accept_as("Output a {nchar}-letter word starting with '{initial}'.") |>
         predict(list(nchar = 4L, initial = "a"))
     expect_equal(ans, "Able")

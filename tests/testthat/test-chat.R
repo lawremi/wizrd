@@ -1,5 +1,5 @@
 test_that("chat() and predict() work for text messages", {
-    model <- llama3()
+    model <- llama()
     model@instructions <- "Respond with a single sentence"
     
     chat <- chat(model, "Who created R?")
@@ -37,7 +37,7 @@ test_that("chat() and predict() work for images", {
 })
 
 test_that("chat() can stream responses", {
-    model <- llama3()
+    model <- llama()
     
     model@instructions <- "Respond with a single sentence"
 

@@ -1,5 +1,5 @@
 test_that("models can call R functions as tools", {
-    model <- llama3()
+    model <- ollama_llama()
     
     get_mean <- function(name) mean(get(name))
     model <- equip(model, get_mean, "Use to get the mean of an R variable")
@@ -35,7 +35,8 @@ test_that("We can make a model callable as a tool", {
     expect_contains(ans$first_name, "Robert")
 
     var <- 1:3
-    meanie := llama() |> equip(tool(mean) |> can_accept_as(x = class_name)) |>
+    meanie := ollama_llama() |>
+        equip(tool(mean) |> can_accept_as(x = class_name)) |>
         instruct("Compute the mean of a variable")
     ans <- openai_model() |>
         equip(meanie, instructions = "Call to find the mean of a variable") |>
