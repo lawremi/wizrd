@@ -14,11 +14,9 @@ s7_schema <- list(
             description = "Base R object representing the S7 object. Omit if the object does not inherit from a base class."
         )
     ),
-    patternProperties = list(
-        "^.*$" = list(
-            type = c("string", "number", "boolean", "array", "object", "null"),
-            description = "The S7 object's properties."
-        )
+    additionalProperties = list(
+        type = c("string", "number", "boolean", "array", "object", "null"),
+        description = "The S7 object's properties."
     ),
     description = "An R S7 object."
 )
@@ -56,7 +54,8 @@ method(as_json_schema, S7_class) <- function(from, description = NULL, ...) {
                    properties = prop_schema,
                    additionalProperties = FALSE)
     description <- c(description, if (!is.null(Rd)) Rd_description(Rd))
-    schema$description <- paste(description, collapse = " ")
+    if (!is.null(description))
+        schema$description <- paste(description, collapse = " ")
     schema$required <- I(names(props))
     schema
 }
@@ -104,7 +103,7 @@ method(default_description, S7_S3_class) <- function(from) {
 base_json_schema <- function(from, description = NULL, scalar = FALSE,
                              named = FALSE)
 {
-    schema <- setNames(list(), character())
+    schema <- named_list()
     type <- if (named && "list" %in% from$class)
                 "object"
     else if (!scalar) "array"
@@ -116,7 +115,7 @@ base_json_schema <- function(from, description = NULL, scalar = FALSE,
     if (type == "array" && !scalar)
         schema$items <- base_json_schema(from, scalar = TRUE)
     else if (type == "object")
-        schema$patternProperties$"^.*$" <- list()
+        schema$additionalProperties <- TRUE
     
     if (scalar) {
         schema$format <- if ("Date" %in% from$class)
@@ -157,27 +156,28 @@ method(as_json_schema, S7_S3_class) <- function(from, description = NULL,
 
 method(as_json_schema, S7_property) <- function(from, description = NULL, ...) {
     schema <- as_json_schema(from$class, ...)
-    schema$description <- paste(c(schema$description, description),
-                                collapse = " ")
+    description <- c(schema$description, description)
+    if (!is.null(description))
+        schema$description <- paste(description, collapse = " ")
     schema
 }
 
 method(as_json_schema, scalar_S7_property) <- function(from, description = NULL)
 {
-    as_json_schema(super(from, S7_property), description, scalar = TRUE)
+    as_json_schema(s3_super(from, S7_property), description, scalar = TRUE)
 }
 
 method(as_json_schema, string_S7_property) <- function(from, description = NULL)
 {
-    schema <- as_json_schema(super(from, scalar_S7_property), description)
+    schema <- as_json_schema(s3_super(from, scalar_S7_property), description)
     schema$enum <- from$choices
     schema
 }
 
 method(as_json_schema, list_S7_property) <- function(from, description = NULL)
 {
-    schema <- as_json_schema(super(from, scalar_S7_property), description,
-                             named = from$named)
+    schema <- as_json_schema(s3_super(from, S7_property), description,
+                             named = is.na(from$named) || from$named)
     c(schema, items = if (!is.null(from$of)) list(as_json_schema(from$of)))
 }
 
@@ -190,7 +190,7 @@ method(as_json_schema, data_frame_S7_property) <- function(from,
 method(as_json_schema, numeric_S7_property) <- function(from,
                                                         description = NULL)
 {
-    schema <- as_json_schema(super(from, scalar_S7_property), description)
+    schema <- as_json_schema(s3_super(from, scalar_S7_property), description)
     c(schema, minimum = from$min, maximum = from$max)
 }
 

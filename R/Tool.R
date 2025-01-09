@@ -194,10 +194,11 @@ json_schema_param_descs <- function(tool) {
 tool_input_json_schema <- function(sig_params, param_descs) {
     schema <- as_json_schema(sig_params)
     schema$properties <- Map(function(param_schema, param_desc) {
-        if (is.list(param_desc))
-            param_schema$description <-
-                paste(c(param_schema$description, param_desc$description),
-                      collapse = " ")
+        if (is.list(param_desc)) {
+            description <- c(param_schema$description, param_desc$description)
+            if (!is.null(description))
+                param_schema$description <- paste(description, collapse = " ")
+        }
         if (length(param_schema) == 0L)
             # workaround bug in Ollama that requires a 'description'
             param_schema <- list(description = "")

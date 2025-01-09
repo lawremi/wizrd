@@ -577,3 +577,17 @@ resembles_hub_id <- function(x) length(strsplit(x, "/")[[1L]]) == 2L
 
 read_as_string <- function(x) paste(readLines(x), collapse = "\n")
 
+s3_super <- function(from, to) {
+    m <- match(to$class[1L], class(from))
+    if (is.na(m))
+        stop("'from' is not an instance of '", to$class, "'")
+    class(from) <- tail(class(from), 1L - m)
+    from
+}
+
+named_list <- function(...) {
+    ans <- list(...)
+    if (is.null(names(ans)))
+        names(ans) <- as.character(seq_along(ans))
+    ans
+}
