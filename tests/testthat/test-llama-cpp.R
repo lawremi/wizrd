@@ -1,5 +1,9 @@
-test_that("llama.cpp chatting works", {
-    model <- llama_cpp_model_from_ollama(llama3()@name)
+test_that("llama.cpp chatting works with a llamafile", {
+    
+})
+
+test_that("llama.cpp chatting works with ollama weights", {
+    model <- llama_cpp_model_from_ollama(llama()@name)
     ans <- predict(model, "How was R created, in three sentences?")
     expect_match(ans, "Robert.*Ross|Ross.*Robert")
 })

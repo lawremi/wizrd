@@ -35,7 +35,7 @@ test_that("We can make a model callable as a tool", {
     expect_contains(ans$first_name, "Robert")
 
     var <- 1:3
-    meanie := llama3() |> equip(tool(mean) |> can_accept_as(x = class_name)) |>
+    meanie := llama() |> equip(tool(mean) |> can_accept_as(x = class_name)) |>
         instruct("Compute the mean of a variable")
     ans <- openai_model() |>
         equip(meanie, instructions = "Call to find the mean of a variable") |>

@@ -116,12 +116,13 @@ method(on_restore, OllamaServer) <- function(x, name, ...) {
     server
 }
 
-llama3 <- function(temperature = 0, ...) {
-    ollama_model("llama3.1:8b-instruct-q4_K_M", temperature = temperature, ...)
+llama_vision <- function(temperature = 0, ...) {
+    ollama_model("llama3.2-vision:11b-instruct-q4_K_M",
+                 temperature = temperature, ...)
 }
 
-llava <- function(temperature = 0, ...) {
-    ollama_model("llava", temperature = temperature, ...)
+llama <- function(temperature = 0, ...) {
+    ollama_model("llama3.2:3b-instruct-q4_K_M", temperature = temperature, ...)
 }
 
 nomic <- function(temperature = 0, ...) {
