@@ -225,37 +225,3 @@ method(on_restore, LlamaCppServer) <- function(x, ...) {
     p <- R6_private(x@process)
     set_props(x, process = init_fun(p$command, p$args))
 }
-
-llama_url <- "https://huggingface.co/Mozilla/Llama-3.2-3B-Instruct-llamafile/resolve/main/Llama-3.2-3B-Instruct.Q6_K.llamafile"
-
-resolve_a_llamafile_path <- function(url) {
-    file.path(tools::R_user_dir("wizrd", which = "cache"), "llamafiles",
-              basename(url))
-}
-
-install_a_llamafile <- function(url, path) {
-    utils::download.file(url, path)
-    Sys.chmod(path, "755")
-    invisible(path)
-}
-
-prompt_install_a_llamafile <- function(url, path) {
-    answer <- if (interactive())
-                  utils::askYesNo("Do you want to download ", basename(url), "?")
-    else TRUE
-    
-    if (isTRUE(answer)) {
-        install_a_llamafile(url, path)
-        TRUE
-    } else FALSE
-}
-
-llama_cpp_model_from_url <- function(url) {
-    path <- resolve_a_llamafile_path(url)
-    if (file.exists(path) || prompt_install_a_llamafile(url, path))
-        llama_cpp_model(path)
-}
-
-llama <- function(temperature = 0, ...) {
-    llama_cpp_model_from_url(llama_url)
-}
