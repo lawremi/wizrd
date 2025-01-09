@@ -19,7 +19,7 @@ export(embed_text)
 # chunking
 export(chunk, default_chunking)
 # convenience models
-export(llama, ollama_llama, llama_vision, nomic)
+export(llama, llamafile_llama, llama_vision, nomic)
 # backend API
 export(models)
 # persistence

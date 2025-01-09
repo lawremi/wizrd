@@ -121,8 +121,13 @@ ollama_llama_vision <- function(temperature = 0, ...) {
                  temperature = temperature, ...)
 }
 
-ollama_llama <- function(temperature = 0, ...) {
-    ollama_model("llama3.2:3b-instruct-q4_K_M", temperature = temperature, ...)
+ollama_llama <- function(temperature = 0, ...)
+{
+    ans <- try(ollama_model("llama3.2:3b-instruct-q4_K_M",
+                            temperature = temperature, ...))
+    if (inherits(ans, "try-error"))
+        stop("Try using llamafile_llama() as a quickstart.")
+    ans
 }
 
 ollama_nomic <- function(temperature = 0, ...) {

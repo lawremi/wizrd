@@ -254,6 +254,6 @@ llama_cpp_model_from_url <- function(url) {
         llama_cpp_model(path)
 }
 
-llama_cpp_llama <- function(temperature = 0, ...) {
+llamafile_llama <- function(temperature = 0, ...) {
     llama_cpp_model_from_url("https://huggingface.co/Mozilla/Llama-3.2-3B-Instruct-llamafile/resolve/main/Llama-3.2-3B-Instruct.Q6_K.llamafile")
 }

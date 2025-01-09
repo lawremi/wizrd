@@ -1,5 +1,5 @@
 test_that("llama.cpp chatting works with a llamafile", {
-    ans <- wizrd:::llama_cpp_llama() |>
+    ans <- llamafile_llama() |>
         predict(model, "How was R created, in three sentences?")
     expect_match(ans, "Robert.*Ross|Ross.*Robert")    
 })
