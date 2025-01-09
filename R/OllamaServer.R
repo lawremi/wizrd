@@ -10,9 +10,9 @@ ollama_url <- function() {
     paste0("http://", host)
 }
 
-ollama_server <- function(url = ollama_url(), ...) {
+ollama_server <- function(url = ollama_url(), start = TRUE, ...) {
     server <- OllamaServer(url = url)
-    if (!ollama_is_running(server))
+    if (start && !ollama_is_running(server))
         start_ollama_server(server, ...)
     else server
 }
@@ -33,7 +33,11 @@ start_ollama_server <- function(server, path = Sys.which("ollama"),
     wait_until_ready(set_props(server, process = p), max_seconds)
 }
 
-ollama_is_running <- function(server = ollama_server()) {
+ollama_is_installed <- function() {
+    nzchar(Sys.which("ollama"))
+}
+
+ollama_is_running <- function(server = ollama_server(start = FALSE)) {
     !inherits(try(ollama_list(server), silent = TRUE), "try-error")
 }
 
