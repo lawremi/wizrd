@@ -44,4 +44,4 @@ method(print, LanguageModelServer) <- function(x, ...) {
 
 ## Commercial: [X] OpenAI, Gemini, Anthropic, Perplexity
 ## Local / open-source: [X] LlamaCpp (server, llamafile), [X] Ollama
-## Third party hosts: Hugging Face, Bedrock, Azure, Vertex AI
+## Third party hosts: Hugging Face, Bedrock, [X] Azure, Vertex AI
