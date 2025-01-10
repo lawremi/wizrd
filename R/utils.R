@@ -601,6 +601,8 @@ home_dir <- function() {
 }
 
 put <- function(x, `_list` = list(...), ...) {
-    x[names(`_list`)] <- `_list`
+    for (name in names(`_list`)) {
+        x[[name]] <- `_list`[[name]]
+    }
     x
 }

@@ -18,7 +18,8 @@ openai_body_messages <- function(body, messages) {
 
 openai_body_tools <- function(tools) {
     assert_list(tools, "wizrd::ToolBinding")
-    put(body, tools = unname(lapply(tools, openai_encode_tool)))
+    put(body, tools = if (length(tools) > 0L)
+        unname(lapply(tools, openai_encode_tool)))
 }
 
 openai_response_format <- new_generic("openai_response_format", "x")
