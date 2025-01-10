@@ -5,7 +5,7 @@ EmbeddingTextIndex <- new_class("EmbeddingTextIndex", TextIndex,
                                     embedder = LanguageModel,
                                     vector_index_builder = new_property(
                                         class_function,
-                                        default = annoy_index
+                                        default = quote(annoy_index)
                                     ),
                                     vector_index = class_any,
                                     ndim = nullable(prop_int_nn)
@@ -33,6 +33,8 @@ text_store <- function(index, text = NULL) {
         index <- EmbeddingTextIndex(embedder = index)
     TextStore(index = index, text = text)
 }
+
+fetch <- new_generic("fetch", c("x", "from"))
 
 method(fetch, list(class_any, TextStore)) <- function(x, from, params) {
     from@text[fetch(x, from@index, params),]
@@ -72,6 +74,8 @@ ResultsAugmentedFormat <- new_class("ResultsAugmentedFormat", TextFormat,
                                         store = TextStore,
                                         params = VectorIndexRetrievalParams
                                     ))
+
+param_class := new_generic("x")
 
 results_augmented_query_to <- function(store, k = 5L, min_similarity = 0L, ...) {
     params <- param_class(store@index@vector_index)(k = as.integer(k),

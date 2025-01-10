@@ -10,8 +10,6 @@ annoy_index <- function(embedding, ntrees = ncol(embedding) %/% 5L) {
     index
 }
 
-fetch <- new_generic("fetch", c("x", "from"))
-
 method(fetch, list(class_numeric, Rcpp_AnnoyAngular)) <- function(x, from,
                                                                   params)
 {
@@ -33,7 +31,5 @@ method(on_restore, Rcpp_AnnoyAngular) <- function(x, file, ndim) {
     index$load(annoy_path(file))
     index
 }
-
-param_class := new_generic("x")
 
 method(param_class, Rcpp_AnnoyAngular) <- function(x) VectorIndexRetrievalParams
