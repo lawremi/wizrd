@@ -14,10 +14,10 @@ method(language_model, LlamaCppServer) <-
         LanguageModel(backend = x, name = x@model, params = params)
     }
 
-method(complete_chat, LlamaCppServer) <- function(x, ...) {
+method(perform_chat, LlamaCppServer) <- function(x, ...) {
     if (x@embedding)
         stop("llama.cpp server does not chat when started with --embedding")
-    complete_chat(super(x, OpenAIAPIServer), ...)
+    perform_chat(super(x, OpenAIAPIServer), ...)
 }
 
 method(perform_embedding, LlamaCppServer) <- function(x, ...) {

@@ -2,24 +2,23 @@ OpenAIAPIServer <- new_class("OpenAIAPIServer", LanguageModelServer)
 
 openai_response_models <- function(x) x$data
 
-openai_send_models_request <- function(x) {
-    create_request(x) |> httr2::req_url_path_append(models_path(x)) |>
+openai_models_perform <- function(x) {
+    server_request(x) |> httr2::req_url_path_append(models_path(x)) |>
         httr2::req_perform() |> httr2::resp_body_json()
 }
 
 method(models, OpenAIAPIServer) <- function(x) {
-    openai_send_models_request(x) |> openai_response_models()
+    openai_models_perform(x) |> openai_response_models()
 }
 
-openai_body_messages <- function(messages) {
+openai_body_messages <- function(body, messages) {
     assert_list(messages, "wizrd::ChatMessage")
-    unname(lapply(messages, openai_encode_message))
+    put(body, messages = unname(lapply(messages, openai_encode_message)))
 }
 
 openai_body_tools <- function(tools) {
     assert_list(tools, "wizrd::ToolBinding")
-    if (length(tools) > 0L)
-        lapply(unname(tools), openai_encode_tool)
+    put(body, tools = unname(lapply(tools, openai_encode_tool)))
 }
 
 openai_response_format <- new_generic("openai_response_format", "x")
@@ -53,22 +52,20 @@ method(openai_response_format, JSONFormat) <- function(x) {
     } else list(type = "json_object")
 }
 
-openai_chat_body <- function(model, messages, tools, output_format, params, ...)
-{
-    assert_string(model)
-    
-    body <- list(model = model, messages = openai_body_messages(messages), ...)
-    body <- openai_add_params(body, params)
-    body$tools <- openai_body_tools(tools)
-    body$response_format <- openai_response_format(output_format)
-    
-    body
+openai_body_response_format <- function(body, output_format) {
+    put(body, response_format = openai_response_format(output_format))
 }
 
-openai_add_params <- function(body, params) {
-    param_list <- Filter(Negate(is.null), props(params))
-    body[names(param_list)] <- param_list
-    body
+openai_chat_body <- function(model, messages, tools, output_format, params, ...)
+{
+    assert_string(model)    
+    list(model = model, ...) |> openai_body_messages(messages) |>
+        openai_body_params(params) |> openai_body_tools(tools) |>
+        openai_body_response_format(output_format)
+}
+
+openai_body_params <- function(body, params) {
+    put(body, Filter(Negate(is.null), props(params)))
 }
 
 req_perform_sse <- function(req, onmessage_callback = NULL,
@@ -98,7 +95,7 @@ req_perform_sse <- function(req, onmessage_callback = NULL,
     httr2::req_perform_stream(req, callback, timeout_sec, buffer_kb, round)
 }
 
-req_capture_stream_openai <- function(req, stream_callback) {
+openai_chat_perform_stream <- function(req, stream_callback) {
     assert_function(stream_callback, nargs = 1L)
     content <- NULL
     sse_callback <- function(event) {
@@ -113,32 +110,32 @@ req_capture_stream_openai <- function(req, stream_callback) {
     ChatMessage(role = "assistant", content = paste(content, collapse = ""))
 }
 
-method(complete_chat, OpenAIAPIServer) <- function(x, model, messages, tools,
+method(perform_chat, OpenAIAPIServer) <- function(x, model, messages, tools,
                                                   io, params, stream_callback,
                                                   ...)
 {
     openai_chat_body(model, messages, tools, io@output, params,
                      stream = !is.null(stream_callback), ...) |>
-        openai_send_chat_body(x, stream_callback) |>
+        openai_chat_perform(x, stream_callback) |>
         openai_response_chat_message()
 }
 
-openai_send_chat_body <- function(body, server, stream_callback) {
-    req <- create_request(server) |>
+openai_chat_perform <- function(body, server, stream_callback) {
+    req <- server_request(server) |>
         httr2::req_url_path_append(chat_completions_path(server, body$model)) |>
         httr2::req_body_json(body)
     if (!is.null(stream_callback)) {
-        req |> req_capture_stream_openai(stream_callback)
+        req |> openai_chat_perform_stream(stream_callback)
     } else {
         req |> httr2::req_perform() |> httr2::resp_body_json()
     }
 }
 
-method(add_api_key, OpenAIAPIServer) <- function(server, req, key) {
+method(server_req_api_key, OpenAIAPIServer) <- function(server, req, key) {
     httr2::req_auth_bearer_token(req, key)
 }
 
-method(add_api_version, OpenAIAPIServer) <- function(server, req) {
+method(server_req_api_version, OpenAIAPIServer) <- function(server, req) {
     httr2::req_url_path_append(req, "v1")
 }
 
@@ -154,7 +151,7 @@ method(models_path, OpenAIAPIServer) <- function(server) {
     "models"
 }
 
-openai_tool_calls <- function(message) {
+openai_message_tool_calls <- function(message) {
     tool_calls <- message$tool_calls
     lapply(tool_calls, function(tool_call) {
         ToolCall(id = tool_call$id, tool_name = tool_call$`function`$name,
@@ -170,7 +167,7 @@ openai_response_chat_message <- function(x) {
     if (getOption("httr2_verbosity", 0L) == 3L)
         message(toJSON(msg))
     ChatMessage(content = msg$content %||% character(),
-                tool_calls = openai_tool_calls(msg),
+                tool_calls = openai_message_tool_calls(msg),
                 role = "assistant", refusal = msg$refusal)
 }
 
@@ -243,12 +240,12 @@ method(perform_embedding, OpenAIAPIServer) <- function(x, model, data,
     assert_integerish(ndim, lower = 1L, null.ok = TRUE)
     
     openai_embedding_body(model, data, ndim) |>
-        openai_send_embedding_body(x) |>
+        openai_embedding_perform(x) |>
         openai_response_embedding()
 }
 
-openai_send_embedding_body <- function(body, server) {
-    req <- create_request(server) |>
+openai_embedding_perform <- function(body, server) {
+    req <- server_request(server) |>
         httr2::req_url_path_append(embeddings_path(server, body$model)) |>
         httr2::req_body_json(body) |>
         httr2::req_perform() |>

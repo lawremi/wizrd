@@ -599,3 +599,8 @@ home_dir <- function() {
         path.expand("~")
     }
 }
+
+put <- function(x, `_list` = list(...), ...) {
+    x[names(`_list`)] <- `_list`
+    x
+}

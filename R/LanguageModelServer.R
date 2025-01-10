@@ -21,17 +21,17 @@ embeddings_path <- new_generic("embeddings_path", "server",
                                function(server, model) S7_dispatch())
 models_path <- new_generic("models_path", "server")
 
-add_api_key <- new_generic("add_api_key", "server",
-                           function(server, req, key) S7_dispatch())
+server_req_api_key := new_generic("server",
+                                  function(server, req, key) S7_dispatch())
 
-add_api_version <- new_generic("add_api_version", "server",
-                            function(server, req) S7_dispatch())
+server_req_api_version := new_generic("server",
+                                      function(server, req) S7_dispatch())
 
-create_request <- function(server) {
+server_request <- function(server) {
     req <- httr2::request(server@url) |> httr2::req_retry(max_tries = 10L)
     if (nzchar(server@key_prefix))
-        req <- add_api_key(server, req, get_api_key(server@key_prefix))
-    add_api_version(server, req)
+        req <- server_req_api_key(server, req, get_api_key(server@key_prefix))
+    server_req_api_version(server, req)
 }
 
 method(print, LanguageModelServer) <- function(x, ...) {

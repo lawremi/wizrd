@@ -44,10 +44,10 @@ method(print, LanguageModel) <- function(x, ...) {
     print(x@backend)
 }
 
-method(complete_chat, LanguageModel) <- function(x, messages, stream_callback,
+method(perform_chat, LanguageModel) <- function(x, messages, stream_callback,
                                                  env, ...)
 {
-    complete_chat(x@backend, x@name, messages, x@tools, x@io,
+    perform_chat(x@backend, x@name, messages, x@tools, x@io,
                   set_props(x@params, ...), stream_callback)
 }
 

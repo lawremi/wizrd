@@ -12,7 +12,7 @@ azure_openai_model <- function(name = "gpt-4o", ...) {
     language_model(azure_openai_server(), name, ...)
 }
 
-method(add_api_key, AzureOpenAIServer) <- function(server, req, key) {
+method(server_req_api_key, AzureOpenAIServer) <- function(server, req, key) {
     httr2::req_headers(req, "api-key" = key)
 }
 
@@ -28,6 +28,6 @@ method(models_path, AzureOpenAIServer) <- function(server) {
     "openai/models"
 }
 
-method(add_api_version, AzureOpenAIServer) <- function(server, req) {
+method(server_req_api_version, AzureOpenAIServer) <- function(server, req) {
     httr2::req_url_query(req, "api-version" = AZURE_OPENAI_API_VERSION)
 }
