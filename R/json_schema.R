@@ -170,7 +170,7 @@ method(as_json_schema, list_S7_property) <- function(from, description = NULL)
 {
     schema <- as_json_schema(s3_super(from, S7_property), description,
                              named = is.na(from$named) || from$named)
-    c(schema, items = if (!is.null(from$of)) list(as_json_schema(from$of)))
+    put(schema, items = if (!is.null(from$of)) as_json_schema(from$of))
 }
 
 method(as_json_schema, data_frame_S7_property) <- function(from,
