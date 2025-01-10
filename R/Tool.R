@@ -70,10 +70,12 @@ norm_examples <- function(examples, self) {
     FUN <- self
     if (is.primitive(FUN))
         FUN <- as_stub_closure(FUN)
+    Params <- self@signature@parameters
     examples$input <- lapply(examples$input, \(input) {
-        mc <- match.call(FUN, as.call(c(FUN, input)), expand.dots = FALSE) |>
+        mc <- match.call(Params, as.call(c(Params, input)),
+                         expand.dots = FALSE) |>
             dodge_dots() |> as.list()
-        do.call(self@signature@parameters, mc[-1L])
+        do.call(Params, mc[-1L])
     })
     examples
 }
@@ -211,9 +213,7 @@ tool_input_json_schema <- function(sig_params, param_descs) {
 tool_input_json_format <- function(tool) {
     sig_params <- tool@signature@parameters
     param_descs <- json_schema_param_descs(tool)[names(sig_params@properties)]
-
     schema <- tool_input_json_schema(sig_params, param_descs)
-    
     JSONFormat(schema = schema, schema_class = sig_params)
 }
 
