@@ -459,6 +459,10 @@ rename <- function(x, ...) {
     x
 }
 
+prop_read_only <- function(prop) {
+    !is.null(prop$getter) && is.null(prop$setter)
+}
+
 writable_props <- function(x) {
     stopifnot(inherits(x, S7_object))
     static_names <- names(Filter(Negate(prop_read_only), S7_class(x)@properties))

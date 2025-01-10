@@ -71,11 +71,6 @@ method(convert, list(TextFormat, TextFormat)) <- function(from, to) {
     from
 }
 
-output_as <- function(x, format) {
-    x@io@output <- convert(format, TextFormat)
-    x
-}
-
 method(convert, list(File, TextFormat)) <- function(from, to) {
     convert(as_glue(read_as_string(from)), to)
 }

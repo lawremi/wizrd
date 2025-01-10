@@ -33,10 +33,6 @@ base_ancestor_class <- function(class) {
     }
 }
 
-prop_read_only <- function(prop) {
-    !is.null(prop$getter) && is.null(prop$setter)
-}
-
 method(as_json_schema, S7_class) <- function(from, description = NULL, ...) {
     if (identical(from, S7_object))
         return(s7_schema)

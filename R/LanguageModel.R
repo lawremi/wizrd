@@ -245,3 +245,8 @@ system_prompt_as <- function(x, format) {
     x@system_prompt_format <- convert(format, TextFormat)
     x
 }
+
+output_as <- function(x, format) {
+    x@io@output <- convert(format, TextFormat)
+    x
+}
