@@ -113,7 +113,7 @@ req_capture_stream_openai <- function(req, stream_callback) {
     ChatMessage(role = "assistant", content = paste(content, collapse = ""))
 }
 
-method(perform_chat, OpenAIAPIServer) <- function(x, model, messages, tools,
+method(complete_chat, OpenAIAPIServer) <- function(x, model, messages, tools,
                                                   io, params, stream_callback,
                                                   ...)
 {

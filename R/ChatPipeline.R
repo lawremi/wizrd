@@ -21,8 +21,8 @@ method(chat, ChatPipeline) <- function(x, input = NULL,
     chat(Chat(model = x, env = env), input, stream_callback, ...)
 }
 
-method(perform_chat, ChatPipeline) <- function(x, messages, stream_callback, env,
-                                               ...)
+method(complete_chat, ChatPipeline) <- function(x, messages, stream_callback,
+                                                env, ...)
 {
     stopifnot(is.null(stream_callback))
 

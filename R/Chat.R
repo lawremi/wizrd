@@ -45,7 +45,7 @@ method(chat, Chat) <- function(x, input = NULL, stream_callback = NULL, ...) {
     if (length(input) == 0L)
         return(x)
     x <- append_input(x, input)
-    output <- perform_chat(x@model, x@messages, stream_callback, x@env, ...)
+    output <- complete_chat(x@model, x@messages, stream_callback, x@env, ...)
     handle_output(x, output)
 }
 
