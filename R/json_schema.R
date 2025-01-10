@@ -21,10 +21,6 @@ s7_schema <- list(
     description = "An R S7 object."
 )
 
-valid_by_default <- function(prop) {
-    is.null(prop$validator) || is.null(prop$validator(S7:::prop_default(prop)))
-}
-
 base_ancestor_class <- function(class) {
     while(!identical(class, S7_object)) {
         class <- class@parent
