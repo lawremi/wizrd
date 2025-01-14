@@ -16,7 +16,7 @@ openai_body_messages <- function(body, messages) {
     put(body, messages = unname(lapply(messages, openai_encode_message)))
 }
 
-openai_body_tools <- function(tools) {
+openai_body_tools <- function(body, tools) {
     assert_list(tools, "wizrd::ToolBinding")
     put(body, tools = if (length(tools) > 0L)
         unname(lapply(tools, openai_encode_tool)))
