@@ -124,6 +124,7 @@ chunk_starts <- function(by, len) {
 
 method(chunk, list(Text, TokenChunking)) <- function(x, by)
 {
+    require_ns("stringi", "generate word-aligned chunks")
     stopifnot(length(x) == 1L && !is.na(x))
 
     token_boundaries <- stringi::stri_locate_all_boundaries(text, type = "word")
