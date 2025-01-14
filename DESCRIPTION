@@ -48,4 +48,4 @@ Collate: utils.R ToolCall.R TextFormat.R ChatMessage.R LanguageModelParams.R
 	 LanguageModel.R ChatPipeline.R Chat.R LanguageModelTool.R
 	 LanguageModelServer.R OpenAIAPIServer.R LlamaCppServer.R OllamaServer.R
 	 AzureOpenAIServer.R TextStore.R annoy.R openai.R become.R json_schema.R
-	 chunk.R langsmith-hub.R zzz.R
+	 chunk.R langsmith-hub.R convenience-models.R zzz.R
