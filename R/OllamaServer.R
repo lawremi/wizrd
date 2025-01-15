@@ -60,24 +60,21 @@ method(models, OllamaServer) <- function(x) {
 ollama_pull <- function(name, server = ollama_server()) {
     stopifnot(inherits(server, OllamaServer))
     system2("ollama", c("pull", name))
+    invisible(TRUE)
 }
 
-maybe_ollama_pull <- function(pull, name, server = ollama_server()) {
+require_ollama_model <- function(name, server = ollama_server(), pull = NA) {
     assert_flag(pull, na.ok = TRUE)
     assert_string(name)
-        
-    pull <- if (is.na(pull)) {
-        installed <- name %in% ollama_list(server)$name
-        if (!installed) {
-            if (interactive())
-                utils::askYesNo(paste0("Pull ", name, "?"))
-            else TRUE
-        } else FALSE
-    }
-    if (pull)
-        ollama_pull(name, server)
 
-    pull
+    installed <- name %in% ollama_list(server)$name
+    if (installed)
+        return(invisible(TRUE))
+    
+    if (is.na(pull))
+        pull <- !interactive() || utils::askYesNo(paste0("Pull ", name, "?"))
+    
+    invisible(pull && ollama_pull(name, server))
 }
 
 maybe_add_latest <- function(name) {
@@ -88,7 +85,8 @@ maybe_add_latest <- function(name) {
 
 ollama_model <- function(name, pull = NA, server = ollama_server(), ...) {
     name <- maybe_add_latest(name)
-    maybe_ollama_pull(pull, name, server)
+    if (!require_ollama_model(name, server, pull))
+        stop("Model '", name, "' not found")
     language_model(server, name, ...)
 }
 

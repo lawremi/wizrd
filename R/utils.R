@@ -579,6 +579,8 @@ resembles_text <- function(x) !resembles_file(x)
 
 resembles_hub_id <- function(x) length(strsplit(x, "/")[[1L]]) == 2L
 
+resembles_url <- function(x) !is.null(httr2::url_parse(x)$scheme)
+
 read_as_string <- function(x) paste(readLines(x), collapse = "\n")
 
 s3_super <- function(from, to) {
@@ -614,8 +616,24 @@ put <- function(x, `_list` = list(...), ...) {
 download_file <- function(url, destfile, timeout) {
     if (!dir.exists(dirname(destfile)))
         dir.create(dirname(destfile), recursive = TRUE)
-    user_timeout <- getOption("timeout")
-    on.exit(options(timeout = user_timeout))
-    options(timeout = max(timeout, user_timeout))
-    utils::download.file(url, destfile, mode = "wb")
+    curl::multi_download(url, destfile, resume = TRUE)
+    invisible(TRUE)
+}
+
+prompt_download_file <- function(url, path) {
+    download <- !interactive() ||
+        utils::askYesNo(paste0("Do you want to download ", basename(url), "?"))
+    invisible(download && download_file(url, path))
+}
+
+file_cache_path <- function(url, type) {
+    file.path(tools::R_user_dir("wizrd", which = "cache"), type,
+              basename(url))
+}
+
+cache_file <- function(url, type) {
+    path <- file_cache_path(url, type)
+    if (file.exists(path) || prompt_download_file(url, path))
+        path
+    else stop("Failed to cache ", url)
 }
