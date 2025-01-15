@@ -65,7 +65,7 @@ install_llamafile <- function() {
     url <- llamafile_url()
 
     dest_file <- tempfile(fileext = ".zip")
-    utils::download.file(url, dest_file, mode = "wb")
+    utils::download_file(url, dest_file, 500L)
 
     user_dir <- tools::R_user_dir("wizrd", which = "cache")
     dir.create(user_dir, recursive = TRUE, showWarnings = FALSE)
@@ -232,14 +232,15 @@ resolve_a_llamafile_path <- function(url) {
 }
 
 install_a_llamafile <- function(url, path) {
-    utils::download.file(url, path)
+    download_file(url, path, 2500L)
     Sys.chmod(path, "755")
     invisible(path)
 }
 
 prompt_install_a_llamafile <- function(url, path) {
     answer <- if (interactive())
-                  utils::askYesNo("Do you want to download ", basename(url), "?")
+                  utils::askYesNo(paste0("Do you want to download ",
+                                         basename(url), "?"))
     else TRUE
     
     if (isTRUE(answer)) {

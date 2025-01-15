@@ -610,3 +610,12 @@ put <- function(x, `_list` = list(...), ...) {
     }
     x
 }
+
+download_file <- function(url, destfile, timeout) {
+    if (!dir.exists(dirname(destfile)))
+        dir.create(dirname(destfile), recursive = TRUE)
+    user_timeout <- getOption("timeout")
+    on.exit(options(timeout = user_timeout))
+    options(timeout = max(timeout, user_timeout))
+    utils::download.file(url, destfile, mode = "wb")
+}
