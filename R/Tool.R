@@ -5,7 +5,7 @@ validate_Tool <- function(self) {
     })))
 
     formal_names <- names(tool_formals(self))
-    extra_arg_problems <- if (!"..." %in% formal_names) {
+    extra_arg_problems <- if (!"_dots" %in% formal_names) {
         extra_sig_args <- setdiff(names(self@signature@parameters@properties),
                                   formal_names)
         extra_param_descs <- setdiff(names(self@param_descriptions),
@@ -66,16 +66,25 @@ any_signature <- function(FUN) {
     ToolSignature(value = class_any, parameters = params)
 }
 
+param_fun <- function(x) {
+    p <- x@signature@parameters
+    if ("_dots" %in% names(formals(p))) {
+        formals(p)$"..." <- alist(x =)
+        formals(p)$"_dots" <- NULL
+    }
+    p
+}
+
 norm_examples <- function(examples, self) {
     FUN <- self
     if (is.primitive(FUN))
         FUN <- as_stub_closure(FUN)
-    Params <- self@signature@parameters
+    p <- param_fun(self)
     examples$input <- lapply(examples$input, \(input) {
-        mc <- match.call(Params, as.call(c(Params, input)),
-                         expand.dots = FALSE) |>
+        mc <- match.call(p, as.call(c(list(p), input)), expand.dots = FALSE) |>
             dodge_dots() |> as.list()
-        do.call(Params, mc[-1L])
+        mc$"_dots" <- if ("_dots" %in% names(mc)) as.list(mc$"_dots")
+        do.call(self@signature@parameters, mc[-1L], quote = TRUE)
     })
     examples
 }
