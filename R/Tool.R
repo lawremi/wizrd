@@ -102,7 +102,7 @@ norm_param_descriptions <- function(descs, signature) {
     descs |> dodge_dots()
 }
 
-add_Rd <- function(tool) {
+describe_with_Rd <- function(tool) {
     params_to_describe <- setdiff(names(tool@signature@parameters@properties),
                                   names(tool@param_descriptions))
     fully_described <- !is.null(tool@description) &&
@@ -130,7 +130,7 @@ tool <- function(x, name = deparse(substitute(x)), ...) {
 }
 
 method(convert, list(class_function, Tool)) <- function(from, to, ...) {
-    Tool(from, ...) |> add_Rd()
+    Tool(from, ...)
 }
 
 equip <- function(x, tool, instructions = NULL, ...) {
