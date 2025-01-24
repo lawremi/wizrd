@@ -10,33 +10,41 @@ test_that("models can call R functions as tools", {
     expect_equal(jsonlite::fromJSON(output)$mean, mean(var))
 
     model <- model |> unequip("get_mean") |>
-        equip(tool(mean) |> can_accept_as(class_name))
+        equip(tool(mean) |> describe_with_Rd() |> can_accept_as(class_name))
     output <- predict(model, "What is the mean of var?")
     expect_equal(jsonlite::fromJSON(output)$mean, mean(var))
 
-    model <- equip(model, mean)
+    model <- equip(model, tool(mean) |> describe_with_Rd())
     output <- predict(model, "What is the mean of `var`?")
     expect_equal(jsonlite::fromJSON(output)$mean, mean(var))
 
-    aggregate_tool <- tool(method(aggregate, class_formula)) |>
-        can_accept_as(x = class_formula, data = class_name, FUN = class_name,
-                      subset = class_call) |>
-        can_output_as(class_data.frame)
-    model <- unequip("mean") |> equip(model, aggregate_tool)
-    output <- predict(model, "Mean of MPG.city for each Manufacturer in the Cars93 dataset")
-    expect_equal(as.numeric(output), mean(var))
+    model <- llama()
+    aggregate_tool <- tool(aggregate) |> describe_with_Rd() |>
+        can_accept_as(x = class_formula, data = class_name, FUN = class_name)
+    model <- equip(model, aggregate_tool)
+    data(Cars93, package = "MASS")
+    ans <- predict(model,
+                  "Mean of MPG.city for each Manufacturer in the Cars93 dataset")
+    expect_contains(ans, "Lexus: 18")
+
+    aggregate_tool <- tool(aggregate) |>
+        demonstrate(alist(x = MPG.city ~ Origin, data = Cars93, FUN = median),
+                    "the median of MPG.city by Origin in Cars93")
+    expect_equal(aggregate_tool@examples[[1L]][[1L]]@"_dots",
+                 alist(data = Cars93, FUN = median))
 })
 
 test_that("We can make a model callable as a tool", {
     model <- openai_model() |> prompt_as("Who created {language}?") |>
         output_as(data.frame(first_name = character(), last_name = character()))
-    agt <- convert(model, wizrd:::Tool)
-    ans <- agt(list(language = "R"))
+    who_is_the_creator_of <- convert(model, wizrd:::Tool)
+    ans <- who_is_the_creator_of(list(language = "R"))
     expect_contains(ans$first_name, "Robert")
 
     var <- 1:3
-    meanie := llama() |>
-        equip(tool(mean) |> can_accept_as(x = class_name)) |>
+    meanie <- llama() |>
+        equip(tool(mean) |> describe_with_Rd() |>
+                  can_accept_as(x = class_name)) |>
         instruct("Compute the mean of a variable")
     ans <- openai_model() |>
         equip(meanie, instructions = "Call to find the mean of a variable") |>
