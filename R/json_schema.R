@@ -22,7 +22,7 @@ s7_schema <- list(
 )
 
 base_ancestor_class <- function(class) {
-    while(!identical(class, S7_object)) {
+    while(!is.null(class)) {
         class <- class@parent
         if (inherits(class, S7_base_class))
             return(class)
