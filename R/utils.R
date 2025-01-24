@@ -276,12 +276,17 @@ Rd_parse_args <- function(args) {
              trimws(unlist(ans_names_split)))
 }
 
+untag <- function(x) {
+    attr(x, "Rd_tag") <- NULL
+    x
+}
+
 Rd_description <- function(Rd) {
-    Rd_src(Rd_for_tag(Rd, "description"))
+    Rd_for_tag(Rd, "description") |> untag() |> Rd_src() |> trimws()
 }
 
 Rd_value <- function(Rd) {
-    Rd_src(Rd_for_tag(Rd, "value"))
+    Rd_for_tag(Rd, "value") |> untag() |> Rd_src() |> trimws()
 }
 
 Rd_for_function <- function(FUN, name = deparse(substitute(FUN))) {
