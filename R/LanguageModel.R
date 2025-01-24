@@ -206,10 +206,18 @@ method(on_restore, LanguageModel) <- function(x, ...) {
     set_props(x, backend = on_restore(x@backend, x@name, ...))
 }
 
-demonstrate <- function(x, examples = data.frame(input, output),
-                        input = character(), output = character())
+demonstrate <- function(x, input, output)
 {
-    assert_data_frame(examples, col.names = c("input", "output"))
+    if (!is.atomic(input))
+        input <- I(list(input))
+    if (!is.atomic(output))
+        output <- I(list(output))
+    demonstrate_all(x, data.frame(input, output))
+}
+
+demonstrate_all <- function(x, examples) {
+    assert_data_frame(examples)
+    assert_names(colnames(examples), identical.to = c("input", "output"))
     x@examples <- rbind(x@examples, examples)
     x
 }
