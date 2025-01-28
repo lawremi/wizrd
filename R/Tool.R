@@ -81,12 +81,6 @@ norm_examples <- function(examples, self) {
         FUN <- as_stub_closure(FUN)
     p <- param_fun(self)
     examples$input <- lapply(examples$input, \(input) {
-        if (is.character(input))
-            input <- parse(text = input)[[1L]]
-        if (is.call(input))
-            input <- as.list(input[-1L])
-        p_classes <- lapply(self@signature@parameters@properties, `[[`, "class")
-        input <- Map(convert, input, p_classes)
         mc <- match.call(p, as.call(c(list(p), input)), expand.dots = FALSE) |>
             dodge_dots() |> as.list()
         mc$"_dots" <- if ("_dots" %in% names(mc)) as.list(mc$"_dots")

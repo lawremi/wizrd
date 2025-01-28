@@ -28,16 +28,16 @@ test_that("models can call R functions as tools", {
     expect_contains(ans, "Lexus: 18")
 
     aggregate_tool <- tool(aggregate) |>
-        demonstrate(alist(x = MPG.city ~ Origin, data = Cars93, FUN = median),
+        demonstrate(c(x = MPG.city ~ Origin, alist(data = Cars93, FUN = median)),
                     "the median of MPG.city by Origin in Cars93")
     expect_equal(aggregate_tool@examples[[1L]][[1L]]@"_dots",
                  alist(data = Cars93, FUN = median))
 
     aggregate_tool <- tool(aggregate) |>
-        can_accept_as(x = class_formula, data = class_name, FUN = class_name) |>
-        demonstrate("aggregate(MPG.city ~ Origin, Cars93, median)",
-                    "the median of MPG.city by Origin in Cars93")
-    expect_equal(aggregate_tool@examples[[1L]][[1L]]@x, MPG.city ~ Origin)
+        can_accept_as(x = class_formula, data = class_name, FUN = class_name)
+    expect_error(demonstrate(aggregate_tool,
+                             alist(Cars93["MPG.city"], Cars93$Origin, median),
+                             "the median of MPG.city by Origin in Cars93"))
 })
 
 test_that("We can make a model callable as a tool", {
