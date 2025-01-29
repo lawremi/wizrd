@@ -77,7 +77,7 @@ ResultsAugmentedFormat <- new_class("ResultsAugmentedFormat", TextFormat,
 
 param_class := new_generic("x")
 
-results_augmented_query_to <- function(store, k = 5L, min_similarity = 0L, ...) {
+rag_from <- function(store, k = 5L, min_similarity = 0L, ...) {
     params <- param_class(store@index@vector_index)(k = as.integer(k),
         min_similarity = min_similarity, ...)
     ResultsAugmentedFormat(store = store, params = params)
