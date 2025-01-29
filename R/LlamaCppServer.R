@@ -43,7 +43,7 @@ llama_cpp_model <- function(path, mode = c("chat", "embedding"), alias = NULL,
         server_path <- path
     } else {
         model <- path
-        server_path <- llamafile_path()
+        server_path <- server_path %||% llamafile_path()
     }
 
     run_server <- if (mode == "chat") run_llama_cpp_server else run_llamafile_v2
