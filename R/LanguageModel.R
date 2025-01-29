@@ -249,9 +249,15 @@ method(prompt_as, list(LanguageModel, class_character)) <- function(x, format) {
     prompt_as(x, interpret_format_string(format))
 }
 
-system_prompt_as <- function(x, format) {
+system_prompt_as := new_generic(c("x", "format"))
+
+method(system_prompt_as, class_any) <- function(x, format) {
     x@system_prompt_format <- convert(format, TextFormat)
     x
+}
+
+method(system_prompt_as, class_character) <- function(x, format) {
+    system_prompt_as(x, interpret_format_string(format))
 }
 
 output_as <- function(x, format) {

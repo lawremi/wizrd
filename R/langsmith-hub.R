@@ -87,6 +87,10 @@ method(prompt_as, list(LanguageModel, HubID)) <- function(x, format) {
     prompt_as(x, pull_langsmith_template(format))
 }
 
+method(system_prompt_as, list(LanguageModel, HubID)) <- function(x, format) {
+    system_prompt_as(x, pull_langsmith_template(format))
+}
+
 method(convert, list(PromptTemplate, class_character)) <- function(from, to) {
     ans <- switch(from@template_format, "f-string" = as_glue(from@template),
                   mustache = as_whisker(from@template))
