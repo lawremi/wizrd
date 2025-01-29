@@ -101,7 +101,7 @@ ollama_weights_path <- function(name) {
                      "library")
     manifest_path <- file.path(lib, sub(":", .Platform$file.sep, name))
     if (!file.exists(manifest_path))
-        stop("no manifest found for ", name)
+        require_ollama_model(name)
     manifest <- fromJSON(manifest_path)
     digest <- manifest$layers$digest[manifest$layers$mediaType ==
                                          "application/vnd.ollama.image.model"]
@@ -120,7 +120,7 @@ wait_until_ready <- function(server, max_seconds) {
 
 method(on_restore, OllamaServer) <- function(x, name, ...) {
     server <- ollama_server(x@url)
-    maybe_ollama_pull(NA, name, server)
+    require_ollama_model(name, server)
     server
 }
 
