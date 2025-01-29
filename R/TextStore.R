@@ -69,23 +69,23 @@ VectorIndexRetrievalParams := new_class(
 
 ## Is this the right way to do RAG? Or should we provide the model a
 ## tool that performs a search?
-ResultsAugmentedFormat <- new_class("ResultsAugmentedFormat", TextFormat,
-                                    properties = list(
-                                        store = TextStore,
-                                        params = VectorIndexRetrievalParams
-                                    ))
+RetrievalAugmentedFormat <- new_class("RetrievalAugmentedFormat", TextFormat,
+                                      properties = list(
+                                          store = TextStore,
+                                          params = VectorIndexRetrievalParams
+                                      ))
 
 param_class := new_generic("x")
 
 rag_from <- function(store, k = 5L, min_similarity = 0L, ...) {
     params <- param_class(store@index@vector_index)(k = as.integer(k),
         min_similarity = min_similarity, ...)
-    ResultsAugmentedFormat(store = store, params = params)
+    RetrievalAugmentedFormat(store = store, params = params)
 }
 
 method(textify,
        list(class_character | class_list | class_any,
-            ResultsAugmentedFormat)) <- function(x, format)
+            RetrievalAugmentedFormat)) <- function(x, format)
 {
     results <- fetch(x, format@store, format@params)
     paste0("Using this information:\n",
