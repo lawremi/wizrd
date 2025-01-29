@@ -13,5 +13,3 @@ LanguageModelParams <- new_class("LanguageModelParams",
                                                  "must not contain NAs"
                                          })
                                  ))
-
-language_model_params <- LanguageModelParams

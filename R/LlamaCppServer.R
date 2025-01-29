@@ -9,7 +9,7 @@ LlamaCppServer <- new_class("LlamaCppServer", OpenAIAPIServer,
 method(models, LlamaCppServer) <- function(x) data.frame(id = x@model)
 
 method(language_model, LlamaCppServer) <-
-    function(x, ..., params = language_model_params(...))
+    function(x, ..., params = LanguageModelParams(...))
     {
         LanguageModel(backend = x, name = x@model, params = params)
     }
