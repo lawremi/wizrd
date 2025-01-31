@@ -19,8 +19,6 @@ export(embed_text)
 export(chunk, default_chunking)
 # convenience models
 export(llama, llamafile_llama, llama_vision, nomic)
-# backend API
-export(models)
 # persistence
 export(persist, restore)
 
