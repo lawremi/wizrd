@@ -47,11 +47,6 @@ method(as.data.frame, Text) <-
                       optional = optional, ...)
     }
 
-chunk := new_generic(c("x", "by"))
-
-method(chunk, list(Text | class_character, NULL)) <- function(x, by)
-    data.frame(text = x)
-
 ext_to_chunking <- local({
     map <- list()
     function(...) {
@@ -77,6 +72,12 @@ default_chunking := new_generic("x")
 method(default_chunking, class_character | class_list) <- function(x) {
     ext_to_chunking()
 }
+
+chunk := new_generic(c("x", "by"),
+                     function(x, by = default_chunking(x)) S7_dispatch())
+
+method(chunk, list(Text | class_character, NULL)) <- function(x, by)
+    data.frame(text = x)
 
 method(chunk, list(class_any, class_missing)) <- function(x, by, ...) {
     chunk(x, default_chunking(x), ...)
