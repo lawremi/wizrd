@@ -32,7 +32,8 @@ text_store(index, text = NULL)
 }
 \author{Michael Lawrence}
 \seealso{
-  \code{\link{rag_from}}, for using the returned object in RAG.
+  \code{\link{rag_from}}, for using the returned object in
+  RAG. \code{persist} and \code{restore} for persistence of text stores.
 }
 \note{
   The RAG capabilities of \pkg{wizrd} are currently experimental and quite
@@ -48,7 +49,7 @@ text_store(index, text = NULL)
 \dontrun{
     chunks <- chunk(tools::Rd_db("S7"))
     store <- text_store(nomic(), chunks)
-    model <- llama() |> prompt_as(text_store(store))
+    model <- llama() |> prompt_as(rag_from(store))
     predict(model, "new_property example")
 }
 }
