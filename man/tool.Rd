@@ -5,16 +5,18 @@
   Model Tools
 }
 \description{
-  Convert an object, such as an R function or another model, into a tool
-  for use by a model. The \code{\link{equip}} function performs this
-  conversion automatically, but by calling \code{tool} directly, the
-  user can customize the tool before equipping it.
+  Convert an object, such as an R function or a model, into a Tool
+  object for use by a model. The \code{\link{equip}} function performs
+  this conversion automatically, but by calling \code{tool} directly,
+  the user can customize the tool before equipping it.
 }
 \usage{
 tool(x, name = deparse(substitute(x)), ...)
 }
 \arguments{
-  \item{x}{Object to convert to a tool}
+  \item{x}{
+    Object to convert to a tool, such as a function or LanguageModel
+  }
   \item{name}{Name of the new tool}
   \item{\dots}{
     Arguments passed to \code{\link[S7]{convert}}. Methods on
@@ -23,24 +25,30 @@ tool(x, name = deparse(substitute(x)), ...)
   }
 }
 \value{
-  A Tool object
+  A Tool object, which is an R function decorated with metadata, such as
+  the argument types and return type.
 }
 \details{
+  The more annotations on a tool, the more the model will understand how
+  to use it. \code{\link{describe_with_Rd}} is a convenient way to
+  annotate a tool based on a packaged R function with information from
+  its man page.
+
   Arguments passed to a tool are converted according to the types
   declared by \code{\link{accept_as}}, without any conversion by
   default.
 
+  Converting a LanguageModel to a Tool enables a model to be called by
+  another model (enabling networks of agents), as well as the user by
+  simply invoking it like any other function, fully realizing the goal
+  of the wizrd package: to program models as functions.
+  
   The call to the tool is evaluated in the \code{env} provided to
   \code{\link{chat}}, so any arguments converted to language objects
   will be evaluated as R code. If the model sends a backquoted string,
   like \code{`x`}, it will be converted to a name and resolved
   dynamically, as shown in the examples.
 
-  The more annotations on a tool, the more the model will understand how
-  to use it. \code{\link{describe_with_Rd}} is a convenient way to
-  annotate a tool based on a packaged R function with information from
-  its man page.
-  
   There is nothing LLM-specific about Tool objects. Thus, they could
   even be used as a way to annotate ordinary R functions, like with
   inferred parameter types.
