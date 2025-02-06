@@ -12,7 +12,7 @@
   HTML files and PDF files.
 }
 \usage{
-chunk(x, by = default_chunking(x))
+chunk(x, by)
 default_chunking(x)
 }
 \arguments{
@@ -21,7 +21,8 @@ default_chunking(x)
   }
   \item{by}{
     A Chunking object representing the chunking strategy and its
-    parameters, or a named list of such objects.  If \code{NULL}, no
+    parameters, or a named list of such objects.  By default, the return
+    value of \code{default_chunking(x)} is used. If \code{NULL}, no
     chunking is performed (the text is returned as a single chunk, if
     possible).
   }

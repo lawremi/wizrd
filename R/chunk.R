@@ -73,8 +73,7 @@ method(default_chunking, class_character | class_list) <- function(x) {
     ext_to_chunking()
 }
 
-chunk := new_generic(c("x", "by"),
-                     function(x, by = default_chunking(x)) S7_dispatch())
+chunk := new_generic(c("x", "by"))
 
 method(chunk, list(Text | class_character, NULL)) <- function(x, by)
     data.frame(text = x)
