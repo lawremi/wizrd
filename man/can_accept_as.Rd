@@ -1,5 +1,5 @@
-\name{accept_as}
-\alias{accept_as}
+\name{can_accept_as}
+\alias{can_accept_as}
 
 \title{
   Declaring Tool Parameters
@@ -10,7 +10,7 @@
   to convert whatever the model sends to the declared class.
 }
 \usage{
-accept_as(x, ..., `_parameters` = list(...))
+can_accept_as(x, ..., `_parameters` = list(...))
 }
 \arguments{
   \item{x}{
