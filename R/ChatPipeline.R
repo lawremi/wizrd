@@ -57,4 +57,3 @@ c_ChatPipeline <- function(...) {
 
 method(c, ChatPipeline) <- c_ChatPipeline
 method(c, LanguageModel) <- c_ChatPipeline
-method(c, Chat) <- c_ChatPipeline
