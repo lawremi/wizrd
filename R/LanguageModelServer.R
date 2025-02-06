@@ -1,7 +1,7 @@
 LanguageModelServer <- new_class("LanguageModelServer", LanguageModelBackend,
                                  properties = list(
                                      url = prop_string,
-                                     key_prefix = prop_string,
+                                     key_prefix = nullable(prop_string),
                                      process = NULL | new_S3_class("process")
                                  ),
                                  abstract = TRUE)
@@ -29,7 +29,7 @@ server_req_api_version := new_generic("server",
 
 server_request <- function(server) {
     req <- httr2::request(server@url) |> httr2::req_retry(max_tries = 10L)
-    if (nzchar(server@key_prefix))
+    if (!is.null(server@key_prefix))
         req <- server_req_api_key(server, req, get_api_key(server@key_prefix))
     server_req_api_version(server, req)
 }

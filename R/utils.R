@@ -58,8 +58,10 @@ new_scalar_property <- function(class, ..., validator = NULL, default) {
 }
 
 new_string_property <- function(..., validator = NULL,
-                                default = "", choices = NULL)
+                                default = NULL, choices = NULL)
 {
+    if (is.null(default) && length(choices) > 0L)
+        default <- choices[1L]
     prop <- new_scalar_property(
         class_character, ...,
         validator = function(value) {
