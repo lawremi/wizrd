@@ -232,10 +232,11 @@ method(detextify, list(class_any, LanguageModel)) <- function(x, format) {
 
 prompt_as := new_generic(c("x", "format"))
 
-method(prompt_as, list(LanguageModel, class_any)) <- function(x, format) {
-    x@io@input <- convert(format, TextFormat)
-    x
-}
+method(prompt_as, list(LanguageModel, class_any | class_glue)) <-
+    function(x, format) {
+        x@io@input <- convert(format, TextFormat)
+        x
+    }
 
 interpret_format_string <- function(x) {
     if (resembles_file(x))
