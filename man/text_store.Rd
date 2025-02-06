@@ -37,7 +37,8 @@ text_store(index, text = NULL)
 }
 \note{
   The RAG capabilities of \pkg{wizrd} are currently experimental and quite
-  primitive.
+  primitive. They may be removed or moved to a different package in
+  the future.
 }
 \details{
   The default index uses an embedding model to embed the chunks in an

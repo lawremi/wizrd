@@ -36,8 +36,9 @@ rag_from(store, k = 5L, min_similarity = 0L, ...)
   should be passed in order to configure a model to use RAG.
 }
 \note{
-  The RAG capabilities of \pkg{wizrd} are currently experimental and quite
-  primitive.
+  The RAG capabilities of \pkg{wizrd} are currently experimental and
+  quite primitive. They may be removed or moved to a different package in
+  the future.
 }
 \examples{
 \dontrun{
