@@ -63,7 +63,7 @@ any_signature <- function(FUN) {
     params[] <- list(class_any)
     if (!is.null(params$"..."))
         params$"..." <- class_list
-    ToolSignature(value = class_any, parameters = params)
+    ToolSignature(value = new_property(class_any), parameters = params)
 }
 
 param_fun <- function(x) {
@@ -158,7 +158,7 @@ can_accept_as <- function(`_x`, ..., `_parameters` = list(...)) {
 
 can_return_as <- function(x, type) {
     stopifnot(inherits(x, Tool))
-    x@signature@value <- type
+    x@signature@value <- convert(type, S7_property)
     x
 }
 
@@ -234,7 +234,7 @@ tool_output_json_format <- function(tool) {
         schema$description <- paste(desc, collapse = " ")
     
     JSONFormat(schema = schema,
-               schema_class = tool@signature@value)
+               schema_class = tool@signature@value$class)
 }
 
 describe_tool <- function(binding) {

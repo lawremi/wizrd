@@ -16,7 +16,7 @@ ToolSignature := new_class(
             },
             default = quote(new_parameters())
         ),
-        value = union_classes
+        value = S7_property
     ))
 
 method(print, ToolSignature) <- function(x, ...) {
@@ -24,7 +24,7 @@ method(print, ToolSignature) <- function(x, ...) {
                       character(1L))
     cat("(", paste0(names(x@parameters@properties), ": ",
                     classes, collapse = ", "),
-        "): ", S7:::class_desc(x@value), "\n", sep = "")
+        "): ", S7:::class_desc(x@value$class), "\n", sep = "")
 }
 
 dodge_dots <- function(x) {
