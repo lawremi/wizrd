@@ -66,3 +66,10 @@ method(convert, list(LanguageModel, Tool)) <-
         LanguageModelTool(name = name, model = from, description = description,
                           ...)
     }
+
+method(convert, list(LanguageModel, class_function)) <- function(from, to, ...) {
+    convert(from, Tool, ...)
+}
+
+method(as.function, LanguageModel) <- function(x, ...)
+    convert(x, class_function, ...)
