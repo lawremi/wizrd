@@ -29,15 +29,17 @@ test_that("structured output works", {
 })
 
 test_that("glue templating works", {
-    ans <- llama() |>
-        prompt_as("Output a {nchar}-letter word starting with '{initial}'.") |>
-        predict(list(nchar = 4L, initial = "a"))
-    expect_equal(ans, "Able")
+    model <- llama() |> instruct("Return a single word.") |>
+        prompt_as("Output a {nchar}-letter word starting with '{initial}'.")
+    ans <- model |> predict(list(nchar = 4L, initial = "a"))
+    expect_equal(trimws(ans), "Able")
+    ans2 <- as.function(model)(4L, "a")
+    expect_equal(ans, ans2)
 
     ans <- llama() |>
         system_prompt_as("Answer questions about {language}") |>
         chat(system_params = list(language = "R")) |>
         predict("Who created the language?")
-    expect_contains(ans, "Robert|Ross")
+    expect_match(ans, "Robert|Ross")
 })
 
