@@ -93,25 +93,18 @@ method(convert, list(PlainTextFormat, S7_property)) <- function(from, to) {
     prop_string
 }
 
-method(convert, list(PlainTextFormat, S7_class)) <- function(from, to) {
-    class_character
+glue_params <- function(x) {
+    regmatches(x, gregexec("\\{(.*?)\\}", x))[[1L]][2L,]
 }
 
-method(convert, list(GlueFormat, S7_property)) <- function(from, to) {
-    m <- regmatches(from@template,
-                    gregexec("\\{(.*?)\\}", from@template))[[1L]][2L,]
-    prototype <- setNames(rep(list(character()), length(m)), m)
-    new_data_frame_property(prototype = prototype)
+method(convert, list(GlueFormat, S7_class)) <- function(from, to) {
+    params <- glue_params(from@template)
+    props <- setNames(rep(list(class_character), length(params)), params)
+    new_class("glue_parameters", Parameters, properties = props)
 }
 
 method(convert, list(class_data.frame, S7_property)) <- function(from, to, ...) {
     new_data_frame_property(prototype = from)
-}
-
-method(convert, list(JSONFormat, S7_class)) <- function(from, to) {
-    if (is.data.frame(from@schema_class))
-        class_data.frame
-    else from@schema_class
 }
 
 method(convert, list(JSONFormat, S7_property)) <- function(from, to) {

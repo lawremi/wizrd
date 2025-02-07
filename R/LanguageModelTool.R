@@ -16,7 +16,7 @@ LanguageModelTool := new_class(
         signature = new_property(
             ToolSignature,
             setter = \(self, value) {
-                S7_data(self, check = FALSE) <- model_fun(value)
+                S7_data(self, check = FALSE) <- model_fun(self@model, value)
                 self@signature <- value
                 self@examples <- self@model@examples
                 self
@@ -25,12 +25,13 @@ LanguageModelTool := new_class(
     )
 )
 
-model_fun <- function(sig) {
+model_fun <- function(model, sig) {
     args <- formals(sig@parameters)
-    if (length(args) != 1L)
-        stop("'signature' must have a single parameter")
-    predict_call <- as.call(c(quote(predict), quote(self@model),
-                              as.name(names(args))))
+    if (unary(model)) {
+        stopifnot(length(args) == 1L)
+        args_language <- as.name(names(args))
+    } else args_language <- as.call(c(quote(list), sapply(names(args), as.name)))
+    predict_call <- as.call(c(quote(predict), quote(self@model), args_language))
     body <- substitute({
         self <- sys.function()
         if (!inherits(self, LanguageModelTool))
@@ -40,9 +41,23 @@ model_fun <- function(sig) {
     as.function(c(args, body))
 }
 
+unary := new_generic("x")
+
+method(unary, LanguageModel) <- function(x) unary(x@io@input)
+
+method(unary, GlueFormat) <- function(x) FALSE
+
+method(unary, TextFormat) <- function(x) TRUE
+
+as_parameters <- function(x) {
+    if (unary(x))
+        list(x = convert(x, S7_property))
+    else convert(x, S7_class)
+}
+
 model_signature <- function(model) {
-    parameters <- list(x = convert(model@io@input, S7_property))
-    value <- convert(model@io@output, S7_class)
+    parameters <- as_parameters(model@io@input)
+    value <- convert(model@io@output, S7_property)
     ToolSignature(parameters = parameters, value = value)
 }
 
