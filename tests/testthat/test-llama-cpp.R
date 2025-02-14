@@ -9,4 +9,4 @@ test_that("llama.cpp supports external weights and generating embeddings", {
                                                  mode = "embedding")
     embedding <- embed_text(model, "test")
     expect_equal(dim(embedding), c(1L, 768L))
-}
+})
