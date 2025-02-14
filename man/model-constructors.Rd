@@ -38,14 +38,15 @@ azure_openai_model(name = "gpt-4o", ...)
     start the server.
   }
   \item{path}{
-    A string pointing to a model file with a format that is compatible
-    with llama.cpp, or a
-    \href{https://github.com/Mozilla-Ocho/llamafile}{llamafile}. This
-    can be a simple path on the file system, a URL or the name of an
-    Ollama model. If it resembles a URL, the file is downloaded and
-    cached in a standard place (see \code{\link[tools]{R_user_dir}}). If
-    it resembles an Ollama identifier, the path to the model is
-    automatically resolved, pulling the model if necessary.
+    A string pointing to a
+    \href{https://github.com/Mozilla-Ocho/llamafile}{llamafile} or a
+    file containing weights in a format compatible with
+    llama.cpp. This can be a simple path on the file system, a URL or
+    the name of an Ollama model. If it resembles a URL, the file is
+    downloaded and cached in a standard place (see
+    \code{\link[tools]{R_user_dir}}). If it resembles an Ollama
+    identifier, the path to the model is automatically resolved, pulling
+    the model if necessary.
   }
   \item{mode}{
     Whether the model is to be used for \code{"chat"} or
@@ -66,6 +67,18 @@ azure_openai_model(name = "gpt-4o", ...)
   \item{\dots}{
     Model parameters, see \code{\link{LanguageModelParams}}.
   }
+}
+\section{Issues with llamafile}{
+  While a llamafile is supposed to work seamlessly across platforms,
+  OS-specific issues may arise. Examples include:
+  \itemize{
+    \item{On Linux, issues with binary format registration may result in
+      a wine popup appearing when attempting to run a llamafile.
+    }
+    \item{On Windows, llamafiles over 4GB in size are not supported.}
+  }
+  See the \href{https://github.com/Mozilla-Ocho/llamafile}{llamafile
+    README} for workarounds.
 }
 \value{A LanguageModel object}
 \author{Michael Lawrence}

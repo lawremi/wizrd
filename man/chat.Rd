@@ -26,10 +26,10 @@ predict(object, input, env = parent.frame(), ...)
   \item{input}{
     An object that is sent to the model (appended to the context when
     \code{x} is a Chat object). Typically a string but could also be a
-    \code{\link[=plot.raster]{raster}} object or any other R object
-    supported by the extensible serialization mechanism. data.frames are
-    converted to CSV, and other complex objects are serialized to JSON,
-    by default.
+    \code{\link[=plot.raster]{raster}} object (for vision models) or any
+    other R object supported by the extensible serialization
+    mechanism. data.frames are converted to CSV, and other complex
+    objects are serialized to JSON, by default.
   }
   \item{stream_callback}{
     A function that takes a single argument, a chunk of the model

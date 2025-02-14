@@ -35,6 +35,10 @@ nomic(temperature = 0, ...)
   cache a self-contained, cross-platform llamafile binary using the same
   weights as \code{llama}. No Ollama required.
 }
+\section{Issues with llamafile}{
+  See \code{\link{llama_cpp_model}} for resolving OS-specific issues
+  with \code{llamafile_llama}.
+}
 \value{
   A LanguageModel
 }
