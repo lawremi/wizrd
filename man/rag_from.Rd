@@ -17,11 +17,7 @@ rag_from(store, k = 5L, min_similarity = 0L, ...)
 \arguments{
   \item{store}{
     A TextStore object to be queried for text chunks based on the user
-    input and its index, which determines the retrieval
-    algorithm. Converted to a TextStore if necessary. The default
-    conversion treats this argument as containing text, which is chunked
-    if necessary, and constructs a TextStore using the result of
-    \code{\link{nomic}} as the embedding model.
+    input and its index, which determines the retrieval algorithm.
   }
   \item{k}{The maximum number of chunks to retrieve}
   \item{min_similarity}{

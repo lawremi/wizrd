@@ -19,12 +19,11 @@ text_store(index, text = NULL)
   }
   \item{text}{
     Optionally, a data.frame with a column named \dQuote{text} that
-    contains the text chunks. If it looks like something else,
-    \code{\text{chunk}} is called on it first. The other columns in the
-    data.frame are stored along with the chunks as metadata. Query
-    results are returned as entire rows, including both the text and
-    metadata. To set the text later, assign to the \code{@text} property
-    on the returned TextStore.
+    contains the text chunks. The other columns in the data.frame are
+    stored along with the chunks as metadata. Query results are returned
+    as entire rows, including both the text and metadata. To set the
+    text later, assign to the \code{@text} property on the returned
+    TextStore.
   }
 }
 \value{
