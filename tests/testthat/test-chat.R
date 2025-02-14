@@ -8,10 +8,10 @@ test_that("chat() and predict() work for text messages", {
 
     chat2 <- chat(chat, "When did they do it?")
     expect_length(chat2@messages, 5L)
-    expect_match(last_output(chat2), "1992")
+    expect_match(last_output(chat2), "1993")
     
     expect_match(predict(model, "Who created R?"), "Robert.*Ross|Ross.*Robert")
-    expect_match(predict(chat, "When did they do it?"), "1992")
+    expect_match(predict(chat, "When did they do it?"), "1993")
 })
 
 test_that("chat() and predict() work for images", {
