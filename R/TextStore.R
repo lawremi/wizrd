@@ -11,14 +11,19 @@ EmbeddingTextIndex <- new_class("EmbeddingTextIndex", TextIndex,
                                     ndim = nullable(prop_int_nn)
                                 ))
 
+resembles_chunks <- function(x) is.data.frame(x) && is.character(x$text)
+
 TextStore <- new_class("TextStore",
                        properties = list(
                            index = TextIndex,
                            text = new_property(
-                               NULL | class_data.frame,
+                               class_data.frame,
                                setter = \(self, value) {
-                                   if (!is.null(value) && is.null(value$text))
-                                       stop("'value' must have a 'text' column")
+                                   if (!resembles_chunks(value))
+                                       value <- chunk(value)
+                                   if (!resembles_chunks(value))
+                                       stop("'value' must be a data.frame and ",
+                                            "have a 'text' column")
                                    if (identical(self@text, value))
                                        return(self)
                                    self@index <- build(self@index, value$text)
@@ -77,7 +82,12 @@ RetrievalAugmentedFormat <- new_class("RetrievalAugmentedFormat", TextFormat,
 
 param_class := new_generic("x")
 
+method(convert, list(class_any, TextStore)) <- function(from, to) {
+    TextStore(nomic(), from)
+}
+
 rag_from <- function(store, k = 5L, min_similarity = 0L, ...) {
+    store <- convert(store, TextStore)
     params <- param_class(store@index@vector_index)(k = as.integer(k),
         min_similarity = min_similarity, ...)
     RetrievalAugmentedFormat(store = store, params = params)
