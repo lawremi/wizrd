@@ -35,7 +35,8 @@ Suggests:
     whisker,
     knitr,
     rmarkdown,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    httptest2
 Depends: 
     R (>= 3.5.0)
 Encoding: UTF-8
