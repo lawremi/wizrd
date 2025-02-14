@@ -69,11 +69,14 @@ ext_to_chunking(SentenceAlignedTokenChunking(), md = MarkdownChunking(),
 
 default_chunking := new_generic("x")
 
-method(default_chunking, class_character | class_list) <- function(x) {
+method(default_chunking, class_any) <- function(x) {
     ext_to_chunking()
 }
 
 chunk := new_generic(c("x", "by"))
+
+method(chunk, list(class_any, class_any)) <- function(x, by)
+    chunk(as.character(x), by)
 
 method(chunk, list(Text | class_character, NULL)) <- function(x, by)
     data.frame(text = x)
