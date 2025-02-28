@@ -1,5 +1,6 @@
 \name{last_output}
 \alias{last_output}
+\alias{last_message}
 
 \title{
   Getting the Last Model Output
@@ -10,6 +11,7 @@
 }
 \usage{
 last_output(x)
+last_message(x)
 }
 \arguments{
   \item{x}{
@@ -17,11 +19,13 @@ last_output(x)
   }
 }
 \value{
-  The converted output (not necessarily the raw response).
+  For \code{last_output}, the converted output (not necessarily the raw
+  response). For the lower level \code{last_message}, a ChatMessage
+  object containing the raw and converted output, among other things.
 }
 \seealso{
   \code{\link[predict.LanguageModel]{predict}} is a convenience wrapper
-  that uses this function.
+  that uses \code{last_output}.
 }
 \author{Michael Lawrence}
 \examples{
