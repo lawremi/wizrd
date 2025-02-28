@@ -130,7 +130,7 @@ method(chunk, list(Text, TokenChunking)) <- function(x, by)
     require_ns("stringi", "generate word-aligned chunks")
     stopifnot(length(x) == 1L && !is.na(x))
 
-    token_boundaries <- stringi::stri_locate_all_boundaries(text, type = "word")
+    token_boundaries <- stringi::stri_locate_all_boundaries(x, type = "word")
     starts <- chunk_starts(nrow(token_boundaries), by)
     ends <- c(starts[-1L] - 1L, length(starts))
     text <- substring(x, token_boundaries[starts, "start"],
@@ -143,8 +143,8 @@ method(chunk, list(Text, SentenceAlignedTokenChunking)) <- function(x, by)
 {
     require_ns("stringi", "generate sentence-aligned chunks")
     sentence_boundaries <-
-        stringi::stri_locate_all_boundaries(text, type = "sentence")[[1L]]
-    token_boundaries <- stringi::stri_locate_all_words(text)[[1L]]
+        stringi::stri_locate_all_boundaries(x, type = "sentence")[[1L]]
+    token_boundaries <- stringi::stri_locate_all_words(x)[[1L]]
 
     sentence_starts <- sentence_boundaries[, "start"]
     sentence_ends <- sentence_boundaries[, "end"]
@@ -155,7 +155,7 @@ method(chunk, list(Text, SentenceAlignedTokenChunking)) <- function(x, by)
     chunk_indices <- cumsum_breaks(token_counts, by@token_limit, by@max_overlap) 
     chunk_starts <- sentence_starts[chunk_indices$starts]
     chunk_ends <- sentence_ends[chunk_indices$ends]
-    text <- substring(text, chunk_starts, chunk_ends)
+    text <- substring(x, chunk_starts, chunk_ends)
     
     data.frame(text)
 }
@@ -223,7 +223,7 @@ method(default_chunking, packageIQR) <- function(x) ext_to_chunking()
 method(chunk, list(packageIQR, class_list)) <- function(x, by) {
     if (x$type != "vignette")
         stop("Only 'packageIQR' objects of type 'vignette' are supported")
-    assert_named(by)
+    assert_character(names(by))
     r <- x$results
     if (nrow(r) == 0L)
         return(chunk(character(), by))

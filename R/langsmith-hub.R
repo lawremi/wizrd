@@ -124,5 +124,5 @@ method(prompt_as, list(LanguageModel, HumanMessagePromptTemplate)) <-
 
 method(prompt_as, list(LanguageModel, StructuredPrompt)) <- function(x, format) {
     prompt_as(x, super(format, ChatPromptTemplate)) |>
-        output_as(format@"schema_")
+        output_as(format@"schema_" |> norm_json_schema())
 }

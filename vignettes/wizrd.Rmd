@@ -1,3 +1,18 @@
+---
+title: "The wizrd Package"
+author: "Michael Lawrence"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{wizrd}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r include=FALSE}
+httptest2::start_vignette("http")
+```
+
 # Overview
 
 The wizrd package exists to test the hypothesis that Large Language
@@ -9,10 +24,11 @@ fluent API for programming with LLMs.
 # Quick start
 
 To start chatting with a model:
-```r
+```{r results='asis'}
 library(wizrd)
 model <- llamafile_llama()
-predict(model, "Who created R?")
+ans <- predict(model, "Who created R?")
+ans |> strwrap() |> paste(collapse = "\n") |> cat()
 ```
 
 The call to `llamafile_llama()` will download, cache and run the
@@ -28,8 +44,17 @@ The `predict()` function is the most convenient way to execute single
 exchanges with a model. To maintain a context over multiple exchanges,
 use the `chat()` function:
 ```r
-model |> chat("Who created R?") |> predict("When was it created?")
+ctx <- model |> chat("Who created R?") |> chat("When was it created?")
+ctx
 ```
+A useful feature of the returned Chat object is that it prints the
+context in a readable format.
+
+To extract the last output from the Chat object, call `last_output()`:
+```r
+last_output(ctx)
+```
+The returned value can then be used in further computations.
 
 As an exercise, try to create a readline-based chatbot interface. 
 See `wizrd:::readline_chat` for one answer.
@@ -43,7 +68,12 @@ There are three requirements for LLMs to act as functions:
 1. Return an R object of a specified type and structure.
 
 We will demonstrate how the wizrd package meets each of these
-requirements in turn.
+requirements in turn. We will use gpt-4o-mini for this example, in
+order to support constrained output. Set the `OPENAI_API_KEY`
+environment variable to your OpenAI key before running this.
+```r
+model <- openai_model(temperature = 0)
+```
 
 ## Parameterized input
 
@@ -52,7 +82,7 @@ questions about any given programming language.
 
 ```r
 parameterized_model <- model |> prompt_as("Who created {language}?")
-parameterized_model |> predict(list(language = "R"))
+parameterized_model |> chat(list(language = "R"))
 ```
 
 By calling `prompt_as()`, we parameterized the model using a glue
@@ -66,20 +96,20 @@ instructions, inserted into the system prompt, using the `instruct()`
 function:
 ```r
 instructed_model <- parameterized_model |>
-    instruct("Include all major contributors. Return only names, no other text.")
-instructed_model |> predict(list(language = "R"))
+    instruct("Include the name of every author.",
+             "Return only names separated by commas, no extra text.")
 ```
-The model obeys the instructions to include more contributors and to
-only return their names.
+The model obeys the instructions to include every contributor and only
+return the actual names.
 
 We can also provide a tool that queries for the authors of the R
 language:
 ```r
-get_contributors <- function() {
+get_R_authors <- function() {
     R.home("doc") |> file.path("AUTHORS") |> readLines() |> paste(collapse="\n")
 }
-equipped_model <- instructed_model |> equip(get_contributors)
-equipped_model |> predict(list(language = "R"))
+equipped_model <- instructed_model |> equip(get_R_authors)
+equipped_model |> chat(list(language = "R"))
 ```
 
 ## Constraining output
@@ -90,7 +120,7 @@ object. We made some progress through our instructions above, but we
 can be much more precise using the `output_as()` function:
 
 ```r
-df_model <- instructed_model |>
+df_model <- equipped_model |>
     output_as(data.frame(first_name = character(), last_name = character()))
 df_model |> predict(list(language = "R"))
 ```
@@ -100,10 +130,13 @@ so the model returns a completed data.frame, with the same columns.
 
 We could also use an S7 object to capture the output:
 ```r
+library(S7)
 Person <- new_class("Person",
                     properties = list(first_name = class_character,
                                       last_name = class_character))
-s7_model <- instructed_model |> output_as(Person)
+method(print, Person) <- function(x, ...)
+    cat("People:", paste(x@first_name, x@last_name, collapse = ", "), "\n")
+s7_model <- equipped_model |> output_as(Person)
 s7_model |> predict(list(language = "R"))
 ```
 
@@ -136,32 +169,33 @@ model |> prompt_as("lawremi/creators") |> predict(list(language = "R"))
 
 ## Retrieval Augmented Generation (RAG)
 
-In support of this, the package implements experimental functionality
+The wizrd package implements experimental functionality
 for Retrieval Augmented Generation (RAG). One potentially useful
-application is in the querying of R manual pages:
+application is in the querying of R manual pages. 
 
-```r
-chunks <- chunk(tools::Rd_db("S7"))
-store <- text_store(nomic(), chunks)
-model <- llama() |> prompt_as(rag_from(store))
-predict(model, "new_property example")
-```
+### Basic example
 
-The above code uses the `chunk` generic to generate text chunks from
+The code below uses the `chunk()` generic to generate text chunks from
 the S7 man pages. Next, it creates a TextStore that indexes those
 chunks using the nomic text embedding model. It then configures the
 prompt generator to query the text store for chunks that are similar
 to the query. Finally, it sends the query for an example of the
-`S7::new_property` function.
+`S7::new_property()` function. 
 
-The `chunk` utility has basic support for a number of formats,
+The `chunk()` utility has basic support for a number of formats,
 including markdown derivatives, HTML and PDF.
 
-As a final example, we can query this very vignette:
-```r
-chunks <- chunk(vignette(package = "wizrd"))
+Since the output is markdown, we embed it
+directly in this document. 
+
+```{r results='asis'}
+chunks <- chunk(tools::Rd_db("S7"))
 store <- text_store(nomic(), chunks)
-model <- llama() |> prompt_as(rag_from(store, k = 1L))
-predict(model, "RAG example")
+model <- llama() |> prompt_as(rag_from(store))
+cat("#### new_property example\n")
+last_message(chat(model, "new_property example"))
 ```
-And now the vignette has come full circle, querying itself.
+
+```{r include=FALSE}
+httptest2::end_vignette()
+```

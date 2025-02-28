@@ -31,6 +31,8 @@ method(openai_response_format, TextFormat) <- function(x) {
 schema_name_regex <- "^[a-zA-Z0-9_-]+$"
 
 schema_is_strict <- function(x) {
+    if (is.logical(x))
+        return(TRUE)
     if (identical(x$type, "object")) {
         identical(x$additionalProperties, FALSE) &&
             all(names(x$properties) %in% x$required) &&

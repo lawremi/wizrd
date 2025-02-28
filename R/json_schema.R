@@ -1,6 +1,12 @@
 as_json_schema <- new_generic("as_json_schema", "from")
 
-method(as_json_schema, class_logical | class_list) <- function(from, ...) {
+method(as_json_schema, class_logical) <- function(from, ...) {
+    assert_flag(from)
+    from
+}
+
+method(as_json_schema, class_list) <- function(from, ...) {
+    assert_character(names(from))
     from
 }
 
@@ -35,7 +41,8 @@ method(as_json_schema, S7_class) <- function(from, description = NULL, ...) {
     Rd <- get_Rd(from@name)
     arg_descriptions <- if (!is.null(Rd)) Rd_args(Rd) else list()
     props <- Filter(Negate(prop_read_only), from@properties)
-    prop_schema <- Map(as_json_schema, props, arg_descriptions[names(props)])
+    prop_schema <- Map(as_json_schema, props, arg_descriptions[names(props)]) |>
+        ensure_named()
     base_class <- base_ancestor_class(from)
     if (!is.null(base_class)) {
         desc <- "Base R object representing instances of the class"
@@ -48,7 +55,7 @@ method(as_json_schema, S7_class) <- function(from, description = NULL, ...) {
     description <- c(description, if (!is.null(Rd)) Rd_description(Rd))
     if (!is.null(description))
         schema$description <- paste(description, collapse = " ")
-    schema$required <- I(names(props))
+    schema$required <- I(names(prop_schema))
     schema
 }
 
@@ -169,8 +176,15 @@ method(as_json_schema, string_S7_property) <- function(from, description = NULL)
 method(as_json_schema, list_S7_property) <- function(from, description = NULL)
 {
     schema <- as_json_schema(s3_super(from, S7_property), description,
-                             named = is.na(from$named) || from$named)
-    put(schema, items = if (!is.null(from$of)) as_json_schema(from$of))
+                             named = isTRUE(from$named))
+    if (!is.null(from$of)) {
+        of_schema <- as_json_schema(from$of)
+        if (schema$type == "object")
+            schema$additionalProperties <- of_schema
+        else if (schema$type == "array")
+            schema$items <- of_schema
+    }
+    schema
 }
 
 method(as_json_schema, data_frame_S7_property) <- function(from,
@@ -204,9 +218,17 @@ method(as_json_schema, class_data.frame) <- function(from, description = NULL)
 }
 
 box_json_schema <- function(x) {
-    if (!identical(x$type, "object"))
+    if (is.logical(x) || !identical(x$type, "object"))
         list(type = "object", properties = list("__boxed" = x),
              additionalProperties = FALSE,
              required = I("__boxed"))
     else x
+}
+
+norm_json_schema <- function(x) {
+    if (is.list(x) && !is.null(x$required)) {
+        x$required <- I(x$required)
+        lapply(x, norm_json_schema)
+    }
+    x
 }

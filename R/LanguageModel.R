@@ -90,10 +90,7 @@ method(tool_instructions, LanguageModel) <- function(x) {
     
     paste0("You have access to one or more tools named ",
            paste(names(x@tools), collapse = ", "),
-           ". Use them when relevant to answer user queries, but ",
-           "prioritize generating responses without them unless ",
-           "the user explicitly requests or ",
-           "the task requires precise computation or external data.\n\n",
+           ". Use them when relevant or requested to answer user queries.\n\n",
            paste(unlist(lapply(x@tools, \(binding) {
                if (!is.null(binding@instructions))
                    paste0("Specific instructions for '", binding@tool@name,
@@ -116,7 +113,12 @@ describe_examples <- function(ex, io = TextProtocol()) {
 }
 
 method(instructions, list(JSONFormat, LanguageModel)) <- function(on, to) {
-    prompt <- paste0("Return only JSON, without any explanation or other text. ",
+    tool_prefix <- if (length(to@tools) > 0L) {
+        paste0("Call tools if necessary first, ",
+               "and once tools have been called, instead ")
+    }
+    prompt <- paste0(tool_prefix,
+                     "Return only JSON, without any explanation or other text. ",
                      "If the user input is incompatible with the task, ",
                      "issue an informative refusal.\n")
     prompt
@@ -190,7 +192,7 @@ method(embed_text, LanguageModel) <- function(x, data, ndim = NULL) {
     assert_integerish(ndim, null.ok = TRUE)
 
     if (length(data) == 0L)
-        return(matrix(numeric(), ncol = ndim))
+        return(matrix(numeric(), ncol = ndim %||% 0L))
     
     data <- textify(data, x@io@input)
     if (length(data) == 1L && (!is.list(data) || is.object(data)))
@@ -232,7 +234,7 @@ method(detextify, list(class_any, LanguageModel)) <- function(x, format) {
 
 prompt_as := new_generic(c("x", "format"))
 
-method(prompt_as, list(LanguageModel, class_any | class_glue)) <-
+method(prompt_as, list(LanguageModel, class_any | class_glue | File)) <-
     function(x, format) {
         x@io@input <- convert(format, TextFormat)
         x
@@ -252,10 +254,11 @@ method(prompt_as, list(LanguageModel, class_character)) <- function(x, format) {
 
 system_prompt_as := new_generic(c("x", "format"))
 
-method(system_prompt_as, list(LanguageModel, class_any)) <- function(x, format) {
-    x@system_prompt_format <- convert(format, TextFormat)
-    x
-}
+method(system_prompt_as, list(LanguageModel, class_any | class_glue | File)) <-
+    function(x, format) {
+        x@system_prompt_format <- convert(format, TextFormat)
+        x
+    }
 
 method(system_prompt_as, list(LanguageModel, class_character)) <-
     function(x, format) {

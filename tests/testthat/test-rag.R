@@ -20,6 +20,6 @@ test_that("RAG works with vignettes", {
     chunks <- chunk(vignettes)
     store <- text_store(nomic(), chunks)
     model <- llama() |> prompt_as(rag_from(store))
-    ans <- chat(model, "new_property example")
+    ans <- predict(model, "new_property example")
     expect_match(ans, "new_property")
 })

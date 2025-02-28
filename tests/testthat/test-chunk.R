@@ -57,6 +57,4 @@ test_that("Token splitting works", {
     expect_error(chunk("Test sentence.", token_limit = -10, max_overlap = 5))
     
     expect_error(chunk("Test sentence.", token_limit = 10, max_overlap = 15))
-    
-    print("All tests passed!")
 })

@@ -12,7 +12,8 @@ JSONFormat <- new_class("JSONFormat", TextFormat,
                                 },
                                 default = list(type = "object")
                             ),
-                            schema_class = union_classes | class_data.frame))
+                            schema_class = union_classes | class_data.frame |
+                                S7_property))
 
 CSVFormat <- new_class("CSVFormat", TextFormat,
                        properties = list(
@@ -131,6 +132,7 @@ method(textify, list(class_character, TextFormat)) <- function(x, format) {
     unname(x)
 }
 
+## FIXME: questionable
 method(textify, list(class_list, TextFormat)) <- function(x, format) {
     if (!is.null(names(x)))
         textify(x, JSONFormat())
@@ -207,10 +209,12 @@ class_jsonic <- new_S3_class("jsonic")
 
 dejsonify <- new_generic("dejsonify", c("x", "spec"))
 
-method(dejsonify, list(class_list, S7_class)) <- function(x, spec) {
-    keep <- intersect(names(x), names(spec@properties))
-    do.call(spec, Map(dejsonify, x[keep], spec@properties[keep]), quote = TRUE)
-}
+method(dejsonify, list(class_list | class_data.frame, S7_class)) <-
+    function(x, spec) {
+        keep <- intersect(names(x), names(spec@properties))
+        do.call(spec, Map(dejsonify, x[keep], spec@properties[keep]),
+                quote = TRUE)
+    }
 
 method(dejsonify, list(class_any, S7_property)) <- function(x, spec) {
     dejsonify(x, spec$class)
@@ -218,6 +222,11 @@ method(dejsonify, list(class_any, S7_property)) <- function(x, spec) {
 
 method(dejsonify, list(class_any, list_S7_property)) <- function(x, spec) {
     lapply(x, dejsonify, spec$of)
+}
+
+method(dejsonify, list(class_data.frame, list_S7_property)) <- function(x, spec)
+{
+    dejsonify(split(x, seq(nrow(x))), spec)
 }
 
 method(convert, list(class_jsonic, class_raw)) <- function(from, to) {
@@ -258,6 +267,11 @@ method(dejsonify, list(class_any, S7_union)) <- function(x, spec) {
     stop("failed to convert to ", capture.output(print(x)))
 }
 
+method(dejsonify, list(class_list, class_data.frame)) <- function(x, spec)
+{
+    do.call(rbind, c(list(spec), x))
+}
+
 method(dejsonify, list(class_data.frame, class_data.frame)) <- function(x, spec)
 {
     x[colnames(spec)] # JSON schema does not ensure order
@@ -277,7 +291,9 @@ is_json_object <- function(x) is.list(x) && !is.null(names(x))
 box_json <- function(x) if (!is_json_object(x)) list("__boxed" = x) else x
 
 method(detextify, list(class_character, JSONFormat)) <- function(x, format) {
-    fromJSON(x) |> unbox_json() |> dejsonify(format@schema_class)
+    if (length(x) != 1L) # could make simplification optional flag on format
+        lapply(x, detextify, format)
+    else fromJSON(x) |> unbox_json() |> dejsonify(format@schema_class)
 }
 
 method(detextify, list(class_list, JSONFormat)) <- function(x, format) {

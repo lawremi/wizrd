@@ -15,7 +15,7 @@ test_that("chat() and predict() work for text messages", {
 })
 
 test_that("chat() and predict() work for images", {
-    model <- llava()
+    model <- llama_vision()
 
     temp_png <- tempfile(fileext = ".png")
     png(temp_png, type = "Xlib")
@@ -29,10 +29,9 @@ test_that("chat() and predict() work for images", {
 
     chat <- chat(model, raster)
     expect_match(last_output(chat), "scatter.*plot")
-    msgs <- list(raster, "Is there positive correlation in this plot? Answer yes or no.")
-    chat <- chat(model, msgs) # as two separate messages
-    expect_match(last_output(chat), "Yes")
-    chat <- chat(model, list(msgs)) # as a single, multi-part message
+    msgs <- list(raster,
+                 "Is there positive correlation in this plot? Answer yes or no.")
+    chat <- chat(model, msgs) # as a multipart message
     expect_match(last_output(chat), "Yes")
 })
 

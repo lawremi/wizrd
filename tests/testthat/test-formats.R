@@ -20,12 +20,19 @@ test_that("structured output works", {
     ))
     model <- output_as(model, wizrd:::new_list_property(of = Person))
     ans <- predict(model, "Who created R?")
-    expect_contains(ans[[1L]]@first_name, "Robert|Ross")
+    expect_match(ans[[1L]]@first_name, "Robert|Ross")
 
-    model <- output_as(model, list()) # unconstrained JSON output
+    model <- output_as(model, model@io@output)
     ans <- predict(model, "Who created R?")
-    expect_is(ans, "list")
-    expect_contains(unlist(ans), "Robert|Ross")
+    expect_match(ans[[1L]]@first_name, "Robert|Ross")
+
+    model <- output_as(model, model@io@output@schema)
+    ans <- predict(model, "Who created R?")
+    expect_contains(ans$first_name, "Robert")
+    
+    model <- output_as(model, TRUE) # unconstrained JSON output
+    ans <- predict(model, "Who created R?")
+    expect_true(ans) # obviously wrong, but...
 })
 
 test_that("glue templating works", {

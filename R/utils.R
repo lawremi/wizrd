@@ -603,10 +603,13 @@ s3_super <- function(from, to) {
 }
 
 named_list <- function(...) {
-    ans <- list(...)
-    if (is.null(names(ans)))
-        names(ans) <- as.character(seq_along(ans))
-    ans
+    ensure_named(list(...))
+}
+
+ensure_named <- function(x) {
+    if (is.null(names(x)))
+        names(x) <- as.character(seq_along(x))
+    x
 }
 
 home_dir <- function() {
