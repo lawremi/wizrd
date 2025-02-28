@@ -46,7 +46,7 @@ print_message_content <- function(x) {
     float <- float_for_role(x@role)
     if (length(x@content) > 0L) {
         if (x@role == "assistant")
-            cat(paste(strwrap(x@content), collapse = "\n"))
+            cat(paste(strwrap_preserve(x@content), collapse = "\n"))
         else if (x@role %in% c("user", "system")) {
             border_style <- switch(x@role, user = "single", system = "double")
             str <- strfit(x@content, width = cli::console_width() / 2L)
@@ -64,7 +64,10 @@ print_message_object <- function(x) {
             (!identical(x@object, x@content) || x@role == "tool")) {
         opts <- options(max.print = 10L)
         on.exit(options(opts))
-        str <- capture.output(print(x@object, width = cli::console_width() / 2L))
+        w <- cli::console_width() / 2L
+        if (is.character(x@object))
+            x@object <- strfit(x@object, width = w)
+        str <- capture.output(print(x@object, width = w))
         cat(cli::boxx(str, float = float, header = x@participant %||% "",
                       border_style = "classic"))
         cat("\n")

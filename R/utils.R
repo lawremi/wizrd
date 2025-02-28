@@ -450,6 +450,10 @@ strfit <- function(x, width = getOption("width")) {
     cli::ansi_strtrim(strwrap(x, width), width)
 }
 
+strwrap_preserve <- function(x, width = getOption("width")) {
+    strwrap(strsplit(x, "\n", fixed = TRUE)[[1L]], width)
+}
+
 print.raster <- function(x, ...) {
     cat("<raster>: ", nrow(x), "x", ncol(x), "\n", sep = "")
 }
