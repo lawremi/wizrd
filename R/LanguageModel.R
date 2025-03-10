@@ -15,7 +15,8 @@ LanguageModel <- new_class("LanguageModel",
                                    TextFormat,
                                    default = paste(c("{tool_instructions}",
                                                      "{output_instructions}",
-                                                     "{task_instructions}"),
+                                                     "{task_instructions}",
+                                                     "{examples}"),
                                                    collapse = "\n\n") |>
                                        GlueFormat() |> quote()
                                )
@@ -73,14 +74,13 @@ instruct <- function(x, ...) {
 textify_system_prompt <- function(x, params = list()) {
     all_params <- c(
         tool_instructions = tool_instructions(x),
-        output_instructions = instructions(x@io@output, x),
-        task_instructions = x@instructions
+        output_instructions = output_instructions(x),
+        task_instructions = instructions(x),
+        examples = textify_examples(x)
     )
     all_params[names(params)] <- params
     textify(all_params, x@system_prompt_format) |> trimws()
 }
-
-instructions <- new_generic("instructions", c("on", "to"))
 
 tool_instructions <- new_generic("tool_instructions", "x")
 
@@ -99,26 +99,20 @@ method(tool_instructions, LanguageModel) <- function(x) {
            })), collapse = "\n\n"))
 }
 
-method(instructions, list(TextFormat, LanguageModel)) <- function(on, to) ""
-
-describe_examples <- function(ex, io = TextProtocol()) {
-    if (nrow(ex) == 0L)
-        return(NULL)
-    ex_text <- 
-        paste0("Input: ", vapply(exi$input, textify, character(1L), io@input),
-               "\n",
-               "Output: ", vapply(exi$output, textify, character(1L), io@output),
-               collapse = "\n\n")
-    paste0("Example(s):\n\n", ex_text)
+output_instructions <- function(x) {
+    ans <- instructions(x@io@output)
+    if (nzchar(ans) && length(x@tools) > 0L)
+        paste0("Call tools if necessary first, ",
+               "and once tools have been called, instead ", ans)
+    else ans
 }
 
-method(instructions, list(JSONFormat, LanguageModel)) <- function(on, to) {
-    tool_prefix <- if (length(to@tools) > 0L) {
-        paste0("Call tools if necessary first, ",
-               "and once tools have been called, instead ")
-    }
-    prompt <- paste0(tool_prefix,
-                     "Return only JSON, without any explanation or other text. ",
+instructions <- new_generic("instructions", "on")
+
+method(instructions, TextFormat) <- function(on) ""
+
+method(instructions, JSONFormat) <- function(on) {
+    prompt <- paste0("Return only JSON, without any explanation or other text. ",
                      "If the user input is incompatible with the task, ",
                      "issue an informative refusal.\n")
     prompt
@@ -132,7 +126,7 @@ json_type <- function(x) {
             POSIXct = "date-time in ISO8601 format")
 }
 
-method(instructions, list(CSVFormat, LanguageModel)) <- function(on, to) {
+method(instructions, CSVFormat) <- function(on) {
     prompt <- paste("Return only CSV, with values separated by commas.",
                     "Include a header containing the column names.",
                     "The CSV should adhere to the RFC 4180 standard,",
@@ -150,12 +144,27 @@ method(instructions, list(CSVFormat, LanguageModel)) <- function(on, to) {
     prompt
 }
 
-method(instructions, list(CodeFormat, LanguageModel)) <- function(on, to) {
+method(instructions, CodeFormat) <- function(on) {
     prompt <- paste(c("Return only", on@language,
                       "code. Do not wrap the code in ``` blocks.",
                       "Do not include any explanation or other text.\n"),
                     collapse = " ")
     prompt
+}
+
+method(instructions, LanguageModel) <- function(on) on@instructions
+
+textify_examples <- function(x) {
+    ex <- x@examples
+    if (nrow(ex) == 0L)
+        return("")
+    ex_text <- 
+        paste0("Input: ", vapply(ex$input, textify, character(1L), x@io@input),
+               "\n",
+               "Output: ", vapply(ex$output, textify, character(1L),
+                                  x@io@output),
+               collapse = "\n\n")
+    paste0("Example(s):\n\n", ex_text)
 }
 
 tool_input_format <- new_generic("tool_input_format", "x",
