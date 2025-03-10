@@ -16,7 +16,7 @@ Description: Ride the LLM hype llama with an abstraction for configuring
 	     callable by other models. Use cases include
 	     generating code, guiding data exploration, and creating
 	     documentation. Powered by S7.
-License: MIT
+License: MIT + file LICENSE
 Imports:
     tools,
     S7,
