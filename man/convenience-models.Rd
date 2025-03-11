@@ -24,7 +24,7 @@ nomic(temperature = 0, ...)
   }
   \item{...}{
     Additional model parameters, see
-    \code{\link{LanguageModelParameters}}.
+    \code{\link{LanguageModelParams}}.
   }
 }
 \details{

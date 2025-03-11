@@ -9,8 +9,8 @@
   Configure a model to be prompted in a systematic way.
 }
 \usage{
-prompt_as(x, format)
-system_prompt_as(x, format)
+prompt_as(x, format, ...)
+system_prompt_as(x, format, ...)
 }
 \arguments{
   \item{x}{
@@ -26,6 +26,9 @@ system_prompt_as(x, format)
     template is downloaded and set on the model (including the system
     prompt). Both fstring (via \pkg{glue}) and mustache (via
     \pkg{whisker}) templates are supported from the hub.
+  }
+  \item{\dots}{
+    Arguments passed to methods
   }
 }
 \details{

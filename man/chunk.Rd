@@ -12,8 +12,8 @@
   HTML files and PDF files.
 }
 \usage{
-chunk(x, by)
-default_chunking(x)
+chunk(x, by, ...)
+default_chunking(x, ...)
 }
 \arguments{
   \item{x}{
@@ -25,6 +25,9 @@ default_chunking(x)
     value of \code{default_chunking(x)} is used. If \code{NULL}, no
     chunking is performed (the text is returned as a single chunk, if
     possible).
+  }
+  \item{\dots}{
+    Arguments passed to methods
   }
 }
 \value{
@@ -40,7 +43,7 @@ default_chunking(x)
 \details{
   Here are the different types of input and how they are handled by
   default:
-  \itemize{
+  \describe{
     \item{string}{
       A vector of strings is chunked directly based on \code{by}. By
       default, \code{by} is a list, in which case the names of the

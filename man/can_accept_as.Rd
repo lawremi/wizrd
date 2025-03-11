@@ -10,15 +10,15 @@
   to convert whatever the model sends to the declared class.
 }
 \usage{
-can_accept_as(x, ..., `_parameters` = list(...))
+can_accept_as(`_x`, ..., `_parameters` = list(...))
 }
 \arguments{
-  \item{x}{
+  \item{_x}{
     The Tool object
   }
   \item{\dots}{
-    Each argument is any S7 class object, including base and S3 classes,
-    unions and the wildcard \code{\link[S7]{S7_any}}. The arguments are
+    Each argument is any S7 class object, including base classes, S3 classes,
+    and unions. The arguments are
     matched to the underlying function via \code{\link{match.call}},
     i.e. normal R calling semantics.
   }

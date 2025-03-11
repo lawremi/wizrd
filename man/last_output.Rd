@@ -11,11 +11,16 @@
 }
 \usage{
 last_output(x)
-last_message(x)
+last_message(x, role = NULL)
 }
 \arguments{
   \item{x}{
     The Chat object
+  }
+  \item{role}{
+    The role (\code{"assistant"}, \code{"user"}, \code{"tool"},
+    \code{"system"}, etc) of the message source; \code{NULL} represents
+    any role
   }
 }
 \value{

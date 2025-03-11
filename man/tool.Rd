@@ -35,7 +35,7 @@ tool(x, name = deparse(substitute(x)), ...)
   its man page.
 
   Arguments passed to a tool are converted according to the types
-  declared by \code{\link{accept_as}}, without any conversion by
+  declared by \code{\link{can_accept_as}}, without any conversion by
   default.
 
   Converting a LanguageModel to a Tool enables a model to be called by

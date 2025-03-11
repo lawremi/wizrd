@@ -10,8 +10,8 @@
   effective way to ensure correct behavior.
 }
 \usage{
-demonstate(x, input, output)
-demonstate_all(x, examples)
+demonstrate(x, input, output)
+demonstrate_all(x, examples)
 }
 \arguments{
   \item{x}{
@@ -34,7 +34,7 @@ demonstate_all(x, examples)
   mappings are configured by \code{\link{prompt_as}} and
   \code{\link{output_as}}. For tools, the input should be a list of
   arguments corresponding to the function formals, modulo any
-  customization via \code{\link{accept_as}}. The tool output is probably
+  customization via \code{\link{can_accept_as}}. The tool output is probably
   best described as a string, as anything more complex, like JSON
   schema, tends to confuse models.
 }

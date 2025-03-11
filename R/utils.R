@@ -480,7 +480,7 @@ writable_props <- function(x) {
     props(x, static_names)
 }
 
-persist <- new_generic("persist", "x")
+persist <- new_generic("persist", "x", function(x, file) S7_dispatch())
 on_persist <- new_generic("on_persist", "x")
 
 method(persist, class_any) <- function(x, file) {
