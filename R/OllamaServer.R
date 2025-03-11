@@ -72,7 +72,7 @@ require_ollama_model <- function(name, server = ollama_server(), pull = NA) {
         return(invisible(TRUE))
     
     if (is.na(pull))
-        pull <- !interactive() || utils::askYesNo(paste0("Pull ", name, "?"))
+        pull <- !interactive() || askYesNo(paste0("Pull ", name, "?"))
     
     invisible(pull && ollama_pull(name, server))
 }

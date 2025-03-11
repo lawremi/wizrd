@@ -24,7 +24,9 @@ Imports:
     jsonlite,
     checkmate,
     glue,
-    cli
+    cli,
+    curl,
+    methods
 Suggests:
     processx,
     base64enc,

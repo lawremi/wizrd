@@ -442,7 +442,7 @@ function_formals <- function(x) {
 class_object <- function(x) {
     if (is.null(x))
         return(NULL)
-    S7_class(x) %||% as_class(methods::getClassDef(class(x)[1L])) %||%
+    S7_class(x) %||% as_class(getClassDef(class(x)[1L])) %||%
         new_S3_class(class(x))
 }
 
@@ -636,7 +636,7 @@ download_file <- function(url, destfile, timeout) {
 
 prompt_download_file <- function(url, path) {
     download <- !interactive() ||
-        utils::askYesNo(paste0("Do you want to download ", basename(url), "?"))
+        askYesNo(paste0("Do you want to download ", basename(url), "?"))
     invisible(download && download_file(url, path))
 }
 

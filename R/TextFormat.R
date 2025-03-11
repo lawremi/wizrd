@@ -144,7 +144,7 @@ method(textify, list(class_json, TextFormat)) <- function(x, format) unclass(x)
 method(textify, list(class_data.frame, TextFormat)) <- function(x, format) {
     con <- file()
     on.exit(close(con))
-    utils::write.csv(x, con, row.names = FALSE)
+    write.csv(x, con, row.names = FALSE)
     read_as_string(con)
 }
 
@@ -309,7 +309,7 @@ method(detextify, list(class_character, CSVFormat)) <- function(x, format) {
     col_names <- names(format@col_classes)
     header <- has_header(x, col_names)
     if (!header) warning("missing header")
-    utils::read.csv(text = x, colClasses = format@col_classes,
+    read.csv(text = x, colClasses = format@col_classes,
                     col.names = col_names, header = header)
 }
 

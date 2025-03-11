@@ -80,12 +80,12 @@ install_llamafile <- function() {
     url <- llamafile_url()
 
     dest_file <- tempfile(fileext = ".zip")
-    utils::download_file(url, dest_file, 500L)
+    download_file(url, dest_file, 500L)
 
     user_dir <- tools::R_user_dir("wizrd", which = "cache")
     dir.create(user_dir, recursive = TRUE, showWarnings = FALSE)
     
-    utils::unzip(dest_file, exdir = user_dir)
+    unzip(dest_file, exdir = user_dir)
     unlink(dest_file)
 
     Sys.chmod(dir(llamafile_bin_dir(), full.names = TRUE), "755")
@@ -95,7 +95,7 @@ install_llamafile <- function() {
 
 prompt_install_llamafile <- function() {
     answer <- if (interactive())
-                  utils::askYesNo("Do you want to download llamafile in order to use llama.cpp models?")
+                  askYesNo("Do you want to download llamafile in order to use llama.cpp models?")
               else TRUE
     
     if (isTRUE(answer)) {
