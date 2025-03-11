@@ -41,7 +41,8 @@ test_that("models can call R functions as tools", {
 })
 
 test_that("We can make a model callable as a tool", {
-    model <- openai_model() |> prompt_as("Who created {language}?") |>
+    model <- openai_model(temperature = 0) |>
+        prompt_as("Who created {language}?") |>
         output_as(data.frame(first_name = character(), last_name = character()))
     who_is_the_creator_of <- convert(model, wizrd:::Tool)
     ans <- who_is_the_creator_of(list(language = "R"))
@@ -53,7 +54,7 @@ test_that("We can make a model callable as a tool", {
                   can_accept_as(x = class_name)) |>
         instruct("Compute the mean of a named variable.",
                  "Assume the type of the variable to be numeric.")
-    ans <- openai_model() |>
+    ans <- openai_model(temperature = 0) |>
         equip(meanie, instructions = "Call to find the mean of a variable") |>
         predict("What is the mean of the variable 'var'?")
     expect_match(ans, "2")
