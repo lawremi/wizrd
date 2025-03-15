@@ -48,14 +48,14 @@ test_that("We can make a model callable as a tool", {
     ans <- who_is_the_creator_of(list(language = "R"))
     expect_contains(ans$first_name, "Robert")
 
-    var <- 1:3
-    meanie <- llama() |>
+    meanie <- llama(server) |>
         equip(tool(mean) |> describe_with_Rd() |>
                   can_accept_as(x = class_name)) |>
         instruct("Compute the mean of a named variable.",
-                 "Assume the type of the variable to be numeric.")
+                 "Assume the type of the variable to be nuzmeric.")
     ans <- openai_model(temperature = 0) |>
-        equip(meanie, instructions = "Call to find the mean of a variable") |>
+        equip(meanie, instructions = "Call to find the mean of a variable",
+              predict_args = list(env = list2env(list(var = 1:3)))) |>
         predict("What is the mean of the variable 'var'?")
     expect_match(ans, "2")
 })

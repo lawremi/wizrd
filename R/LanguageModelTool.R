@@ -16,22 +16,35 @@ LanguageModelTool := new_class(
         signature = new_property(
             ToolSignature,
             setter = \(self, value) {
-                S7_data(self, check = FALSE) <- model_fun(self@model, value)
+                S7_data(self, check = FALSE) <- model_fun(self@model, value,
+                                                          self@predict_args)
                 self@signature <- value
                 self@examples <- self@model@examples
+                self
+            }
+        ),
+        predict_args = new_property(
+            class_list,
+            default = quote(list()),
+            setter = \(self, value) {
+                S7_data(self, check = FALSE) <- model_fun(self@model,
+                                                          self@signature,
+                                                          value)
+                self@predict_args <- value
                 self
             }
         )
     )
 )
 
-model_fun <- function(model, sig) {
+model_fun <- function(model, sig, predict_args) {
     args <- formals(sig@parameters)
     if (unary(model)) {
         stopifnot(length(args) == 1L)
         args_language <- as.name(names(args))
     } else args_language <- as.call(c(quote(list), sapply(names(args), as.name)))
-    predict_call <- as.call(c(quote(predict), quote(self@model), args_language))
+    predict_call <- as.call(c(quote(predict), quote(self@model), args_language,
+                              predict_args))
     body <- substitute({
         self <- sys.function()
         if (!inherits(self, LanguageModelTool))
