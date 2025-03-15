@@ -6,7 +6,7 @@ library(wizrd)
 
 server <- ollama_server()
 
-dir <- file.path(getwd(), "testthat/http")
+dir <- file.path(getwd(), "testthat", "http")
 
 results <- httptest2::with_mock_dir(dir, {
     test_check("wizrd", reporter = "summary")
