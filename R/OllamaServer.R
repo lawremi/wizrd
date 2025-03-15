@@ -124,20 +124,21 @@ method(on_restore, OllamaServer) <- function(x, name, ...) {
     server
 }
 
-ollama_llama_vision <- function(temperature = 0, ...) {
+ollama_llama_vision <- function(server, temperature = 0, ...) {
     ollama_model("llama3.2-vision:11b-instruct-q4_K_M",
-                 temperature = temperature, ...)
+                 server = server, temperature = temperature, ...)
 }
 
-ollama_llama <- function(temperature = 0, ...)
+ollama_llama <- function(server, temperature = 0, ...)
 {
     ans <- try(ollama_model("llama3.2:3b-instruct-q4_K_M",
-                            temperature = temperature, ...))
+                            server = server, temperature = temperature, ...))
     if (inherits(ans, "try-error"))
         stop("Try using llamafile_llama() as a quickstart.")
     ans
 }
 
-ollama_nomic <- function(temperature = 0, ...) {
-    ollama_model("nomic-embed-text:v1.5", temperature = temperature, ...)
+ollama_nomic <- function(server, temperature = 0, ...) {
+    ollama_model("nomic-embed-text:v1.5", temperature = temperature,
+                 server = server, ...)
 }

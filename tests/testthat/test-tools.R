@@ -1,5 +1,5 @@
 test_that("models can call R functions as tools", {
-    model <- llama()
+    model <- llama(server)
     
     get_mean <- function(name) mean(get(name))
     model <- equip(model, get_mean, "Use to get the mean of an R variable whose name matches the 'name' argument.")
@@ -18,7 +18,7 @@ test_that("models can call R functions as tools", {
     output <- predict(model, "What is the mean of `var`?")
     expect_equal(jsonlite::fromJSON(output)$mean, mean(var))
 
-    model <- llama()
+    model <- llama(server)
     aggregate_tool <- tool(aggregate) |> describe_with_Rd() |>
         can_accept_as(x = class_formula, data = class_name, FUN = class_name)
     model <- equip(model, aggregate_tool)

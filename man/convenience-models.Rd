@@ -12,12 +12,19 @@
   models for the purpose of testing and demonstration.
 }
 \usage{
-llama(temperature = 0, ...)
+llama(server = ollama_server(), temperature = 0, ...)
 llamafile_llama(temperature = 0, ...)
-llama_vision(temperature = 0, ...)
-nomic(temperature = 0, ...)
+llama_vision(server = ollama_server(), temperature = 0, ...)
+nomic(server = ollama_server(), temperature = 0, ...)
 }
 \arguments{
+  \item{server}{
+    The Ollama-based models require an Ollama server to be running. By
+    default, this calls \code{\link{ollama_server}} to start the server,
+    if it is not already running. See the cautionary note in
+    \code{\link{ollama_model}} for the potential pitfalls of this
+    convenience.
+  }
   \item{temperature}{
     The temperature of the model, defaulting to zero for convenient
     stability during testing and demos.

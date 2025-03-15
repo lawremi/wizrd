@@ -35,7 +35,11 @@ azure_openai_model(name = "gpt-4o", ...)
   \item{server}{
     OllamaServer object. By default, looks for a server running on
     localhost on the default port. If no server is found, attempts to
-    start the server.
+    start the server. Note that if this ends up starting the server, the
+    server process will be killed when the returned object goes out of
+    scope. Thus, it is safest to start the server explicitly using
+    \code{\link{ollama_server}} and keep a reference around (or just run
+    \command{ollama serve} in a shell).
   }
   \item{path}{
     A string pointing to a

@@ -10,7 +10,7 @@ importFrom(utils, unzip, askYesNo, write.csv, read.csv, capture.output, help,
 # model constructors
 export(ollama_model, llama_cpp_model, openai_model, azure_openai_model)
 # other constructors
-export(chat, tool, rag_from, text_store, LanguageModelParams)
+export(chat, tool, rag_from, text_store, LanguageModelParams, ollama_server)
 # builders
 export(equip, unequip, instruct, output_as, prompt_as, system_prompt_as,
        can_accept_as, demonstrate, demonstrate_all, describe_with_Rd)

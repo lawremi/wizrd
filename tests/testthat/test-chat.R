@@ -1,5 +1,5 @@
 test_that("chat() and predict() work for text messages", {
-    model <- llama()
+    model <- llama(server)
     model@instructions <- "Respond with a single sentence"
     
     chat <- chat(model, "Who created R?")
@@ -15,7 +15,7 @@ test_that("chat() and predict() work for text messages", {
 })
 
 test_that("chat() and predict() work for images", {
-    model <- llama_vision()
+    model <- llama_vision(server)
 
     temp_png <- tempfile(fileext = ".png")
     png(temp_png, type = "Xlib")
@@ -36,7 +36,7 @@ test_that("chat() and predict() work for images", {
 })
 
 test_that("chat() can stream responses", {
-    model <- llama()
+    model <- llama(server)
     
     model@instructions <- "Respond with a single sentence"
 
