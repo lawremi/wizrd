@@ -8,28 +8,23 @@
   Generates embeddings of text chunks as a matrix.
 }
 \usage{
-embed_text(x, ...)
+embed_text(x, text, ndim, ...)
 }
 \arguments{
   \item{x}{
     The LanguageModel object, whose underlying model should be
     specialized for generating embeddings, like \code{\link{nomic}}.
   }
-  \item{\dots}{
-    Arguments passed to methods
+  \item{text}{
+    A data.frame, typically generated via \code{\link{chunk}}, with
+    a \dQuote{text} column containing text chunks to embed.
   }
-}
-\section{Methods}{
-  \describe{LanguageModel}{\code{embed_text(x, data, ndim = NULL)}}
-  \describe{
-    \item{data}{
-      A data.frame, typically generated via \code{\link{chunk}}, with
-      a \dQuote{text} column containing text chunks to embed.
-    }
-    \item{ndim}{
-      The dimensionality of the embedding (the length of the each
-      embedding vector). If \code{NULL}, it uses the model default.
-    }
+  \item{ndim}{
+    The dimensionality of the embedding (the length of the each
+    embedding vector). If \code{NULL}, it uses the model default.
+  }
+  \item{\dots}{
+    Arguments passed to the embedding backend
   }
 }
 \value{

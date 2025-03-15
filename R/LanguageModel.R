@@ -23,7 +23,8 @@ LanguageModel <- new_class("LanguageModel",
                            ))
 
 chat <- new_generic("chat", "x")
-embed_text <- new_generic("embed_text", "x")
+embed_text <- new_generic("embed_text", "x",
+                          function(x, text, ndim = NULL, ...) S7_dispatch())
 
 method(print, LanguageModel) <- function(x, ...) {
     cat(S7:::obj_desc(x))
@@ -197,20 +198,20 @@ interpret_symbols <-function(x) {
     x
 }
 
-method(embed_text, LanguageModel) <- function(x, data, ndim = NULL) {
+method(embed_text, LanguageModel) <- function(x, text, ndim = NULL, ...) {
     assert_integerish(ndim, null.ok = TRUE)
 
-    if (length(data) == 0L)
+    if (length(text) == 0L)
         return(matrix(numeric(), ncol = ndim %||% 0L))
     
-    data <- textify(data, x@io@input)
-    if (length(data) == 1L && (!is.list(data) || is.object(data)))
-        data <- list(data)
-    if (any(lengths(data) != 1L))
-        stop("elements of 'data' must be length one")
+    text <- textify(text, x@io@input)
+    if (length(text) == 1L && (!is.list(text) || is.object(text)))
+        text <- list(text)
+    if (any(lengths(text) != 1L))
+        stop("elements of 'text' must be length one")
     
-    do.call(rbind, lapply(data, perform_embedding, model = x@name, x = x@backend,
-                          ndim = ndim))
+    do.call(rbind, lapply(text, perform_embedding, model = x@name, x = x@backend,
+                          ndim = ndim, ...))
 }
 
 method(on_restore, LanguageModel) <- function(x, ...) {
