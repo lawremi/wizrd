@@ -1,21 +1,19 @@
 Package: wizrd
 Type: Package
-Title: Integration of Large Language Models (LLMs) into R
+Title: An R Interface to Large Language Models
 Version: 0.1.0
 Authors@R: c(
 		person(given = "Michael", family = "Lawrence",
 		       role = c("aut", "cre"), email = "michafla@gene.com")
 	   )
-Description: Ride the LLM hype llama with an abstraction for configuring
-	     and running models on top of various LLM backends,
-	     commercially hosted or local. Craft parameterized
-	     prompts. Chat using text and images. Stream chat
-	     responses. Generate embeddings and realize the RAG to
-	     riches dream. Implement tools using R functions and
-	     instruct the model to call them. Wrap models as tools
-	     callable by other models. Use cases include
-	     generating code, guiding data exploration, and creating
-	     documentation. Powered by S7.
+Description: Enables embedding Large Language Models (LLMs) in R programs by
+	     treating them as functions with structured inputs and
+	     outputs. Features include tool calling, prompt templating,
+	     convenient encoding of examples and interconversion of JSON and S7
+	     objects. Supports local and remote LLMs, including Ollama,
+	     llama.cpp, OpenAI and Azure, via an abstraction that is extensible
+	     to other providers. There is experimental support for text
+	     embedding, vector stores and Results Augmented Generation (RAG).
 License: MIT + file LICENSE
 Imports:
     tools,
