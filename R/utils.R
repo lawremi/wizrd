@@ -1,8 +1,11 @@
 assert_scalar <- function(scalar, class, arg = deparse(substitute(scalar)))
 {
     if (length(scalar) != 1L || !S7:::class_inherits(scalar, class)) {
-        type_name <- if (identical(class, class_numeric)) "numeric"
-                     else class$class
+        type_name <- if (identical(class, class_numeric)) {
+            "numeric"
+        } else if (inherits(class, "S7_union"))
+            paste(class$classes, collapse = " | "),
+        else class$class
         msg <- sprintf("`%s` must be a single %s value", arg, type_name)
         stop(msg, call. = FALSE)
     }
@@ -41,10 +44,14 @@ with_default <- function(prop, default) {
     prop
 }
 
-new_scalar_property <- function(class, ..., validator = NULL, default) {
+scalar <- function(x, ..., validator = NULL, default = NULL) {
+    if (S7:::is_foundation_class(x))
+        x <- new_property(x, ...)
+    stopifnot(inherits(x, "S7_property"))
     if (!is.null(default) && !is.language(default))
-        assert_scalar(default, class)
-    prop <- new_property(class, ..., validator = function(value) {
+        assert_scalar(default, x$class)
+    x$default <- default
+    x$validator <- function(value) {
         if (is.null(value))
             return(NULL)
         c(if (length(value) != 1L || is.na(value))
@@ -52,9 +59,9 @@ new_scalar_property <- function(class, ..., validator = NULL, default) {
           if (!is.null(validator))
               validator(value)
           )
-    }, default = default)
-    class(prop) <- c("scalar_S7_property", class(prop))
-    prop
+    }
+    class(x) <- c("scalar_S7_property", class(x))
+    x
 }
 
 new_string_property <- function(..., validator = NULL,
@@ -62,7 +69,7 @@ new_string_property <- function(..., validator = NULL,
 {
     if (is.null(default) && length(choices) > 0L)
         default <- choices[1L]
-    prop <- new_scalar_property(
+    prop <- scalar(
         class_character, ...,
         validator = function(value) {
             c(if (!is.null(choices) && !all(value %in% choices))
@@ -81,7 +88,7 @@ new_string_property <- function(..., validator = NULL,
 ## sensible pattern?
 
 new_flag_property <- function(..., default = FALSE) {
-    new_scalar_property(class_logical, ..., default = default)
+    scalar(class_logical, ..., default = default)
 }
 
 ## TODO: make this handle non-scalars as well
@@ -89,7 +96,7 @@ new_number_property <- function(class = class_numeric, ..., validator = NULL,
                                 default = min(max(min, 0), max),
                                 min = -Inf, max = Inf)
 {
-    prop <- new_scalar_property(class, ..., validator = function(value) {
+    prop <- scalar(class, ..., validator = function(value) {
         c(if (any(value < min))
               paste("must be >=", min),
           if (any(value > max))
