@@ -597,7 +597,12 @@ resembles_text <- function(x) !resembles_file(x)
 
 resembles_hub_id <- function(x) length(strsplit(x, "/")[[1L]]) == 2L
 
-resembles_url <- function(x) !is.null(httr2::url_parse(x)$scheme)
+resembles_url <- function(x, scheme) {
+    x_scheme <- httr2::url_parse(x)$scheme
+    if (!missing(scheme))
+        identical(x_scheme, scheme)
+    else !is.null(x_scheme)
+}
 
 read_as_string <- function(x) paste(readLines(x), collapse = "\n")
 

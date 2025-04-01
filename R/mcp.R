@@ -4,6 +4,13 @@ MCPSession := new_class(
     )
 )
 
+MCPSSEEndpoint := new_class(
+    properties = list(
+        sse_con = S3_connection,
+        post_url = scalar(class_string)
+    )
+)
+
 MCPImplementation := new_class(
     properties = list(
         name = scalar(class_character,
@@ -87,26 +94,29 @@ MCPListToolsResult := new_class(
     )
 )
 
-mcp_method := new_generic()
+method(json_rpc_method, MCPInitializeRequest) <- function(x) "initialize"
 
-method(mcp_method, MCPInitializeRequest) <- function(x) "initialize"
+method(json_rpc_method, MCPListToolsRequest) <- function(x) "tools/list"
 
-method(mcp_method, MCPListToolsRequest) <- function(x) "tools/list"
+method(json_rpc_params, MCPRequest) <- function(x) props(x)
 
-method(jsonify, MCPRequest) <- function(x) {
-    lapply(props(x), jsonify)
-}
+method(response_prototype, MCPInitializeRequest) <-
+    function(x) MCPInitializeResult()
 
 method(send, list(class_any, MCPSession)) <- function(x, to) {
     send(x, to@endpoint)
 }
 
 method(send, list(MCPRequest, class_any)) <- function(x, to) {
-    JSONRPCRequest(method = mcp_method(x), params = x)
+    convert(x, JSONRPCRequest) |> send(to)
 }
 
-method(receive, list(class_character, MCPResult)) <- function(from, as) {
-    receive(from, JSONRPCResponse(result = as))@result
+method(receive, list(class_any, MCPResult)) <- function(from, as) {
+    receive(from, JSONRPCResponse()) |> receive(as)
+}
+
+method(receive, list(JSONRPCResponse, MCPResult)) <- function(from, as) {
+    from@result |> receive(as)
 }
 
 mcp_request_constructor <- function(name) {
@@ -125,11 +135,50 @@ method(`$`, MCPSession) <- function(x, name) {
     fun
 }
 
-method(response_prototype, MCPInitializeRequest) <-
-    function(x) MCPInitializeResult()
+want_reticulate_uv <- function(cmd) {
+    if ((startsWith(cmd, "uv run ") || startsWith(cmd, "uvx ")) &&
+            !file.exists("uv") && Sys.which("uv") == "")
+        return(NULL)
+    install <- !interactive() ||
+        askYesNo("uv not found; use reticulate to find/install?")
+    if (install)
+        require_ns("reticulate", "find/install uv")
+}
+
+make_uv_pipe_tool <- function() {
+    uv_pipe_tool <- reticulate::uv_run_tool
+    environment(uv_pipe_tool) <- list2env(list(
+        system2 = function(command, args) {
+            pipe(paste(command, paste(args, collapse = " ")))
+        }
+    ), environment(uv_pipe_tool))
+    uv_pipe_tool
+}
+
+uv_pipe <- function(cmd) {
+    if (!want_reticulate_uv(cmd))
+        return(NULL)
+    args <- strsplit(cmd, " ", fixed = TRUE)[[1L]] |> tail(-2L)
+    make_uv_pipe_tool()(args[1L], args[-1L])
+}
+
+pipe_endpoint <- function(cmd) {
+    uv_pipe(cmd) %||% pipe(cmd)
+}
+
+ws_endpoint <- function(url) {
+    require_ns("websocket", "connect to websocket-based MCP servers")
+    BufferedWebSocket(webSocket = WebSocket$new(url))
+}
+
+mcp_endpoint <- function(server) {
+    assert_string(server)
+    if (resembles_url(server, "ws"))
+        ws_endpoint(server)
+    else pipe_endpoint(server)
+}
 
 mcp_connect <- function(server) {
-    ## 'server' can be either a command (stdio assumed) or a http:// url (SSE)
     session <- MCPSession(endpoint = mcp_endpoint(server))
     session$initialize()
     session
