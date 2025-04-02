@@ -4,7 +4,7 @@ assert_scalar <- function(scalar, class, arg = deparse(substitute(scalar)))
         type_name <- if (identical(class, class_numeric)) {
             "numeric"
         } else if (inherits(class, "S7_union"))
-            paste(class$classes, collapse = " | "),
+            paste(class$classes, collapse = " | ")
         else class$class
         msg <- sprintf("`%s` must be a single %s value", arg, type_name)
         stop(msg, call. = FALSE)
@@ -128,6 +128,10 @@ prop_prob <- new_number_property(min = 0, max = 1)
 prop_int <- new_int_property()
 prop_int_nn <- new_int_property(min = 0L)
 prop_int_pos <- new_int_property(min = 1L)
+
+list_of <- function(class, ...) {
+    new_list_property(of = class, ...)
+}
 
 new_list_property <- function(..., validator = NULL,
                               default = if (isTRUE(named))

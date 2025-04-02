@@ -1,13 +1,21 @@
-MCPSession := new_class(
-    properties = list(
-        endpoint = class_any
+MCPSession <- setRefClass("MCPSession",
+    fields = list(
+        endpoint = "ANY"
+    ),
+    methods = list(
+        initialize = function(.self) {
+            invoke(MCPInitializeRequest(), .self)
+        },
+        listTools = function(.self) {
+            invoke(MCPListToolsRequest(), .self)
+        }
     )
 )
 
 MCPSSEEndpoint := new_class(
     properties = list(
         sse_con = S3_connection,
-        post_url = scalar(class_string)
+        post_url = scalar(class_character)
     )
 )
 
@@ -21,14 +29,14 @@ MCPImplementation := new_class(
 
 MCPClientCapabilities := new_class(
     properties = list(
-        experimental = new_list_property(named = TRUE) | NULL,
+        experimental = nullable(named(class_list)),
         sampling = class_list | NULL,
         roots = class_list | NULL
     ))
 
 MCPServerCapabilities := new_class(
     properties = list(
-        experimental = new_list_property(named = TRUE) | NULL,
+        experimental = nullable(named(class_list)),
         logging = class_list | NULL,
         completions = class_list | NULL,
         prompts = class_list | NULL,
@@ -44,7 +52,7 @@ MCPInitializeRequest := new_class(
     MCPRequest,
     properties = list(
         protocolVersion = scalar(class_character),
-        capabilities = MCPClientCabilities,
+        capabilities = MCPClientCapabilities,
         clientInfo = MCPImplementation
     )
 )
@@ -81,7 +89,7 @@ MCPToolAnnotations := new_class(
 MCPTool := new_class(
     properties = list(
         name = scalar(class_character),
-        description = scalar(class_character | NULL)
+        description = scalar(class_character | NULL),
         inputSchema = class_list,
         annotations = MCPToolAnnotations
     )
@@ -90,9 +98,13 @@ MCPTool := new_class(
 MCPListToolsResult := new_class(
     MCPResult,
     properties = list(
-        tools = new_list_property(MCPTool)
+        tools = list_of(MCPTool)
     )
 )
+
+close.MCPSession <- function(con, ...) {
+    close(con$endpoint, ...)
+}
 
 method(json_rpc_method, MCPInitializeRequest) <- function(x) "initialize"
 
@@ -102,6 +114,9 @@ method(json_rpc_params, MCPRequest) <- function(x) props(x)
 
 method(response_prototype, MCPInitializeRequest) <-
     function(x) MCPInitializeResult()
+
+method(response_prototype, MCPListToolsRequest) <-
+    function(x) MCPListToolsResult()
 
 method(send, list(class_any, MCPSession)) <- function(x, to) {
     send(x, to@endpoint)
@@ -117,22 +132,6 @@ method(receive, list(class_any, MCPResult)) <- function(from, as) {
 
 method(receive, list(JSONRPCResponse, MCPResult)) <- function(from, as) {
     from@result |> receive(as)
-}
-
-mcp_request_constructor <- function(name) {
-    substring(name, 1L) <- toupper(substring(name, 1L, 1L))
-    match.fun(paste0(name, "MCPRequest"))
-}
-
-method(`$`, MCPSession) <- function(x, name) {
-    fun <- mcp_request_constructor(name)
-    CONSTRUCTOR_CALL <- as.call(lapply(c(name, names(formals(fun))),
-                                       as.name))
-    body(fun) <- substitute({
-        CONSTRUCTOR_CALL |> invoke(session)
-    })
-    environment(fun) <- list2env(list(session = x), topenv())
-    fun
 }
 
 want_reticulate_uv <- function(cmd) {
@@ -182,4 +181,8 @@ mcp_connect <- function(server) {
     session <- MCPSession(endpoint = mcp_endpoint(server))
     session$initialize()
     session
+}
+
+mcp_test_server <- function() {
+    paste("uvx python", system.file("mcp", "server.py", package = "wizrd"))
 }

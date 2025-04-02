@@ -11,22 +11,28 @@ next_id <- local({
 union_id <- class_character | class_numeric | NULL
 
 JSONRPCRequest := new_class(
-    jsonrpc = scalar(class_character),
-    method = scalar(class_character),
-    params = class_list,
-    id = scalar(union_id, default = quote(next_id()))
+    properties = list(
+        jsonrpc = scalar(class_character),
+        method = scalar(class_character),
+        params = class_list,
+        id = scalar(union_id, default = quote(next_id()))
+    )
 )
 
 JSONRPCError := new_class(
-    code = scalar(class_integer),
-    message = scalar(class_character),
-    data = class_any
+    properties = list(
+        code = scalar(class_integer),
+        message = scalar(class_character),
+        data = class_any
+    )
 )
 
 JSONRPCResponse := new_class(
-    result = class_any,
-    error = JSONRPCError | NULL,
-    id = scalar(union_id)
+    properties = list(
+        result = class_any,
+        error = JSONRPCError | NULL,
+        id = scalar(union_id)
+    )
 )
 
 method(jsonify, JSONRPCRequest) <- function(x) {
@@ -37,7 +43,7 @@ send := new_generic(c("x", "to"))
 
 receive := new_generic(c("from", "as"))
 
-response_prototype := new_generic()
+response_prototype := new_generic("x")
 
 invoke <- function(x, endpoint) {
     send(x, endpoint) |> receive(response_prototype(x))
@@ -60,21 +66,31 @@ BufferedWebSocket := new_class(
     properties = list(
         buffer = new_property(
             S3_connection,
-            setter = function(self, value) stop("@buffer is not settable"),
+            setter = function(self, value) {
+                if (is.null(self@buffer))
+                    self@buffer <- value
+                else stop("@buffer is read only after construction")
+                self
+            },
             default = quote(file())
         ),
         webSocket = new_property(
             WebSocket,
             setter = function(self, value) {
                 value$onMessage(function(event) {
-                    writeLines(self@buffer, event$data)
+                    writeLines(event$data, self@buffer)
                 })
-                self@value <- value
+                self@webSocket <- value
                 self
             }
         )
     )
 )
+
+method(close, BufferedWebSocket) <- function(con, ...) {
+    con@webSocket$close()
+    close(con@buffer, ...)
+}
 
 method(send, list(class_character, WebSocket)) <- function(x, to) {
     to$send(x)
@@ -103,8 +119,8 @@ method(receive, list(class_list, S7_object)) <- function(from, as) {
 
 method(response_prototype, JSONRPCRequest) <- function(x) JSONRPCResponse()
 
-json_rpc_method := new_generic()
-json_rpc_params := new_generic()
+json_rpc_method := new_generic("x")
+json_rpc_params := new_generic("x")
 
 method(convert, list(class_any, JSONRPCRequest)) <- function(from, to) {
     JSONRPCRequest(method = json_rpc_method(from),
