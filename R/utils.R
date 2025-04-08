@@ -28,7 +28,7 @@ named <- function(prop) {
         prop <- new_property(prop)
     validator <- prop$validator
     prop$validator <- \(value)
-        c(if (is.null(names(value)))
+        c(if (is.vector(value) && is.null(names(value)))
             "must have names",
           if (!is.null(validator))
               validator(value))
@@ -41,6 +41,13 @@ named <- function(prop) {
 
 with_default <- function(prop, default) {
     prop$default <- default
+    prop
+}
+
+literal <- function(value) {
+    prop <- new_property(class_object(value), getter = function(self) value)
+    if (is.vector(value) && length(value) == 1L)
+        prop <- scalar(prop)
     prop
 }
 
@@ -344,6 +351,54 @@ require_ns <- function(x, to) {
              call. = FALSE)
 
     invisible(TRUE)
+}
+
+S3_connection <- new_S3_class("connection")
+
+S3_processx_connection <- new_S3_class("processx_connection")
+S3_process <- new_S3_class("process")
+
+union_connection <- S3_connection | S3_processx_connection
+
+read_lines := new_generic("con")
+
+method(read_lines, S3_connection) <- function(con, ...) readLines(con, ...)
+method(read_lines, S3_processx_connection) <- function(con, ...)
+    processx::conn_read_lines(con, ...)
+
+write_lines := new_generic("con", function(con, text, ...) S7_dispatch())
+
+method(write_lines, S3_connection) <- function(con, text, ...) {
+    writeLines(text, con, ...)
+    flush(to)
+}
+method(write_lines, S3_processx_connection) <- function(con, text, ...) {
+    if (length(text) > 0L)
+        text[length(text)] <- paste0(text[length(text)], "\n")
+    while(length(text) > 0L)
+        text <- processx::conn_write(con, text, ...)
+}
+
+Pipe := new_class(
+    properties = list(
+        process = S3_process,
+        stdin = new_property(
+            S3_processx_connection,
+            getter = function(self) self@process$get_input_connection()
+        ),
+        stdout = new_property(
+            S3_processx_connection,
+            getter = function(self) self@process$get_output_connection()
+        )
+    )
+)
+
+pipex <- function(command, args) {
+    verbose <- isTRUE(getOption("wizrd_verbose"))
+    if (verbose)
+        message("running: ", command, " ", paste(args, collapse = " "))
+    processx::process$new(command, args, stdin = "|", stdout = "|",
+                          stderr = if (verbose) "") |> Pipe()
 }
 
 init_process <- function(path, args, ready_callback, error_callback,

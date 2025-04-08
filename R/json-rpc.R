@@ -8,15 +8,27 @@ next_id <- local({
     }
 })
 
-union_id <- class_character | class_numeric | NULL
+union_id <- NULL | class_character | class_numeric
 
 JSONRPCRequest := new_class(
     properties = list(
-        jsonrpc = scalar(class_character),
+        jsonrpc = literal("2.0"),
         method = scalar(class_character),
         params = class_list,
         id = scalar(union_id, default = quote(next_id()))
     )
+)
+
+JSONRPCNotification := new_class(
+    JSONRPCRequest,
+    properties = list(
+        id = NULL
+    ), # See S7 PR#473 for why this is necessary
+    constructor = function(.data = JSONRPCRequest(method = method,
+                                                  params = params,
+                                                  id = NULL),
+                           method, params = list())
+        new_object(.data)
 )
 
 JSONRPCError := new_class(
@@ -30,7 +42,7 @@ JSONRPCError := new_class(
 JSONRPCResponse := new_class(
     properties = list(
         result = class_any,
-        error = JSONRPCError | NULL,
+        error = NULL | JSONRPCError,
         id = scalar(union_id)
     )
 )
@@ -49,16 +61,28 @@ invoke <- function(x, endpoint) {
     send(x, endpoint) |> receive(response_prototype(x))
 }
 
-method(send, list(JSONRPCRequest, class_any)) <- function(x, to) {
-    jsonify(x) |> toJSON() |> send(to)
+notify <- function(x, endpoint) {
+    send(x, endpoint)
+    invisible(NULL)
 }
 
-S3_connection <- new_S3_class("connection")
-
-method(send, list(class_character, S3_connection)) <- function(x, to) {
-    writeLines(x, to)
+method(send, list(JSONRPCRequest, class_any)) <- function(x, to) {
+    jsonify(x) |> toJSON(auto_unbox = TRUE) |> send(to)
     to
 }
+
+method(send, list(class_any, Pipe)) <- function(x, to) {
+    send(x, to@stdin)
+    to
+}
+
+method(send, list(class_character | class_json, union_connection)) <-
+    function(x, to) {
+        if (getOption("wizrd_verbose", FALSE))
+            message("SEND: ", x)
+        write_lines(to, x)
+        to
+    }
 
 WebSocket <- new_S3_class("WebSocket") # R6 class from the websocket package
 
@@ -92,29 +116,58 @@ method(close, BufferedWebSocket) <- function(con, ...) {
     close(con@buffer, ...)
 }
 
-method(send, list(class_character, WebSocket)) <- function(x, to) {
+method(close, Pipe) <- function(con, ...) {
+    con@process$kill()
+}
+
+method(send, list(class_character | class_json, WebSocket)) <- function(x, to) {
     to$send(x)
     to
 }
 
 method(send, list(class_any, BufferedWebSocket)) <- function(x, to) {
     send(x, to@webSocket)
+    to
 }
 
-method(receive, list(S3_connection, JSONRPCResponse)) <- function(from, as) {
-    readLines(from, n = 1L) |> receive(as)
+method(receive, list(Pipe, class_any)) <- function(from, as, ...) {
+    receive(from@stdout, as, ...)
 }
 
-method(receive, list(BufferedWebSocket, JSONRPCResponse)) <- function(from, as) {
-    receive(from@buffer, as)
+method(receive, list(union_connection, JSONRPCResponse)) <-
+    function(from, as, on_notify = function(x) invisible(NULL))
+    {
+        ## could become a more general listener that runs asynchronously,
+        ## but that would only make sense for an app with mutable state
+        while(TRUE) {
+            lines <- read_lines(from, n = 1L)
+            if (length(lines) >= 1L) {
+                if (getOption("wizrd_verbose", FALSE))
+                    message("RECEIVE: ", lines)
+                response <- fromJSON(lines)
+                if (is.null(response$id))
+                    receive(from, JSONRPCNotification()) |> on_notify()
+                else break
+            }
+            Sys.sleep(0.01)
+        }
+        receive(response, as)
+    }
+
+method(receive, list(BufferedWebSocket, JSONRPCResponse)) <- function(from, as,
+                                                                      ...)
+{
+    receive(from@buffer, as, ...)
 }
 
-method(receive, list(class_character, JSONRPCResponse)) <- function(from, as) {
-    fromJSON(from) |> receive(as)
+method(receive, list(class_character, JSONRPCResponse)) <- function(from, as,
+                                                                    ...)
+{
+    fromJSON(from) |> receive(as, ...)
 }
 
 method(receive, list(class_list, S7_object)) <- function(from, as) {
-    do.call(S7_class(as), from)
+    dejsonify(from, S7_class(as))
 }
 
 method(response_prototype, JSONRPCRequest) <- function(x) JSONRPCResponse()
@@ -122,7 +175,8 @@ method(response_prototype, JSONRPCRequest) <- function(x) JSONRPCResponse()
 json_rpc_method := new_generic("x")
 json_rpc_params := new_generic("x")
 
-method(convert, list(class_any, JSONRPCRequest)) <- function(from, to) {
-    JSONRPCRequest(method = json_rpc_method(from),
-                   params = json_rpc_params(from)) 
-}
+method(convert, list(class_any, JSONRPCRequest | JSONRPCNotification)) <-
+    function(from, to) {
+        to(method = json_rpc_method(from),
+           params = json_rpc_params(from)) 
+    }
