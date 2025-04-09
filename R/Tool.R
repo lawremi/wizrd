@@ -135,6 +135,11 @@ method(convert, list(class_function, Tool)) <- function(from, to, ...) {
 
 equip <- function(x, tool, instructions = NULL, ...) {
     stopifnot(inherits(x, LanguageModel))
+    if (is.list(tool) && !is.object(tool)) {
+        for (t in tool)
+            x <- equip(x, t)
+        return(x)
+    }
     if (!inherits(tool, Tool))
         tool <- wizrd::tool(tool, name = deparse(substitute(tool)), ...)
     x@tools[[tool@name]] <- bind(tool, x, instructions)
@@ -251,4 +256,8 @@ describe_tool_examples <- function(binding) {
     value <- vapply(ex$output, textify, character(1L), binding@io@output)
     ex_text <- paste0(call, " returns: ", value, collapse = "\n")
     paste0("Example(s):\n", ex_text)
+}
+
+param_descriptions_from_schema <- function(x) {
+    vapply(x$properties, \(x) x$description %||% NA_character_, character(1L))
 }

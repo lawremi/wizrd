@@ -18,6 +18,8 @@ validate_MediaURI <- function(self) {
 
 ImageURI <- new_class("ImageURI", MediaURI, validator = validate_MediaURI)
 
+AudioURI <- new_class("ImageURI", MediaURI, validator = validate_MediaURI)
+
 method(convert, list(union_raster, MediaURI)) <- function(from, to) {
     require_ns(c("base64enc", "png"), "encode images")
     
@@ -32,4 +34,8 @@ method(convert, list(union_raster, MediaURI)) <- function(from, to) {
     uri <- base64enc::dataURI(png::writePNG(image), mime = "image/png")
 
     ImageURI(uri, type = "image/png")
+}
+
+data_uri <- function(data, encoding = "base64", mimeType = "") {
+    paste0("data:", mimeType, ";", encoding, ",", data)
 }

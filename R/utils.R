@@ -45,24 +45,46 @@ with_default <- function(prop, default) {
 }
 
 literal <- function(value) {
-    prop <- new_property(class_object(value), getter = function(self) value)
+    prop <- new_property(class_object(value),
+                         validator = eval(substitute(function(value) {
+                             if (!identical(value, VALUE))
+                                 paste("must match", VALUE)
+                         }, list(VALUE = value))),
+                         default = value)
     if (is.vector(value) && length(value) == 1L)
         prop <- scalar(prop)
+    class(prop) <- c("literal_S7_property", class(prop))
+    prop$value <- value
     prop
 }
 
-scalar <- function(x, ..., validator = NULL, default = NULL) {
+missing_name <- function() alist(x=)[[1L]]
+
+scalar <- function(x, ..., validator = x$validator, default = x$default,
+                   choices = NULL)
+{
     if (S7:::is_foundation_class(x))
         x <- new_property(x, ...)
     stopifnot(inherits(x, "S7_property"))
-    if (!is.null(default) && !is.language(default))
-        assert_scalar(default, x$class)
-    x$default <- default
+    x$default <- if (is.null(default)) {
+        if (inherits(x$class, "S7_union") && is.null(x$class$classes[[1L]]))
+            NULL
+        else if (length(choices) > 0L)
+            choices[1L]
+        else missing_name()
+    } else {
+        if (!is.language(default))
+            assert_scalar(default, x$class)
+        default
+    }
+    force(validator)
     x$validator <- function(value) {
         if (is.null(value))
             return(NULL)
         c(if (length(value) != 1L || is.na(value))
             "must be of length one and not missing",
+          if (!is.null(choices) && !all(value %in% choices))
+                paste("contains values not in", deparse(choices)),
           if (!is.null(validator))
               validator(value)
           )

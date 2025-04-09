@@ -48,3 +48,8 @@ method(format, Parameters) <- function(x, ...) {
 method(print, Parameters) <- function(x, ...) {
     print(Parameters_as_call(x), ...)
 }
+
+method(convert, list(class_jsonic, ToolSignature)) <- function(from, to) {
+    ToolSignature(parameters = schema_class(from),
+                  value = new_property(class_any))
+}

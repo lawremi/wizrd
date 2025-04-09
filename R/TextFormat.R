@@ -31,13 +31,13 @@ whisker := new_class(ScalarString)
 WhiskerFormat := new_class(TextFormat,
                            properties = list(template = whisker))
 
-fits_schema_class <- function(x) {
+is_schema_class <- function(x) {
     S7:::class_inherits(x, JSONFormat@properties$schema_class$class)
 }
 
 json_format <- function(schema = list())
 {
-    schema_class <- if (fits_schema_class(schema)) schema else class_any
+    schema_class <- if (is_schema_class(schema)) schema else schema_class(schema)
     schema <- box_json_schema(as_json_schema(schema))
     JSONFormat(schema = schema, schema_class = schema_class)
 }
@@ -122,26 +122,26 @@ method(textify, list(class_any, class_missing)) <- function(x, format) {
     textify(x, PlainTextFormat())
 }
 
-method(textify, list(class_any, TextFormat)) <- function(x, format) {
+method(textify, list(class_any, PlainTextFormat)) <- function(x, format) {
     if (!is.object(x) && length(x) == 1L)
         unname(as.character(x))
     else textify(x, JSONFormat())
 }
 
-method(textify, list(class_character, TextFormat)) <- function(x, format) {
+method(textify, list(class_character, PlainTextFormat)) <- function(x, format) {
     unname(x)
 }
 
-## FIXME: questionable
-method(textify, list(class_list, TextFormat)) <- function(x, format) {
-    if (!is.null(names(x)))
+method(textify, list(class_list, PlainTextFormat)) <- function(x, format) {
+    if (is.object(names(x)))
         textify(x, JSONFormat())
     else lapply(x, textify, format)
 }
 
-method(textify, list(class_json, TextFormat)) <- function(x, format) unclass(x)
+method(textify, list(class_json, PlainTextFormat)) <-
+    function(x, format) unclass(x)
 
-method(textify, list(class_data.frame, TextFormat)) <- function(x, format) {
+method(textify, list(class_data.frame, PlainTextFormat)) <- function(x, format) {
     con <- file()
     on.exit(close(con))
     write.csv(x, con, row.names = FALSE)
@@ -152,7 +152,7 @@ nativeRaster <- new_S3_class("nativeRaster")
 raster <- new_S3_class("raster")
 union_raster <- new_union(nativeRaster, raster)
 
-method(textify, list(union_raster, TextFormat)) <- function(x, format) {
+method(textify, list(union_raster, PlainTextFormat)) <- function(x, format) {
     convert(x, MediaURI)
 }
 
@@ -264,7 +264,7 @@ method(dejsonify, list(class_any, S7_union)) <- function(x, spec) {
         if (!inherits(ans, "try-error"))
             return(ans)
     }
-    stop("failed to convert to ", capture.output(print(x)))
+    stop("failed to convert to ", capture.output(print(spec)))
 }
 
 method(dejsonify, list(class_list, class_data.frame)) <- function(x, spec)

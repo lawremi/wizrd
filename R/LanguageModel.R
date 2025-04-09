@@ -279,3 +279,7 @@ output_as <- function(x, format) {
     x@io@output <- convert(format, TextFormat)
     x
 }
+
+tools := new_generic("x")
+
+method(tools, LanguageModel) <- function(x) x@tools

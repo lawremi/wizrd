@@ -144,7 +144,7 @@ method(receive, list(union_connection, JSONRPCResponse)) <-
             if (length(lines) >= 1L) {
                 if (getOption("wizrd_verbose", FALSE))
                     message("RECEIVE: ", lines)
-                response <- fromJSON(lines)
+                response <- fromJSON(lines, simplifyDataFrame = FALSE)
                 if (is.null(response$id))
                     receive(from, JSONRPCNotification()) |> on_notify()
                 else break

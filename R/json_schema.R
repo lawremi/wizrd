@@ -232,3 +232,42 @@ norm_json_schema <- function(x) {
     }
     x
 }
+
+schema_class <- function(x) {
+    if (is.null(x) || is.null(x$type))
+        return(class_any)
+    if (!is.null(x$anyOf))
+        return(do.call(new_union, lapply(x$anyOf, schema_class)))
+    switch(x$type,
+           object = schema_S7_class(x),
+           array = schema_array(x$items),
+           string = scalar(class_character),
+           number = scalar(class_numeric),
+           integer = scalar(class_integer),
+           boolean = scalar(class_logical))
+}
+
+schema_S7_class <- function(x) {
+    new_class(x$"$id" %||% x$title %||% "schema",
+              properties = c(lapply(x$properties, schema_class),
+                             `_dots` = if (isTRUE(x$additionalProperties))
+                                 class_list))
+}
+
+vectorize_property <- function(x) {
+    if (inherits(x, scalar_S7_property))
+        new_property(x$class)
+    else list_of(x)
+}
+
+schema_array <- function(x) {
+    item_class <- schema_class(x)
+    if (inherits(item_class, scalar_S7_property))
+        item_class$class
+    else if (inherits(item_class, S7_class)) {
+        item_class@properties <- lapply(item_class@properties,
+                                        vectorize_property)
+        new_data_frame_property(prototype = as.data.frame(formals(item_class)))
+    }
+    else list_of(item_class)
+}

@@ -13,6 +13,9 @@ MCPSession <- setRefClass("MCPSession",
         listTools = function(.self) {
             invoke(MCPListToolsRequest(), .self)
         },
+        callTool = function(.self, name, arguments) {
+            invoke(MCPCallToolRequest(name = name, arguments = arguments), .self)
+        },
         finalize = function(.self) {
             close(.self)
         }
@@ -116,6 +119,77 @@ MCPListToolsResult := new_class(
     )
 )
 
+MCPCallToolRequest := new_class(
+    MCPRequest,
+    properties = list(
+        name = scalar(class_character),
+        arguments = class_list
+    )
+)
+
+MCPAnnotations := new_class(
+    properties = list(
+        audience = scalar(NULL | class_character,
+                          choices = c("user", "assistant")),
+        priority = scalar(NULL | class_numeric)
+    )
+)
+
+MCPTextContent := new_class(
+    properties = list(
+        type = literal("text"),
+        text = scalar(class_character),
+        annotations = NULL | MCPAnnotations
+    )
+)
+
+MCPImageContent := new_class(
+    properties = list(
+        type = literal("image"),
+        data = scalar(class_character),
+        mimeType = scalar(class_character),
+        annotations = NULL | MCPAnnotations
+    )
+)
+
+MCPAudioContent := new_class(
+    properties = list(
+        type = literal("audio"),
+        data = scalar(class_character),
+        mimeType = scalar(class_character),
+        annotations = NULL | MCPAnnotations
+    )
+)
+
+MCPTextResourceContents := new_class(
+    properties = list(
+        text = scalar(class_character)
+    )
+)
+
+MCPBlobResourceContents := new_class(
+    properties = list(
+        blob = scalar(class_character)
+    )
+)
+
+MCPEmbeddedResource := new_class(
+    properties = list(
+        type = literal("resource"),
+        resource = MCPTextResourceContents | MCPBlobResourceContents,
+        annotations = NULL | MCPAnnotations
+    )
+)
+
+MCPCallToolResult := new_class(
+    MCPResult,
+    properties = list(
+        content = list_of(MCPTextContent | MCPImageContent | MCPAudioContent |
+                              MCPEmbeddedResource),
+        isError = NULL | class_logical
+    )
+)
+
 MCPPingRequest := new_class()
 
 close.MCPSession <- function(con, ...) {
@@ -126,6 +200,8 @@ method(json_rpc_method, MCPInitializeRequest) <- function(x) "initialize"
 
 method(json_rpc_method, MCPListToolsRequest) <- function(x) "tools/list"
 
+method(json_rpc_method, MCPCallToolRequest) <- function(x) "tools/call"
+
 method(json_rpc_method, MCPPingRequest) <- function(x) "ping"
 
 method(json_rpc_method, MCPNotification) <- function(x) {
@@ -135,11 +211,14 @@ method(json_rpc_method, MCPNotification) <- function(x) {
 
 method(json_rpc_params, MCPRequest) <- function(x) props(x)
 
-method(response_prototype, MCPInitializeRequest) <-
-    function(x) MCPInitializeResult()
+method(response_prototype, MCPInitializeRequest) <- function(x)
+    MCPInitializeResult()
 
-method(response_prototype, MCPListToolsRequest) <-
-    function(x) MCPListToolsResult()
+method(response_prototype, MCPListToolsRequest) <- function(x)
+    MCPListToolsResult()
+
+method(response_prototype, MCPCallToolRequest) <- function(x)
+    MCPCallToolResult()
 
 method(send, list(class_any, MCPSession)) <- function(x, to) {
     send(x, to$endpoint)
@@ -216,4 +295,48 @@ mcp_exec_server <- function(command, args) {
 mcp_test_server <- function() {
     mcp_exec_server("uvx", c("fastmcp", "run", 
                              system.file("mcp", "server.py", package = "wizrd")))
+}
+
+method(tools, MCPSession) <- function(x) {
+    ans <- x$listTools()@tools |> lapply(convert, Tool, x)
+    setNames(ans, vapply(ans, \(xi) xi@name, character(1L)))
+}
+
+method(convert, list(MCPTool, Tool)) <- function(from, to, session) {
+    signature <- convert(from@inputSchema, ToolSignature)
+    args <- formals(signature@parameters)
+    name <- from@name
+    body <- substitute({
+        session$callTool(NAME, ARGS)
+    }, list(NAME = name,
+            ARGS = as.call(c(quote(list), sapply(names(args), as.name)))))
+    envir <- list2env(list(session = session), parent = topenv())
+    FUN <- as.function(c(args, body), envir)
+    Tool(FUN,
+         name = name,
+         description = from@description,
+         signature = signature,
+         param_descriptions = param_descriptions_from_schema(from@inputSchema))
+}
+
+method(textify, list(MCPCallToolResult, TextFormat)) <- function(x, format) {
+    ans <- lapply(x@content, textify, format)
+    if (length(ans) == 1L)
+        ans <- ans[[1L]]
+    ans
+}
+
+method(textify, list(MCPTextContent, PlainTextFormat)) <- function(x, format) {
+    x@text
+}
+
+method(textify, list(MCPImageContent | MCPAudioContent, PlainTextFormat)) <-
+    function(x, format) convert(x, MediaURI)
+
+method(convert, list(MCPImageContent, MediaURI)) <- function(from, to) {
+    ImageURI(data_uri(from@data), type = from@mimeType)
+}
+
+method(convert, list(MCPAudioContent, MediaURI)) <- function(from, to) {
+    AudioURI(data_uri(from@data), type = from@mimeType)
 }
