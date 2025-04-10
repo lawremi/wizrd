@@ -14,7 +14,8 @@ MCPSession <- setRefClass("MCPSession",
             invoke(MCPListToolsRequest(), .self)
         },
         callTool = function(.self, name, arguments) {
-            invoke(MCPCallToolRequest(name = name, arguments = arguments), .self)
+            invoke(MCPCallToolRequest(name = name, arguments = arguments),
+                   .self) |> textify()
         },
         finalize = function(.self) {
             close(.self)

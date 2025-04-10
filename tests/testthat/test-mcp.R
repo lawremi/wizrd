@@ -3,7 +3,7 @@ test_that("we can call MCP tools", {
     session <- mcp_connect(wizrd:::mcp_test_server())
     mcp_tools <- tools(session)
     result <- mcp_tools$add(1L, 2L)
-    expect_match(result@content[[1L]]@text, "3")
+    expect_match(result, "3")
 
     model <- llama(server)
     result <- model |> equip(mcp_tools) |>
