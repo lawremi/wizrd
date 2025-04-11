@@ -34,7 +34,7 @@ named <- function(prop) {
               validator(value))
     if (is.null(prop$default))
         prop$default <- S7:::prop_default(prop)
-    if (is.null(names(prop$default)))
+    if (!is.null(prop$default) && is.null(names(prop$default)))
         names(prop$default) <- rep("", length(prop$default))
     prop
 }
@@ -414,6 +414,10 @@ Pipe := new_class(
         )
     )
 )
+
+method(print, Pipe) <- function(x) {
+    cat(S7:::obj_desc(x), ""); print(x@process)
+}
 
 pipex <- function(command, args) {
     verbose <- isTRUE(getOption("wizrd_verbose"))

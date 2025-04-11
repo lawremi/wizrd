@@ -11,17 +11,51 @@ MCPSession <- setRefClass("MCPSession",
             notify(MCPInitializedNotification(), .self)
         },
         listTools = function(.self) {
-            invoke(MCPListToolsRequest(), .self)
+            result <- invoke(MCPListToolsRequest(), .self)
+            ans <- result@tools |> lapply(convert, Tool, x)
+            setNames(ans, vapply(ans, \(xi) xi@name, character(1L)))
         },
         callTool = function(.self, name, arguments) {
             invoke(MCPCallToolRequest(name = name, arguments = arguments),
                    .self) |> textify()
         },
+        listResources = function(.self) {
+            result <- invoke(MCPListResourcesRequest(), .self)
+            ans <- lapply(result@resources, as.function, .self)
+            setNames(ans, vapply(result@resources, \(xi) xi@name, character(1L)))
+        },
+        listResourceTemplates = function(.self) {
+            result <- invoke(MCPListResourceTemplatesRequest(), .self)
+            ans <- lapply(result@resourceTemplates, as.function, .self)
+            setNames(ans, vapply(result@resourceTemplates, \(xi) xi@name,
+                                 character(1L)))
+        },
+        readResource = function(.self, uri) {
+            result <- invoke(MCPReadResourceRequest(uri = uri), .self)
+            ans <- lapply(result@contents, textify)
+            if (length(ans) == 1L)
+                ans <- ans[[1L]]
+            ans
+        },
+        listPrompts = function(.self) {
+            result <- invoke(MCPListPromptsRequest(), .self)
+            ans <- lapply(result@prompts, as.function, .self)
+            setNames(ans, vapply(result@prompts, \(xi) xi@name, character(1L)))
+        },
+        getPrompt = function(.self, name, arguments) {
+            request <- MCPGetPromptRequest(name = name, arguments = arguments)
+            result <- invoke(request, .self)
+            lapply(result@messages, convert, ChatMessage)
+        },
+        show = function(.self) {
+            cat("<MCPSession>")
+            cat("\n@endpoint: "); print(.self$endpoint)
+        },
         finalize = function(.self) {
             close(.self)
         }
     )
-)
+    )
 
 MCPSSEEndpoint := new_class(
     properties = list(
@@ -55,11 +89,11 @@ MCPServerCapabilities := new_class(
         tools = NULL | class_list
     ))
 
-MCPRequest := new_class()
+MCPRequest := new_class(abstract = TRUE)
 
-MCPResult := new_class()
+MCPResult := new_class(abstract = TRUE)
 
-MCPNotification := new_class(MCPRequest)
+MCPNotification := new_class(MCPRequest, abstract = TRUE)
 
 MCPInitializeRequest := new_class(
     MCPRequest,
@@ -88,7 +122,8 @@ MCPPaginatedRequest := new_class(
     MCPRequest,
     properties = list(
         cursor = scalar(NULL | class_character)
-    )
+    ),
+    abstract = TRUE
 )
 
 MCPListToolsRequest := new_class(
@@ -128,10 +163,11 @@ MCPCallToolRequest := new_class(
     )
 )
 
+Role <- scalar(class_character, choices = c("user", "assistant"))
+
 MCPAnnotations := new_class(
     properties = list(
-        audience = scalar(NULL | class_character,
-                          choices = c("user", "assistant")),
+        audience = nullable(Role),
         priority = scalar(NULL | class_numeric)
     )
 )
@@ -162,13 +198,22 @@ MCPAudioContent := new_class(
     )
 )
 
+MCPResourceContents := new_class(
+    properties = list(
+        uri = scalar(class_character),
+        mimeType = scalar(NULL | class_character)
+    )
+)
+
 MCPTextResourceContents := new_class(
+    MCPResourceContents,
     properties = list(
         text = scalar(class_character)
     )
 )
 
 MCPBlobResourceContents := new_class(
+    MCPResourceContents,
     properties = list(
         blob = scalar(class_character)
     )
@@ -191,7 +236,115 @@ MCPCallToolResult := new_class(
     )
 )
 
-MCPPingRequest := new_class()
+MCPResource := new_class(
+    properties = list(
+        uri = scalar(class_character),
+        name = scalar(class_character),
+        description = scalar(NULL | class_character),
+        mimeType = scalar(NULL | class_character),
+        annotations = NULL | MCPAnnotations,
+        size = scalar(NULL | class_integer)
+    )
+)
+
+MCPListResourcesRequest := new_class(MCPRequest)
+
+MCPListResourcesResult := new_class(
+    MCPResult,
+    properties = list(
+        resources = list_of(MCPResource)
+    )
+)
+
+MCPReadResourceRequest := new_class(
+    MCPRequest,
+    properties = list(
+        uri = scalar(class_character)
+    )
+)
+
+MCPReadResourceResult := new_class(
+    MCPResult,
+    properties = list(
+        contents = list_of(MCPTextResourceContents | MCPBlobResourceContents)
+    )
+)
+
+MCPResourceTemplate := new_class(
+    properties = list(
+        uriTemplate = scalar(class_character),
+        name = scalar(class_character),
+        description = scalar(NULL | class_character),
+        mimeType = scalar(NULL | class_character),
+        annotations = NULL | MCPAnnotations
+    )
+)
+
+MCPListResourceTemplatesRequest := new_class(MCPRequest)
+
+MCPListResourceTemplatesResult := new_class(
+    MCPResult,
+    properties = list(
+        resourceTemplates = list_of(MCPResourceTemplate)
+    )
+)
+
+MCPListPromptsRequest := new_class(MCPRequest)
+
+MCPPromptArgument := new_class(
+    properties = list(
+        name = scalar(class_character),
+        description = scalar(NULL | class_character),
+        required = scalar(NULL | class_logical)
+    )
+)
+
+MCPPrompt := new_class(
+    properties = list(
+        name = scalar(class_character),
+        description = scalar(NULL | class_character),
+        arguments = list_of(MCPPromptArgument)
+    )
+)
+
+MCPPromptFormat := new_class(
+    TextFormat,
+    properties = list(
+        prompt = MCPPrompt,
+        session = MCPSession
+    )
+)
+
+MCPListPromptsResult := new_class(
+    MCPResult,
+    properties = list(
+        prompts = list_of(MCPPrompt)
+    )
+)
+
+MCPGetPromptRequest := new_class(
+    MCPRequest,
+    properties = list(
+        name = scalar(class_character),
+        arguments = named(NULL | class_list)
+    )
+)
+
+MCPPromptMessage := new_class(
+    properties = list(
+        role = Role,
+        content = MCPTextContent | MCPImageContent | MCPAudioContent |
+            MCPEmbeddedResource
+    )
+)
+
+MCPGetPromptResult := new_class(
+    MCPResult,
+    properties = list(
+        description = scalar(NULL | class_character),
+        messages = list_of(MCPPromptMessage)
+    )
+)
 
 close.MCPSession <- function(con, ...) {
     close(con$endpoint, ...)
@@ -203,7 +356,16 @@ method(json_rpc_method, MCPListToolsRequest) <- function(x) "tools/list"
 
 method(json_rpc_method, MCPCallToolRequest) <- function(x) "tools/call"
 
-method(json_rpc_method, MCPPingRequest) <- function(x) "ping"
+method(json_rpc_method, MCPListResourcesRequest) <- function(x) "resources/list"
+
+method(json_rpc_method, MCPReadResourceRequest) <- function(x) "resources/read"
+
+method(json_rpc_method, MCPListResourceTemplatesRequest) <- function(x)
+    "resources/templates/list"
+
+method(json_rpc_method, MCPListPromptsRequest) <- function(x) "prompts/list"
+
+method(json_rpc_method, MCPGetPromptRequest) <- function(x) "prompts/get"
 
 method(json_rpc_method, MCPNotification) <- function(x) {
     name <- tolower(sub(".*MCP(.*)Notification", "\\1", class(x)[1L]))
@@ -212,14 +374,9 @@ method(json_rpc_method, MCPNotification) <- function(x) {
 
 method(json_rpc_params, MCPRequest) <- function(x) props(x)
 
-method(response_prototype, MCPInitializeRequest) <- function(x)
-    MCPInitializeResult()
-
-method(response_prototype, MCPListToolsRequest) <- function(x)
-    MCPListToolsResult()
-
-method(response_prototype, MCPCallToolRequest) <- function(x)
-    MCPCallToolResult()
+method(response_prototype, MCPRequest) <- function(x) {
+    match.fun(sub("wizrd::", "", sub("Request", "Result", class(x)[1L])))()
+}
 
 method(send, list(class_any, MCPSession)) <- function(x, to) {
     send(x, to$endpoint)
@@ -299,8 +456,15 @@ mcp_test_server <- function() {
 }
 
 method(tools, MCPSession) <- function(x) {
-    ans <- x$listTools()@tools |> lapply(convert, Tool, x)
-    setNames(ans, vapply(ans, \(xi) xi@name, character(1L)))
+    x$listTools()
+}
+
+resources <- function(x) {
+    c(x$listResources(), x$listResourceTemplates())
+}
+
+prompt_formats <- function(x) {
+    x$listPrompts()
 }
 
 method(convert, list(MCPTool, Tool)) <- function(from, to, session) {
@@ -340,4 +504,78 @@ method(convert, list(MCPImageContent, MediaURI)) <- function(from, to) {
 
 method(convert, list(MCPAudioContent, MediaURI)) <- function(from, to) {
     AudioURI(data_uri(from@data), type = from@mimeType)
+}
+
+method(textify, list(MCPTextResourceContents, PlainTextFormat)) <-
+    function(x, format) {
+        x@text
+    }
+
+method(textify, list(MCPBlobResourceContents, PlainTextFormat)) <-
+    function(x, format) {
+        convert(x, MediaURI)
+    }
+
+method(convert, list(MCPBlobResourceContents, MediaURI)) <- function(from, to) {
+    MediaURI(from@blob, type = from@mimeType)
+}
+
+method(as.function, MCPResource) <- function(x, session) {
+    ans <- eval(substitute(function() {
+        session$readResource(URI)
+    }, list(URI = x@uri)))
+    environment(ans) <- list2env(list(session = session), parent = topenv())
+    ans
+}
+
+method(as.function, MCPResourceTemplate) <- function(x, session) {
+    params <- glue_params(x@uriTemplate)
+    ans <- eval(substitute(function() {
+        ## FIXME: glue() only handles level 1 URI templates
+        args <- lapply(ARGS, \(a) URLencode(as.character(a), reserved = TRUE))
+        uri <- glue(URI_TEMPLATE, .envir = list2env(args, parent = emptyenv()))
+        session$readResource(uri)
+    }, list(URI_TEMPLATE = x@uriTemplate,
+            ARGS = as.call(c(quote(list), sapply(params, as.name))))))
+    formals(ans)[params] <- alist(x=)
+    environment(ans) <- list2env(list(session = session), parent = topenv())
+    ans
+}
+
+method(as.function, MCPPrompt) <- function(x, session) {
+    args <- vapply(x@arguments, \(a) a@name, character(1L))
+    required <- vapply(x@arguments, \(a) a@required %||% FALSE, logical(1L))
+    missing_args_call <- as.call(c(quote(c),
+                                   sapply(args[!required],
+                                          \(a) call("missing", as.name(a)))))
+    args_call <- as.call(c(quote(list), sapply(args, as.name)))
+    ans <- eval(substitute(function() {
+        missing_args <- MISSING_ARGS
+        args <- ARGS
+        args[names(which(missing_args))] <- NULL
+        session$getPrompt(NAME, args)
+    }, list(MISSING_ARGS = missing_args_call, NAME = x@name, ARGS = args_call)))
+    formals(ans)[args] <- ifelse(required, alist(x=), list(NULL))
+    environment(ans) <- list2env(list(session = session), parent = topenv())
+    ans
+}
+
+method(textify, list(class_list, MCPPromptFormat)) <- function(x, format) {
+    textify(ChatMessage(object = x), format)
+}
+
+method(convert, list(MCPPromptMessage, ChatMessage)) <- function(from, to) {
+    ChatMessage(role = from@role, content = textify(from@content))
+}
+
+method(print, MCPPrompt) <- function(x) {
+    args <- vapply(x@arguments, \(xi) xi@name, character(1L))
+    cat(x@name, "(", paste(args, collapse = ", "), "): ", x@description, "\n",
+        sep = "")
+}
+
+method(print, MCPPromptFormat) <- function(x) {
+    cat(S7:::obj_desc(x))
+    cat("\n")
+    print(x@prompt)
 }

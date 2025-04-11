@@ -37,7 +37,7 @@ append_input <- function(chat, input) {
     if (!is.list(input) || !inherits(input[[1L]], ChatMessage))
         input <- list(convert(input, ChatMessage))
     input <- lapply(input, textify, chat@model)
-    chat@messages <- c(chat@messages, input)
+    chat@messages <- c(chat@messages, input, recursive = TRUE)
     chat
 }
 

@@ -31,6 +31,9 @@ whisker := new_class(ScalarString)
 WhiskerFormat := new_class(TextFormat,
                            properties = list(template = whisker))
 
+FunctionFormat := new_class(TextFormat,
+                            properties = list(fun = class_function))
+
 is_schema_class <- function(x) {
     S7:::class_inherits(x, JSONFormat@properties$schema_class$class)
 }
@@ -78,6 +81,10 @@ method(convert, list(File, TextFormat)) <- function(from, to) {
 
 method(convert, list(HubID, TextFormat)) <- function(from, to) {
     convert(pull_langsmith_template(from), to)
+}
+
+method(convert, list(class_function, TextFormat)) <- function(from, to) {
+    FunctionFormat(fun = from)
 }
 
 class_glue <- new_S3_class(c("glue", "character"))
@@ -201,6 +208,10 @@ method(textify, list(template_contexts, WhiskerFormat)) <- function(x, format) {
     if (is.character(x))
         x <- list(input = x)
     whisker::whisker.render(format@template, as.environment(x))
+}
+
+method(textify, list(template_contexts, FunctionFormat)) <- function(x, format) {
+    do.call(format@fun, x)
 }
 
 ## Could this be done with S7?
