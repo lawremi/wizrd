@@ -1,7 +1,7 @@
 # server.py
 
 from fastmcp import FastMCP
-from fastmcp.prompts.base import Message, UserMessage, AssistantMessage
+from fastmcp.prompts.prompt import Message, UserMessage, AssistantMessage
 
 # Create an MCP server
 mcp = FastMCP("Demo", log_level="DEBUG")
@@ -21,9 +21,9 @@ def get_greeting(name: str) -> str:
     return f"Hello, {name}!"
 
 @mcp.prompt()
-def ask_review(code_snippet: str) -> str:
+def ask_review(code_snippet: str, language: str = "python") -> str:
     """Generates a standard code review request."""
-    return f"Please review the following code snippet for potential bugs and style issues:\n```python\n{code_snippet}\n```"
+    return f"Please review the following code snippet for potential bugs and style issues:\n```{language}\n{code_snippet}\n```"
 
 @mcp.prompt()
 def debug_session_start(error_message: str) -> list[Message]:

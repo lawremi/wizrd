@@ -307,14 +307,6 @@ MCPPrompt := new_class(
     )
 )
 
-MCPPromptFormat := new_class(
-    TextFormat,
-    properties = list(
-        prompt = MCPPrompt,
-        session = MCPSession
-    )
-)
-
 MCPListPromptsResult := new_class(
     MCPResult,
     properties = list(
@@ -544,38 +536,30 @@ method(as.function, MCPResourceTemplate) <- function(x, session) {
 
 method(as.function, MCPPrompt) <- function(x, session) {
     args <- vapply(x@arguments, \(a) a@name, character(1L))
-    required <- vapply(x@arguments, \(a) a@required %||% FALSE, logical(1L))
-    missing_args_call <- as.call(c(quote(c),
-                                   sapply(args[!required],
-                                          \(a) call("missing", as.name(a)))))
     args_call <- as.call(c(quote(list), sapply(args, as.name)))
-    ans <- eval(substitute(function() {
-        missing_args <- MISSING_ARGS
-        args <- ARGS
-        args[names(which(missing_args))] <- NULL
-        session$getPrompt(NAME, args)
-    }, list(MISSING_ARGS = missing_args_call, NAME = x@name, ARGS = args_call)))
+    required <- vapply(x@arguments, \(a) a@required %||% FALSE, logical(1L))
+    ans <- if (all(required)) {
+        eval(substitute(function() {
+            session$getPrompt(NAME, ARGS)
+        }, list(NAME = x@name, ARGS = args_call)))
+    } else {
+        missings <- sapply(args[!required], \(a) call("missing", as.name(a)))
+        missing_args_call <- as.call(c(quote(c), missings))
+        eval(substitute(function() {
+            missing_args <- MISSING_ARGS
+            args <- ARGS
+            args[names(which(missing_args))] <- NULL
+            session$getPrompt(NAME, args)
+        }, list(MISSING_ARGS = missing_args_call, NAME = x@name,
+                ARGS = args_call)))
+    }
     formals(ans)[args] <- ifelse(required, alist(x=), list(NULL))
     environment(ans) <- list2env(list(session = session), parent = topenv())
     ans
 }
 
-method(textify, list(class_list, MCPPromptFormat)) <- function(x, format) {
-    textify(ChatMessage(object = x), format)
-}
-
 method(convert, list(MCPPromptMessage, ChatMessage)) <- function(from, to) {
-    ChatMessage(role = from@role, content = textify(from@content))
-}
-
-method(print, MCPPrompt) <- function(x) {
-    args <- vapply(x@arguments, \(xi) xi@name, character(1L))
-    cat(x@name, "(", paste(args, collapse = ", "), "): ", x@description, "\n",
-        sep = "")
-}
-
-method(print, MCPPromptFormat) <- function(x) {
-    cat(S7:::obj_desc(x))
-    cat("\n")
-    print(x@prompt)
+    ChatMessage(role = from@role,
+                object = from@content,
+                content = textify(from@content))
 }

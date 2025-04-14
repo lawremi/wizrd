@@ -14,7 +14,7 @@ ChatMessage <- new_class("ChatMessage",
 method(convert, list(class_any, ChatMessage)) <- function(from, to,
                                                           role = "user")
 {
-    ChatMessage(role = role, object = from)
+    ChatMessage(role = role, object = from, content = from)
 }
 
 method(convert, list(ChatMessage, ChatMessage)) <- function(from, to) from

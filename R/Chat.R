@@ -32,12 +32,16 @@ method(predict, Chat) <- function(object, input, ...) {
     last_output(chat(object, input, ...))
 }
 
+is_context <- function(x) is.list(x) && inherits(x[[1L]], ChatMessage)
+
 append_input <- function(chat, input) {
     stopifnot(length(input) > 0L)
-    if (!is.list(input) || !inherits(input[[1L]], ChatMessage))
-        input <- list(convert(input, ChatMessage))
-    input <- lapply(input, textify, chat@model)
-    chat@messages <- c(chat@messages, input, recursive = TRUE)
+    if (!is_context(input)) {
+        text <- textify(input, chat)
+        if (!is_context(text))
+            text <- list(convert(input, ChatMessage))
+    } else text <- lapply(input, textify, chat)
+    chat@messages <- c(chat@messages, text)
     chat
 }
 

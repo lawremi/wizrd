@@ -7,14 +7,14 @@ test_that("we can call MCP tools", {
     model <- llama(server)
     result <- model |> equip(mcp_tools) |>
         predict("use the add tool to add 1 and 2")
-    expect_match(result, "The result of adding 1 and 2 is 3.")
+    expect_identical(result, "The result of adding 1 and 2 is 3.")
 })
 
 test_that("we can access MCP resources", {
     session <- mcp_connect(wizrd:::mcp_test_server())
     r <- resources(session)
     result <- r$get_greeting("R")
-    expect_match(result, "Hello, R!")
+    expect_identical(result, "Hello, R!")
 })
 
 test_that("we can generate prompts with MCP", {
@@ -26,11 +26,17 @@ test_that("we can generate prompts with MCP", {
 
     result <- model |> prompt_as(pf$ask_review) |>
         predict(list(code_snippet = "print \"foo\""))
+    expect_match(result, "Python 3.0", fixed = TRUE)
+    
+    result <- model |> prompt_as(pf$ask_review) |>
+        predict(list(code_snippet = "for (i in 1:length(n)) v <- c(v, i)",
+                     language = "R"))
+    expect_match(result, "R code snippet", fixed = TRUE)
 
     error_message <-
         "Error in if (x) y else x (from #1) : argument is of length zero"
     traceback <- "1: fun(integer())"
     msgs <- pf$debug_session_start(error_message)
     result <- chat(model, msgs) |> predict(traceback)
-    expect_match(result, "")
+    expect_identical(result, "")
 })
