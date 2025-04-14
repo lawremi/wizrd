@@ -34,14 +34,19 @@ method(predict, Chat) <- function(object, input, ...) {
 
 is_context <- function(x) is.list(x) && inherits(x[[1L]], ChatMessage)
 
+norm_input <- function(x, chat) {
+    text <- textify(x, chat)
+    if (is_context(text))
+        text
+    else convert(text, ChatMessage)
+}
+
 append_input <- function(chat, input) {
     stopifnot(length(input) > 0L)
-    if (!is_context(input)) {
-        text <- textify(input, chat)
-        if (!is_context(text))
-            text <- list(convert(input, ChatMessage))
-    } else text <- lapply(input, textify, chat)
-    chat@messages <- c(chat@messages, text)
+    if (!is_context(input))
+        input <- list(input)
+    msgs <- lapply(input, norm_input, chat)
+    chat@messages <- c(chat@messages, msgs, recursive = TRUE)
     chat
 }
 

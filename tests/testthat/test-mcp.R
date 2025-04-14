@@ -35,8 +35,8 @@ test_that("we can generate prompts with MCP", {
 
     error_message <-
         "Error in if (x) y else x (from #1) : argument is of length zero"
-    traceback <- "1: fun(integer())"
     msgs <- pf$debug_session_start(error_message)
-    result <- chat(model, msgs) |> predict(traceback)
-    expect_identical(result, "")
+    info <- "Trying to use if() in R. Traceback: 1: fun(integer())"
+    result <- predict(model, c(msgs, info))
+    expect_match(result, "empty vector", fixed = TRUE)
 })
