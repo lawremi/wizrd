@@ -71,31 +71,12 @@ openai_body_params <- function(body, params) {
     put(body, Filter(Negate(is.null), props(params)))
 }
 
-req_perform_sse <- function(req, onmessage_callback = NULL,
-                            event_callbacks = list(),
-                            timeout_sec = Inf, buffer_kb = 64)
-{
-    callback <- function(bytes) {
-        text <- rawToChar(bytes)
-        msgs <- strsplit(text, "\n\n", fixed = TRUE)[[1L]]
-        m <- gregexec("(event|data|id|retry): ?(.*)", msgs, perl = TRUE)
-        for (mat in regmatches(msgs, m)) {
-            event <- split(mat[3L,], mat[2L,])
-            event$data <- paste(event$data, collapse = "\n")
-            if (is.null(event$event)) {
-                event$event <- "message"
-                callback <- onmessage_callback
-            } else callback <- event_callbacks[[event$event]]
-            if (!is.null(callback) && !isTRUE(callback(event)))
-                return(FALSE)
-        }
-        TRUE
+req_perform_sse <- function(req, callback) {
+    con <- req |> httr2::req_perform_connection()
+    while (!httr2::resp_stream_is_complete(con)) {
+        con |> httr2::resp_stream_sse() |> callback()
     }
-    round <- function(bytes) {
-        nl <- bytes == charToRaw("\n")
-        which(diff(nl) == 0L & nl[-1L])
-    }
-    httr2::req_perform_stream(req, callback, timeout_sec, buffer_kb, round)
+    close(con)
 }
 
 openai_chat_perform_stream <- function(req, stream_callback) {
@@ -109,7 +90,7 @@ openai_chat_perform_stream <- function(req, stream_callback) {
         content <<- c(content, new_content)
         stream_callback(new_content)
     }
-    req_perform_sse(req, sse_callback, buffer_kb = 256 / 1024)
+    req_perform_sse(req, sse_callback)
     ChatMessage(role = "assistant", content = paste(content, collapse = ""))
 }
 
