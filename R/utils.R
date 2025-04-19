@@ -194,6 +194,12 @@ new_list_property <- function(..., validator = NULL,
         c(if (!identical(of, class_any) &&
                   !all(vapply(value, S7:::class_inherits, logical(1L), of)))
             paste("must only contain elements of class", S7:::class_desc(of)),
+          if (!is.null(of_validator)) {
+              msgs <- unlist(lapply(value, of_validator))
+              if (length(msgs) > 0L)
+                  paste("element(s) failed validation:",
+                        paste0("'", unique(msgs), "'", collapse = ", "))
+          },
           if (isTRUE(named) && is.null(names(value)))
               "must have names",
           if (identical(named, FALSE) && !is.null(names(value)))
@@ -205,6 +211,10 @@ new_list_property <- function(..., validator = NULL,
           )
     }, default = default)
     prop$of <- of
+    if (inherits(of, "S7_property")) {
+        of_validator <- of$validator
+        of <- of$class
+    } else of_validator <- NULL
     prop$named <- named
     class(prop) <- c("list_S7_property", class(prop))
     prop
