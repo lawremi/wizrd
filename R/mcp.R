@@ -74,19 +74,19 @@ MCPImplementation := new_class(
 
 MCPClientCapabilities := new_class(
     properties = list(
-        experimental = nullable(named(class_list)),
-        sampling = NULL | class_list,
-        roots = NULL | class_list
+        experimental = optional(named(class_list)),
+        sampling = optional(class_list),
+        roots = optional(class_list)
     ))
 
 MCPServerCapabilities := new_class(
     properties = list(
         experimental = nullable(named(class_list)),
-        logging = NULL | class_list,
-        completions = NULL | class_list,
-        prompts = NULL | class_list,
-        resources = NULL | class_list,
-        tools = NULL | class_list
+        logging = optional(class_list),
+        completions = optional(class_list),
+        prompts = optional(class_list),
+        resources = optional(class_list),
+        tools = optional(class_list)
     ))
 
 MCPRequest := new_class(abstract = TRUE)
@@ -110,7 +110,7 @@ MCPInitializeResult := new_class(
         protocolVersion = scalar(class_character, default = MCP_VERSION),
         capabilities = MCPServerCapabilities,
         serverInfo = MCPImplementation,
-        instructions = scalar(NULL | class_character)
+        instructions = optional(scalar(class_character))
     )
 )
 
@@ -121,7 +121,7 @@ MCPInitializedNotification := new_class(
 MCPPaginatedRequest := new_class(
     MCPRequest,
     properties = list(
-        cursor = scalar(NULL | class_character)
+        cursor = optional(scalar(class_character))
     ),
     abstract = TRUE
 )
@@ -142,7 +142,7 @@ MCPToolAnnotations := new_class(
 MCPTool := new_class(
     properties = list(
         name = scalar(class_character),
-        description = scalar(NULL | class_character),
+        description = optional(scalar(class_character)),
         inputSchema = class_list,
         annotations = MCPToolAnnotations
     )
@@ -167,8 +167,8 @@ Role <- scalar(class_character, choices = c("user", "assistant"))
 
 MCPAnnotations := new_class(
     properties = list(
-        audience = nullable(Role),
-        priority = scalar(NULL | class_numeric)
+        audience = optional(Role),
+        priority = optional(scalar(class_numeric))
     )
 )
 
@@ -176,7 +176,7 @@ MCPTextContent := new_class(
     properties = list(
         type = literal("text"),
         text = scalar(class_character),
-        annotations = NULL | MCPAnnotations
+        annotations = optional(MCPAnnotations)
     )
 )
 
@@ -185,7 +185,7 @@ MCPImageContent := new_class(
         type = literal("image"),
         data = scalar(class_character),
         mimeType = scalar(class_character),
-        annotations = NULL | MCPAnnotations
+        annotations = optional(MCPAnnotations)
     )
 )
 
@@ -194,14 +194,14 @@ MCPAudioContent := new_class(
         type = literal("audio"),
         data = scalar(class_character),
         mimeType = scalar(class_character),
-        annotations = NULL | MCPAnnotations
+        annotations = optional(MCPAnnotations)
     )
 )
 
 MCPResourceContents := new_class(
     properties = list(
         uri = scalar(class_character),
-        mimeType = scalar(NULL | class_character)
+        mimeType = optional(scalar(class_character))
     )
 )
 
@@ -223,7 +223,7 @@ MCPEmbeddedResource := new_class(
     properties = list(
         type = literal("resource"),
         resource = MCPTextResourceContents | MCPBlobResourceContents,
-        annotations = NULL | MCPAnnotations
+        annotations = optional(MCPAnnotations)
     )
 )
 
@@ -232,7 +232,7 @@ MCPCallToolResult := new_class(
     properties = list(
         content = list_of(MCPTextContent | MCPImageContent | MCPAudioContent |
                               MCPEmbeddedResource),
-        isError = NULL | class_logical
+        isError = optional(class_logical)
     )
 )
 
@@ -240,10 +240,10 @@ MCPResource := new_class(
     properties = list(
         uri = scalar(class_character),
         name = scalar(class_character),
-        description = scalar(NULL | class_character),
-        mimeType = scalar(NULL | class_character),
-        annotations = NULL | MCPAnnotations,
-        size = scalar(NULL | class_integer)
+        description = optional(scalar(class_character)),
+        mimeType = optional(scalar(class_character)),
+        annotations = optional(MCPAnnotations),
+        size = optional(scalar(class_integer))
     )
 )
 
@@ -274,9 +274,9 @@ MCPResourceTemplate := new_class(
     properties = list(
         uriTemplate = scalar(class_character),
         name = scalar(class_character),
-        description = scalar(NULL | class_character),
-        mimeType = scalar(NULL | class_character),
-        annotations = NULL | MCPAnnotations
+        description = optional(scalar(class_character)),
+        mimeType = optional(scalar(class_character)),
+        annotations = optional(MCPAnnotations)
     )
 )
 
@@ -294,15 +294,15 @@ MCPListPromptsRequest := new_class(MCPRequest)
 MCPPromptArgument := new_class(
     properties = list(
         name = scalar(class_character),
-        description = scalar(NULL | class_character),
-        required = scalar(NULL | class_logical)
+        description = optional(scalar(class_character)),
+        required = optional(scalar(class_logical))
     )
 )
 
 MCPPrompt := new_class(
     properties = list(
         name = scalar(class_character),
-        description = scalar(NULL | class_character),
+        description = optional(scalar(class_character)),
         arguments = list_of(MCPPromptArgument)
     )
 )
@@ -318,7 +318,7 @@ MCPGetPromptRequest := new_class(
     MCPRequest,
     properties = list(
         name = scalar(class_character),
-        arguments = named(NULL | class_list)
+        arguments = named(optional(class_list))
     )
 )
 
@@ -333,7 +333,7 @@ MCPPromptMessage := new_class(
 MCPGetPromptResult := new_class(
     MCPResult,
     properties = list(
-        description = scalar(NULL | class_character),
+        description = optional(scalar(class_character)),
         messages = list_of(MCPPromptMessage)
     )
 )

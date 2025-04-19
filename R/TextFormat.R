@@ -178,14 +178,19 @@ method(jsonify, S7_object) <- function(x) {
     prop_jsonify <- function(property) {
         val <- prop(x, property$name)
         if (inherits(property, scalar_S7_property))
-            val <- jsonlite::unbox(val)
-        else if (is.object(val))
-            jsonify(val)
-        else val
+            jsonlite::unbox(val)
+        else jsonify(val)
     }
+    prop_keep <- function(property) {
+        !is.null(prop(x, property$name)) ||
+            !inherits(property, optional_S7_property)
+    }
+    props <- S7_class(x)@properties
+    prop_json <- lapply(props, prop_jsonify)
+    keep <- vapply(props, prop_keep, logical(1L))
     .data <- S7_data(x)
-    c(if (typeof(.data) != "object") list(.data = .data),
-      lapply(S7_class(x)@properties, prop_jsonify))
+    c(if (typeof(.data) != "object") list(.data = .data), prop_json[keep]) |>
+        ensure_named()
 }
 
 method(textify, list(class_list | class_any | class_data.frame, JSONFormat)) <-

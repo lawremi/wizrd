@@ -23,6 +23,12 @@ nullable <- function(prop) {
     prop
 }
 
+optional <- function(prop) {
+    prop <- nullable(prop)
+    class(prop) <- c("optional_S7_property", class(prop))
+    prop
+}
+
 named <- function(prop) {
     if (S7:::is_foundation_class(prop))
         prop <- new_property(prop)
