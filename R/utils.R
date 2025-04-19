@@ -537,6 +537,7 @@ list_S7_property <- new_S3_class(c("list_S7_property", "S7_property"))
 numeric_S7_property <- new_S3_class(c("numeric_S7_property", "S7_property"))
 data_frame_S7_property <- new_S3_class(c("data_frame_S7_property",
                                          "S7_property"))
+optional_S7_property <- new_S3_class(c("optional_S7_property", "S7_property"))
 
 class_json <- new_S3_class("json") # from jsonlite
 
