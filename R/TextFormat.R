@@ -259,6 +259,12 @@ method(convert, list(class_jsonic, class_call)) <- function(from, to) {
     parse(text=from)[[1L]]
 }
 
+as.data.frame.jsonic <- as.data.frame.list
+
+as.Date.jsonic <- as.Date.character
+
+as.POSIXlt.jsonic <- as.POSIXlt.character
+
 method(dejsonify, list(class_any, S7_S3_class | S7_base_class)) <- function(x,
                                                                             spec)
 {
