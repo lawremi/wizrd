@@ -2,7 +2,7 @@ AzureOpenAIServer <- new_class("AzureOpenAIServer", OpenAIAPIServer)
 
 AZURE_OPENAI_API_VERSION <- "2024-08-01-preview"
 
-azure_openai_server <- function(url = getOption("wizrd.azure.openai.url"),
+azure_openai_server <- function(url = getOption("wizrd_azure_openai_url"),
                                 key_prefix = "AZURE_OPENAI")
 {
     AzureOpenAIServer(url = url, key_prefix = key_prefix)
