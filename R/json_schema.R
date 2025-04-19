@@ -122,7 +122,7 @@ base_json_schema <- function(from, description = NULL, scalar = FALSE,
         else if ("POSIXt" %in% from$class)
             "date-time"
         else if ("raw" %in% from$class)
-            "binary"
+            "byte"
     }
     
     schema
@@ -247,6 +247,7 @@ schema_class <- function(x) {
                       date = class_Date,
                       time =,
                       "date-time" = class_POSIXct,
+                      byte =,
                       binary = class_raw,
                       class_character) |> scalar())
     }
