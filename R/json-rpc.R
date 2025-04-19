@@ -41,15 +41,11 @@ JSONRPCError := new_class(
 
 JSONRPCResponse := new_class(
     properties = list(
-        result = class_any,
-        error = NULL | JSONRPCError,
+        result = optional(class_any),
+        error = optional(JSONRPCError),
         id = scalar(union_id)
     )
 )
-
-method(jsonify, JSONRPCRequest) <- function(x) {
-    lapply(props(x), jsonify)
-}
 
 send := new_generic(c("x", "to"))
 
