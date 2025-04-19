@@ -242,6 +242,14 @@ schema_class <- function(x) {
         return(class_any)
     if (x$type == "object" && identical(names(x$properties), "__boxed"))
         x <- x$properties$"__boxed"
+    if (!is.null(schema$format)) {
+        return(switch(schema$format,
+                      date = class_Date,
+                      time =,
+                      "date-time" = class_POSIXct,
+                      binary = class_raw,
+                      class_character) |> scalar())
+    }
     switch(x$type,
            object = schema_S7_class(x),
            array = schema_array(x$items),
