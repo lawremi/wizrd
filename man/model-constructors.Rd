@@ -72,6 +72,21 @@ azure_openai_model(name = "gpt-4o", ...)
     Model parameters, see \code{\link{LanguageModelParams}}.
   }
 }
+
+\section{Commercial Providers}{
+  Using a commercial provider, like via \code{openai_model} or
+  \code{azure_openai_model}, requires some configuration, depending on
+  the provider:
+  \describe{
+    \item{openai_model}{\var{OPENAI_API_KEY} holds the API key}
+    \item{azure_openai_model}{
+      \var{AZURE_OPENAI_API_KEY} holds the API
+      key, and \code{option(wizrd_azure_openai_url=)} sets the
+      account-specific URL (up to the hostname).
+    }
+  }
+}
+
 \section{Issues with llamafile}{
   While a llamafile is supposed to work seamlessly across platforms,
   OS-specific issues may arise. Examples include:
