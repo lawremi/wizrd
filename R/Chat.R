@@ -35,6 +35,8 @@ method(predict, Chat) <- function(object, input, ...) {
 is_context <- function(x) is.list(x) && inherits(x[[1L]], ChatMessage)
 
 norm_input <- function(x, chat) {
+    if (inherits(x, ChatMessage) && x@role != "user")
+        return(x)
     text <- textify(x, chat)
     if (is_context(text))
         text
