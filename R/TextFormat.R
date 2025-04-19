@@ -174,12 +174,19 @@ method(jsonify, class_environment) <- function(x) jsonify(as.list(x))
 method(jsonify, class_name | class_call | class_formula) <-
     function(x) deparse(x)
 
+jsonify_as := new_generic("x")
+
+method(jsonify_as, class_any) <- function(x, val) jsonify(val)
+
+method(jsonify_as, scalar_S7_property) <- function(x, val) jsonlite::unbox(val)
+
+method(jsonify_as, list_S7_property) <- function(x, val)
+    lapply(val, jsonify_as, x = x$of)
+
 method(jsonify, S7_object) <- function(x) {
     prop_jsonify <- function(property) {
         val <- prop(x, property$name)
-        if (inherits(property, scalar_S7_property))
-            jsonlite::unbox(val)
-        else jsonify(val)
+        jsonify_as(property, val)
     }
     prop_keep <- function(property) {
         !is.null(prop(x, property$name)) ||
