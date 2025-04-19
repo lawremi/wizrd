@@ -449,7 +449,7 @@ try_uv_pipex <- function(command, args) {
         uv_pipex(args[1L], args[-1L])
 }
 
-mcp_exec_server <- function(command, args) {
+mcp_exec_server <- function(command, args = list()) {
     assert_string(command)
     assert_character(args, any.missing = FALSE)
     require_ns("processx", "connect to stdio-based MCP servers")
