@@ -332,7 +332,7 @@ MCPGetPromptRequest := new_class(
     MCPRequest,
     properties = list(
         name = scalar(class_character),
-        arguments = named(optional(class_list))
+        arguments = optional(named(list_of(scalar(class_character))))
     )
 )
 
