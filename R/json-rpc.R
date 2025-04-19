@@ -67,7 +67,7 @@ notify <- function(x, endpoint) {
 }
 
 method(send, list(JSONRPCRequest, class_any)) <- function(x, to) {
-    jsonify(x) |> toJSON(auto_unbox = TRUE) |> send(to)
+    jsonify(x) |> toJSON(null = "null") |> send(to)
     to
 }
 
