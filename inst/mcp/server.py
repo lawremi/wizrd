@@ -4,7 +4,7 @@ from fastmcp import FastMCP
 from fastmcp.prompts.prompt import Message, UserMessage, AssistantMessage
 
 # Create an MCP server
-mcp = FastMCP("Demo", log_level="DEBUG")
+mcp = FastMCP("Demo", log_level="WARNING") # change to DEBUG for debugging
 
 
 # Add an addition tool
