@@ -15,8 +15,8 @@ instruct(x, ...)
     The LanguageModel object
   }
   \item{\dots}{
-    Strings that are pasted together into a block of instructions for
-    the model.
+    Objects that are converted to text and pasted together into a block
+    of instructions for the model.
   }
 }
 \value{

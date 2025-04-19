@@ -69,7 +69,8 @@ predict_via_chat <- function(object, input, env = parent.frame(), ...)
 method(predict, LanguageModel) <- predict_via_chat
 
 instruct <- function(x, ...) {
-    set_props(x, instructions = paste0(...))
+    args <- list(...) |> vapply(textify, character(1L), x)
+    set_props(x, instructions = paste0(args, collapse = "\n"))
 }
 
 textify_system_prompt <- function(x, params = list()) {
