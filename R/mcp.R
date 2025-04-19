@@ -466,8 +466,9 @@ method(convert, list(MCPTool, Tool)) <- function(from, to, session) {
     body <- substitute({
         session$callTool(NAME, ARGS)
     }, list(NAME = name,
-            ARGS = as.call(c(quote(list), sapply(names(args), as.name)))))
-    envir <- list2env(list(session = session), parent = topenv())
+            ARGS = as.call(c(quote(parameters), sapply(names(args), as.name)))))
+    envir <- list2env(list(session = session, parameters = signature@parameters),
+                      parent = topenv())
     FUN <- as.function(c(args, body), envir)
     Tool(FUN,
          name = name,
