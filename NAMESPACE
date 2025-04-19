@@ -15,7 +15,7 @@ export(chat, tool, rag_from, text_store, LanguageModelParams, ollama_server)
 export(equip, unequip, instruct, output_as, prompt_as, system_prompt_as,
        can_accept_as, demonstrate, demonstrate_all, describe_with_Rd)
 # accessors
-export(last_output, last_message, tools, resources, prompt_formats)
+export(last_output, last_message, tools, resources, prompts)
 # operations
 export(embed_text)
 # chunking
