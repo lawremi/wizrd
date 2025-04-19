@@ -455,7 +455,7 @@ resources <- function(x) {
     c(x$listResources(), x$listResourceTemplates())
 }
 
-prompt_formats <- function(x) {
+prompts <- function(x) {
     x$listPrompts()
 }
 

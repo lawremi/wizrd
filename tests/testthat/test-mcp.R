@@ -20,7 +20,7 @@ test_that("we can access MCP resources", {
 test_that("we can generate prompts with MCP", {
     options(wizrd_verbose = TRUE)
     session <- mcp_connect(wizrd:::mcp_test_server())
-    pf <- prompt_formats(session)
+    pf <- prompts(session)
 
     model <- llama(server)
 
