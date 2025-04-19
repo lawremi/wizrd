@@ -242,8 +242,8 @@ schema_class <- function(x) {
         return(class_any)
     if (x$type == "object" && identical(names(x$properties), "__boxed"))
         x <- x$properties$"__boxed"
-    if (!is.null(schema$format)) {
-        return(switch(schema$format,
+    if (!is.null(x$format)) {
+        return(switch(x$format,
                       date = class_Date,
                       time =,
                       "date-time" = class_POSIXct,
