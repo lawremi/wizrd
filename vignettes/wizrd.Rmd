@@ -9,7 +9,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r include=FALSE}
+```{r setup, include=FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -28,7 +28,7 @@ fluent API for programming with LLMs.
 # Quick start
 
 To start chatting with a model:
-```{r results='asis'}
+```{r quickstart, results='asis'}
 library(wizrd)
 model <- llamafile_llama()
 ans <- predict(model, "Who created R?")
@@ -47,7 +47,7 @@ with Ollama. Convenience functions exist for some other common models.
 The `predict()` function is the most convenient way to execute single
 exchanges with a model. To maintain a context over multiple exchanges,
 use the `chat()` function:
-```{r}
+```{r chat}
 ctx <- model |> chat("Who created R?") |> chat("When was it created?")
 ctx
 ```
@@ -55,7 +55,7 @@ A useful feature of the returned Chat object is that it prints the
 context in a readable format.
 
 To extract the last output from the Chat object, call `last_output()`:
-```{r}
+```{r last_output}
 last_output(ctx)
 ```
 The returned value can then be used in further computations.
@@ -101,7 +101,7 @@ the `language`, we get the same result as in the previous section.
 We can define the logic of the LLM function using natural language
 instructions, inserted into the system prompt, using the `instruct()`
 function:
-```{r}
+```{r instruct}
 instructed_model <- parameterized_model |>
     instruct("Include the name of every author.",
              "Return only names separated by commas, no extra text.")
@@ -126,7 +126,7 @@ necessary to convert the output to a more standardized and computable
 object. We made some progress through our instructions above, but we
 can be much more precise using the `output_as()` function:
 
-```{r}
+```{r output_as}
 df_model <- equipped_model |>
     output_as(data.frame(first_name = character(), last_name = character()))
 df_model |> predict(list(language = "R"))
@@ -136,7 +136,7 @@ In the above example, we use a data.frame stub to specify the format,
 so the model returns a completed data.frame, with the same columns. 
 
 We could also use an S7 object to capture the output:
-```{r}
+```{r S7}
 library(S7)
 Person <- new_class("Person",
                     properties = list(first_name = class_character,
@@ -152,7 +152,7 @@ s7_model |> predict(list(language = "R"))
 Since the model is already behaving like a function, it is relatively
 straightforward to convert it into an actual R function using the
 `convert()` generic from S7:
-```{r}
+```{r function}
 model_fun <- convert(df_model, class_function)
 model_fun("R")
 ```
@@ -170,7 +170,7 @@ languages.
 The Langsmith Hub is a community platform for sharing prompt templates
 and output schema. We can load a program from the hub by passing the
 hub ID to `prompt_as()`:
-```{r}
+```{r langsmith}
 model |> prompt_as("lawremi/creators") |> predict(list(language = "R"))
 ```
 
@@ -195,7 +195,7 @@ including markdown derivatives, HTML and PDF.
 Since the output is markdown, we embed it
 directly in this document. 
 
-```{r results='asis'}
+```{r rag, results='asis'}
 chunks <- chunk(tools::Rd_db("S7"))
 store <- text_store(nomic(), chunks)
 model <- llama() |> prompt_as(rag_from(store))
@@ -203,6 +203,6 @@ cat("#### new_property example\n")
 last_message(chat(model, "new_property example"))
 ```
 
-```{r include=FALSE}
+```{r end, include=FALSE}
 httptest2::end_vignette()
 ```
