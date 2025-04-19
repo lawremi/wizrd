@@ -11,11 +11,11 @@ test_that("models can call R functions as tools", {
 
     model <- model |> unequip("get_mean") |>
         equip(tool(mean) |> describe_with_Rd() |> can_accept_as(class_name))
-    output <- predict(model, "What is the mean of var?")
+    output <- predict(model, "What is the mean of var? Respond in pure JSON.")
     expect_equal(jsonlite::fromJSON(output)$mean, mean(var))
 
     model <- equip(model, tool(mean) |> describe_with_Rd())
-    output <- predict(model, "What is the mean of `var`?")
+    output <- predict(model, "What is the mean of `var`? Return the mean in a JSON object.")
     expect_equal(jsonlite::fromJSON(output)$mean, mean(var))
 
     model <- llama(server)

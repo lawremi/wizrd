@@ -32,7 +32,7 @@ test_that("chat() and predict() work for images", {
     msgs <- list(raster,
                  "Is there positive correlation in this plot? Answer yes or no.")
     chat <- chat(model, msgs) # as a multipart message
-    expect_match(last_output(chat), "Yes")
+    expect_match(tolower(last_output(chat)), "yes")
 })
 
 test_that("chat() can stream responses", {
