@@ -1,3 +1,5 @@
+JSON_RPC_VERSION <- "2.0"
+
 next_id <- local({
     id <- 0L
     function() {
@@ -12,7 +14,7 @@ union_id <- NULL | class_character | class_numeric
 
 JSONRPCRequest := new_class(
     properties = list(
-        jsonrpc = literal("2.0"),
+        jsonrpc = literal(JSON_RPC_VERSION),
         method = scalar(class_character),
         params = class_list,
         id = scalar(union_id, default = quote(next_id()))
