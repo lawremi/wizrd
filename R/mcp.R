@@ -378,7 +378,7 @@ method(json_rpc_method, MCPNotification) <- function(x) {
     paste0("notifications/", name)
 }
 
-method(json_rpc_params, MCPRequest) <- function(x) props(x)
+method(json_rpc_params, MCPRequest) <- function(x) jsonify(x)
 
 method(response_prototype, MCPRequest) <- function(x) {
     match.fun(sub("wizrd::", "", sub("Request", "Result", class(x)[1L])))()
