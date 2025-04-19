@@ -1,5 +1,5 @@
 test_that("calling predict() generates correct responses", {
-    model <- openai_model(temperature = 0)
+    model <- openai_model("gpt-4o-mini", temperature = 0)
     model@instructions <- "Respond with a single sentence"
 
     msg <- predict(model, "Who created R?")

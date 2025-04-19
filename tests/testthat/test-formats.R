@@ -1,5 +1,5 @@
 test_that("structured output works", {
-    model <- openai_model(temperature = 0) |>
+    model <- openai_model("gpt-4o-mini", temperature = 0) |>
         output_as(data.frame(first_name = character(), last_name = character()))
     ans <- predict(model, "Who created R?")
     expect_contains(ans$first_name, "Robert")

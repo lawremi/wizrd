@@ -75,16 +75,19 @@ We will demonstrate how the wizrd package meets each of these
 requirements in turn. We will use gpt-4o-mini for this example, in
 order to support constrained output. Set the `OPENAI_API_KEY`
 environment variable to your OpenAI key before running this.
-```{r}
-model <- openai_model(temperature = 0)
+```{r openai_model}
+model <- openai_model("gpt-4o-mini", temperature = 0)
 ```
+For reproducibility reasons, it is best to explicitly specify the
+underlying model, as above, because the default will change as new
+models are released.
 
 ## Parameterized input
 
 Let's extend the above example so that it can answer the same
 questions about any given programming language.
 
-```{r}
+```{r glue}
 parameterized_model <- model |> prompt_as("Who created {language}?")
 parameterized_model |> chat(list(language = "R"))
 ```
