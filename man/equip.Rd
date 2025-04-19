@@ -16,7 +16,8 @@ unequip(x, name)
   \item{x}{
     The LanguageModel object
   }
-  \item{tool}{The Tool object, or an object to convert to a Tool object}
+  \item{tool}{The Tool object, or an object to convert to a Tool
+    object, or a list of such objects.}
   \item{instructions}{
     A string instructing the model on how and when to use the
     tool. Typically, this is not necessary, because the Tool object is
