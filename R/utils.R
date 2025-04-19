@@ -64,6 +64,21 @@ literal <- function(value) {
     prop
 }
 
+static_inherits <- function(x, parent) {
+    while(!is.null(x) && !identical(x@parent, parent))
+        x <- x@parent
+    !is.null(x)
+}
+
+S7_class_with_parent <- function(parent, validator = NULL, ...) {
+    new_property(S7_class, validator = function(value) {
+        c(if (!static_inherits(value, parent))
+            paste("must be a descendant of", parent@name),
+          if (!is.null(validator))
+              validator(value))
+    }, ...)
+}
+
 missing_name <- function() alist(x=)[[1L]]
 
 scalar <- function(x, ..., validator = x$validator, default = x$default,

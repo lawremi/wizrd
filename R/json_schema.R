@@ -247,11 +247,12 @@ schema_class <- function(x) {
            boolean = scalar(class_logical))
 }
 
-schema_S7_class <- function(x) {
+schema_S7_class <- function(x, ...) {
     new_class(x$"$id" %||% x$title %||% "schema",
               properties = c(lapply(x$properties, schema_class),
                              `_dots` = if (isTRUE(x$additionalProperties))
-                                 class_list))
+                                 class_list),
+              ...)
 }
 
 vectorize_property <- function(x) {

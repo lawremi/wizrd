@@ -6,8 +6,8 @@ new_parameters <- function(x = list()) {
 
 ToolSignature := new_class(
     properties = list(
-        parameters = new_property(
-            S7_class,
+        parameters = S7_class_with_parent(
+            Parameters,
             setter = \(self, value) {
                 if (is.list(value))
                     value <- new_parameters(value)
@@ -50,6 +50,6 @@ method(print, Parameters) <- function(x, ...) {
 }
 
 method(convert, list(class_jsonic, ToolSignature)) <- function(from, to) {
-    ToolSignature(parameters = schema_class(from),
+    ToolSignature(parameters = schema_S7_class(from, parent = Parameters),
                   value = new_property(class_any))
 }
