@@ -111,9 +111,10 @@ return the actual names.
 
 We can also provide a tool that queries for the authors of the R
 language:
-```{r}
+```{r tool}
 get_R_authors <- function() {
-    R.home("doc") |> file.path("AUTHORS") |> readLines() |> paste(collapse="\n")
+    authors <- R.home("doc") |> file.path("AUTHORS") |> readLines()
+    paste("Here are all of the R authors:", paste(authors, collapse = "\n"))
 }
 equipped_model <- instructed_model |> equip(get_R_authors)
 equipped_model |> chat(list(language = "R"))
