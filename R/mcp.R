@@ -11,23 +11,34 @@ MCPSession <- setRefClass("MCPSession",
             notify(MCPInitializedNotification(), .self)
         },
         listTools = function(.self) {
-            result <- invoke(MCPListToolsRequest(), .self)
-            ans <- result@tools |> lapply(convert, Tool, x)
+            tools <- tryCatch(
+                invoke(MCPListToolsRequest(), .self)@tools,
+                JSONRPCMethodNotFound = function(cond) list()
+            )
+            ans <- tools |> lapply(convert, Tool, .self)
             setNames(ans, vapply(ans, \(xi) xi@name, character(1L)))
         },
         callTool = function(.self, name, arguments) {
-            invoke(MCPCallToolRequest(name = name, arguments = arguments),
+            invoke(MCPCallToolRequest(name = name,
+                                      arguments = jsonify(arguments)),
                    .self) |> textify()
         },
         listResources = function(.self) {
-            result <- invoke(MCPListResourcesRequest(), .self)
-            ans <- lapply(result@resources, as.function, .self)
-            setNames(ans, vapply(result@resources, \(xi) xi@name, character(1L)))
+            resources <- tryCatch(
+                invoke(MCPListResourcesRequest(), .self)@resources,
+                JSONRPCMethodNotFound = function(cond) list()
+            )
+            ans <- lapply(resources, as.function, .self)
+            setNames(ans, vapply(resources, \(xi) xi@name, character(1L)))
         },
         listResourceTemplates = function(.self) {
-            result <- invoke(MCPListResourceTemplatesRequest(), .self)
-            ans <- lapply(result@resourceTemplates, as.function, .self)
-            setNames(ans, vapply(result@resourceTemplates, \(xi) xi@name,
+            resourceTemplates <- tryCatch(
+                invoke(MCPListResourceTemplatesRequest(),
+                       .self)@resourceTemplates,
+                JSONRPCMethodNotFound = function(cond) list()
+            )
+            ans <- lapply(resourceTemplates, as.function, .self)
+            setNames(ans, vapply(resourceTemplates, \(xi) xi@name,
                                  character(1L)))
         },
         readResource = function(.self, uri) {
@@ -38,9 +49,12 @@ MCPSession <- setRefClass("MCPSession",
             ans
         },
         listPrompts = function(.self) {
-            result <- invoke(MCPListPromptsRequest(), .self)
-            ans <- lapply(result@prompts, as.function, .self)
-            setNames(ans, vapply(result@prompts, \(xi) xi@name, character(1L)))
+            prompts <- tryCatch(
+                invoke(MCPListPromptsRequest(), .self)@prompts,
+                JSONRPCMethodNotFound = function(cond) list()
+            )
+            ans <- lapply(prompts, as.function, .self)
+            setNames(ans, vapply(prompts, \(xi) xi@name, character(1L)))
         },
         getPrompt = function(.self, name, arguments) {
             request <- MCPGetPromptRequest(name = name, arguments = arguments)
