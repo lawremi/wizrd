@@ -234,10 +234,14 @@ norm_json_schema <- function(x) {
 }
 
 schema_class <- function(x) {
-    if (is.null(x) || is.null(x$type))
+    if (is.null(x) || isTRUE(x))
         return(class_any)
     if (!is.null(x$anyOf))
         return(do.call(new_union, lapply(x$anyOf, schema_class)))
+    if (is.null(x$type))
+        return(class_any)
+    if (x$type == "object" && identical(names(x$properties), "__boxed"))
+        x <- x$properties$"__boxed"
     switch(x$type,
            object = schema_S7_class(x),
            array = schema_array(x$items),
@@ -266,9 +270,10 @@ schema_array <- function(x) {
     if (inherits(item_class, scalar_S7_property))
         item_class$class
     else if (inherits(item_class, S7_class)) {
-        item_class@properties <- lapply(item_class@properties,
-                                        vectorize_property)
-        new_data_frame_property(prototype = as.data.frame(formals(item_class)))
+        vector_props <- lapply(item_class@properties, vectorize_property)
+        vector_class <- new_class(item_class@name, properties = vector_props)
+        prototype <- as.data.frame(as.list(formals(vector_class)))
+        new_data_frame_property(prototype = prototype)
     }
     else list_of(item_class)
 }
