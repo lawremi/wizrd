@@ -170,6 +170,24 @@ method(receive, list(class_list, S7_object)) <- function(from, as) {
     dejsonify(from, S7_class(as))
 }
 
+handle_json_rpc_error <- function(e) {
+    if (is.null(e))
+        return(invisible(NULL))
+    error_msg <- paste("MCP Error:", e@message)
+    error_class <- JSON_RPC_ERRORS[[as.character(e@code)]]
+    if (is.null(error_class)) {
+        simpleError(error_msg)
+    } else {
+        errorCondition(error_msg, class = error_class$class)
+    } |> stop()
+}
+
+method(receive, list(class_list, JSONRPCResponse)) <- function(from, as) {
+    response <- receive(from, super(as, S7_object))
+    handle_json_rpc_error(response@error)
+    response
+}
+
 method(response_prototype, JSONRPCRequest) <- function(x) JSONRPCResponse()
 
 json_rpc_method := new_generic("x")
@@ -180,3 +198,19 @@ method(convert, list(class_any, JSONRPCRequest | JSONRPCNotification)) <-
         to(method = json_rpc_method(from),
            params = json_rpc_params(from)) 
     }
+
+new_error_class <- function(x) new_S3_class(c(x, "error", "condition"))
+
+S3_JSONRPCParseError <- new_error_class("JSONRPCParseError")
+S3_JSONRPCInvalidRequest <- new_error_class("JSONRPCInvalidRequest")
+S3_JSONRPCMethodNotFound <- new_error_class("JSONRPCMethodNotFound")
+S3_JSONRPCInvalidParams <- new_error_class("JSONRPCInvalidParams")
+S3_JSONRPCInternalError <- new_error_class("JSONRPCInternalError")
+
+JSON_RPC_ERRORS <- list(
+    "-32700" = S3_JSONRPCParseError,
+    "-32600" = S3_JSONRPCInvalidRequest,
+    "-32601" = S3_JSONRPCMethodNotFound,
+    "-32602" = S3_JSONRPCInvalidParams,
+    "-32603" = S3_JSONRPCInternalError
+)
