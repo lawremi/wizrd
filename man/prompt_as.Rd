@@ -18,8 +18,11 @@ system_prompt_as(x, format, ...)
   }
   \item{format}{
     A TextFormat object, or something convertible to one, representing
-    the prompt format. As a special case, if this is a string, the
-    system will try to interpret as either a file, glue format string or
+    the prompt format. A function is converted to a TextFormat that
+    expects a list of arguments to be passed as input. The arguments are
+    passed to the function, and the return value is sent to the
+    model. If this argument is a string, the system will try
+    to interpret it as either a file, glue format string or
     \href{https://smith.langchain.com/hub}{Langsmith Hub} ID. If it
     resembles a file, the file is read as a string and treated as a glue
     template. If it is a Langsmith Hub ID, the corresponding prompt
