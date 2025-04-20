@@ -446,7 +446,7 @@ Pipe := new_class(
     )
 )
 
-method(print, Pipe) <- function(x) {
+method(print, Pipe) <- function(x, ...) {
     cat(S7:::obj_desc(x), ""); print(x@process)
 }
 

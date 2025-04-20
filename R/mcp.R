@@ -527,7 +527,7 @@ method(convert, list(MCPBlobResourceContents, MediaURI)) <- function(from, to) {
     MediaURI(from@blob, type = from@mimeType)
 }
 
-method(as.function, MCPResource) <- function(x, session) {
+method(as.function, MCPResource) <- function(x, session, ...) {
     ans <- eval(substitute(function() {
         session$readResource(URI)
     }, list(URI = x@uri)))
@@ -535,7 +535,7 @@ method(as.function, MCPResource) <- function(x, session) {
     ans
 }
 
-method(as.function, MCPResourceTemplate) <- function(x, session) {
+method(as.function, MCPResourceTemplate) <- function(x, session, ...) {
     params <- glue_params(x@uriTemplate)
     ans <- eval(substitute(function() {
         ## FIXME: glue() only handles level 1 URI templates
@@ -549,7 +549,7 @@ method(as.function, MCPResourceTemplate) <- function(x, session) {
     ans
 }
 
-method(as.function, MCPPrompt) <- function(x, session) {
+method(as.function, MCPPrompt) <- function(x, session, ...) {
     args <- vapply(x@arguments, \(a) a@name, character(1L))
     args_call <- as.call(c(quote(list), sapply(args, as.name)))
     required <- vapply(x@arguments, \(a) a@required %||% FALSE, logical(1L))

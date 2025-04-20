@@ -1,4 +1,5 @@
 \name{mcp}
+\alias{mcp_exec_server}
 \alias{mcp_connect}
 \alias{tools}
 \alias{resources}
@@ -14,7 +15,7 @@
 \usage{
 mcp_exec_server(command, args = list())
 mcp_connect(server)
-tools(x)
+tools(x, ...)
 resources(x)
 prompts(x)
 }
@@ -37,6 +38,9 @@ prompts(x)
   \item{x}{
     The MCP session returned by \code{mcp_connect}
   }
+  \item{\dots}{
+    Arguments passed to methods
+  }
 }
 \details{
   MCP is an emerging standard for centrally providing tools, resources
@@ -53,7 +57,7 @@ prompts(x)
     \item{Calling a function returned by \code{resources} will return a
       character vector, which might be text or a base64-encoded image or
       audio stream. A typical use would be to pass them to a model,
-      potentially by \code{\link{chunking}}ing them and indexing them for
+      potentially by \code{\link{chunk}}ing them and indexing them for
       use in RAG.
     }
     \item{The functions returned by \code{prompts} can be called to
