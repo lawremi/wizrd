@@ -8,7 +8,8 @@ EmbeddingTextIndex <- new_class("EmbeddingTextIndex", TextIndex,
                                         default = quote(annoy_index)
                                     ),
                                     vector_index = class_any,
-                                    ndim = nullable(prop_int_nn)
+                                    ndim = nullable(scalar(class_integer,
+                                                           min = 0L))
                                 ))
 
 TextStore <- new_class("TextStore",
@@ -62,8 +63,8 @@ method(build, EmbeddingTextIndex) <- function(x, text, ...) {
 
 VectorIndexRetrievalParams := new_class(
     properties = list(
-        k = new_int_property(min = 0L, default = 5L),
-        min_similarity = new_number_property(min = 0L)
+        k = scalar(class_integer, min = 0L, default = 5L),
+        min_similarity = scalar(class_numeric, min = 0L)
     )
 )
 

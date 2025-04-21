@@ -1,14 +1,15 @@
 ChatMessage <- new_class("ChatMessage",
                          properties = list(
-                             role = new_string_property(
+                             role = scalar(
+                                 class_character,
                                  choices = c("system", "user", "assistant",
                                              "tool")
                              ),
                              content = class_character | class_list,
                              object = class_any,
-                             tool_calls = new_list_property(of = ToolCall),
-                             participant = nullable(prop_string),
-                             refusal = nullable(prop_string)
+                             tool_calls = list_of(ToolCall),
+                             participant = nullable(scalar(class_character)),
+                             refusal = nullable(scalar(class_character))
                          ))
 
 method(convert, list(class_any, ChatMessage)) <- function(from, to,

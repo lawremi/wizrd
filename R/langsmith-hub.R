@@ -5,9 +5,9 @@ input_variables_prop <- new_property(class_character, setter = \(self, value) {
 
 PromptTemplate := new_class(
     properties = list(
-        template = prop_string,
+        template = scalar(class_character),
         input_variables = input_variables_prop,
-        template_format = prop_string
+        template_format = scalar(class_character)
     )
 )
 
@@ -43,8 +43,8 @@ method(convert, list(class_list, MessagePromptTemplate)) <- function(from, to) {
 ChatPromptTemplate := new_class(
     properties = list(
         input_variables = input_variables_prop,
-        messages = new_list_property(
-            of = MessagePromptTemplate,
+        messages = list_of(
+            MessagePromptTemplate,
             setter = \(self, value) {
                 self@messages <- lapply(value, convert, MessagePromptTemplate)
                 self

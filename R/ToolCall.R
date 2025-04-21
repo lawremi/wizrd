@@ -1,7 +1,7 @@
 ToolCall <- new_class("ToolCall",
                       properties = list(
-                          id = nullable(prop_string),
-                          tool_name = prop_string,
+                          id = nullable(scalar(class_character)),
+                          tool_name = scalar(class_character),
                           arguments = class_list
                       ))
 

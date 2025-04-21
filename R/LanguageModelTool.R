@@ -1,8 +1,9 @@
 LanguageModelTool := new_class(
     Tool,
     properties = list(
-        name = new_string_property(default = quote(model@name)),
-        description = nullable(new_string_property(
+        name = scalar(class_character, default = quote(model@name)),
+        description = nullable(scalar(
+            class_character,
             default = quote(model@instructions)
         )),
         model = new_property(

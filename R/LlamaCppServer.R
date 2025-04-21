@@ -2,8 +2,8 @@ llamafile_version <- "0.9.0"
 
 LlamaCppServer <- new_class("LlamaCppServer", OpenAIAPIServer,
                             properties = list(
-                                model = prop_string,
-                                embedding = prop_flag
+                                model = scalar(class_character),
+                                embedding = scalar(class_logical)
                             ))
 
 method(models, LlamaCppServer) <- function(x) data.frame(id = x@model)

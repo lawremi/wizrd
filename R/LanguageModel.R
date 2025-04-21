@@ -1,12 +1,13 @@
 LanguageModel <- new_class("LanguageModel",
                            properties = list(
                                backend = LanguageModelBackend,
-                               name = nullable(prop_string),
-                               instructions = new_string_property(
+                               name = nullable(scalar(class_character)),
+                               instructions = scalar(
+                                   class_character,
                                    default = "You are a helpful assistant."
                                ),
                                io = TextProtocol,
-                               tools = new_list_property(of = ToolBinding),
+                               tools = list_of(ToolBinding),
                                params = LanguageModelParams,
                                examples = new_data_frame_property(
                                    col.names = c("input", "output")

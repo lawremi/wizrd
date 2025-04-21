@@ -21,7 +21,9 @@ CSVFormat <- new_class("CSVFormat", TextFormat,
                        ))
 
 CodeFormat <- new_class("CodeFormat", TextFormat,
-                        properties = list(language = nullable(prop_string)))
+                        properties = list(
+                            language = nullable(scalar(class_character))
+                        ))
 
 GlueFormat <- new_class("GlueFormat", TextFormat,
                         properties = list(template = class_character))
@@ -98,7 +100,7 @@ method(convert, list(whisker, TextFormat)) <- function(from, to) {
 }
 
 method(convert, list(PlainTextFormat, S7_property)) <- function(from, to) {
-    prop_string
+    scalar(class_character)
 }
 
 glue_params <- function(x) {

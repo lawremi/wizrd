@@ -5,7 +5,7 @@ Chat_roles <- function(self) vapply(self@messages, prop, character(1L), "role")
 Chat <- new_class("Chat",
                   properties = list(
                       model = LanguageModel | ChatPipeline,
-                      messages = new_list_property(of = ChatMessage),
+                      messages = list_of(ChatMessage),
                       contents = new_property(class_list,
                                               getter = Chat_contents),
                       objects = new_property(class_list,

@@ -1,7 +1,8 @@
 LanguageModelServer <- new_class("LanguageModelServer", LanguageModelBackend,
                                  properties = list(
-                                     url = prop_string,
-                                     key_prefix = nullable(prop_string),
+                                     url = scalar(class_character),
+                                     key_prefix =
+                                         nullable(scalar(class_character)),
                                      process = NULL | S3_process
                                  ),
                                  abstract = TRUE)

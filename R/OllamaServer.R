@@ -1,6 +1,7 @@
 OllamaServer <- new_class("OllamaServer", OpenAIAPIServer,
                           properties = list(
-                              url = new_string_property(
+                              url = scalar(
+                                  class_character,
                                   default = "http://localhost:11434"
                               )
                           ))

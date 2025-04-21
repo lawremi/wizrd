@@ -22,10 +22,11 @@ validate_Tool <- function(self) {
 
 Tool <- new_class("Tool", class_function,
                   properties = list(
-                      name = new_string_property(
+                      name = scalar(
+                          class_character,
                           default = quote(deparse(substitute(.data)))
                       ),
-                      description = nullable(prop_string),
+                      description = nullable(scalar(class_character)),
                       signature = new_property(
                           ToolSignature,
                           default = quote(any_signature(.data))
@@ -38,7 +39,7 @@ Tool <- new_class("Tool", class_function,
                               self
                           }
                       )),
-                      value_description = nullable(prop_string),
+                      value_description = nullable(scalar(class_character)),
                       examples = new_data_frame_property(
                           col.names = c("input", "output"),
                           setter = \(self, value) {
@@ -171,7 +172,7 @@ ToolBinding <- new_class("ToolBinding",
                          properties = list(
                              tool = Tool,
                              io = TextProtocol,
-                             instructions = nullable(prop_string)
+                             instructions = nullable(scalar(class_character))
                          ))
 
 method(print, ToolBinding) <- function(x, ...) {

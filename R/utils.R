@@ -82,7 +82,7 @@ S7_class_with_parent <- function(parent, validator = NULL, ...) {
 missing_name <- function() alist(x=)[[1L]]
 
 scalar <- function(x, ..., validator = x$validator, default = x$default,
-                   choices = NULL)
+                   choices = NULL, min = -Inf, max = Inf)
 {
     if (S7:::is_foundation_class(x))
         x <- new_property(x, ...)
@@ -105,7 +105,13 @@ scalar <- function(x, ..., validator = x$validator, default = x$default,
         c(if (length(value) != 1L || is.na(value))
             "must be of length one and not missing",
           if (!is.null(choices) && !all(value %in% choices))
-                paste("contains values not in", deparse(choices)),
+              paste("contains values not in", deparse(choices)),
+          if (is.numeric(value))
+              c(if (any(value < min))
+                  paste("must be >=", min),
+                if (any(value > max))
+                    paste("must be <=", max)
+                ),
           if (!is.null(validator))
               validator(value)
           )
@@ -113,71 +119,6 @@ scalar <- function(x, ..., validator = x$validator, default = x$default,
     class(x) <- c("scalar_S7_property", class(x))
     x
 }
-
-new_string_property <- function(..., validator = NULL,
-                                default = NULL, choices = NULL)
-{
-    if (is.null(default) && length(choices) > 0L)
-        default <- choices[1L]
-    prop <- scalar(
-        class_character, ...,
-        validator = function(value) {
-            c(if (!is.null(choices) && !all(value %in% choices))
-                paste("contains values not in",
-                      deparse(choices)),
-              if (!is.null(validator))
-                  validator(value)
-              )
-        }, default = default
-    )
-    prop$choices <- choices
-    class(prop) <- c("string_S7_property", class(prop))
-    prop
-}
-
-## sensible pattern?
-
-new_flag_property <- function(..., default = FALSE) {
-    scalar(class_logical, ..., default = default)
-}
-
-## TODO: make this handle non-scalars as well
-new_number_property <- function(class = class_numeric, ..., validator = NULL,
-                                default = min(max(min, 0), max),
-                                min = -Inf, max = Inf)
-{
-    prop <- scalar(class, ..., validator = function(value) {
-        c(if (any(value < min))
-              paste("must be >=", min),
-          if (any(value > max))
-              paste("must be <=", max),
-          if (!is.null(validator))
-              validator(value)
-          )
-    }, default = default)
-    prop$min <- min
-    prop$max <- max
-    class(prop) <- c("numeric_S7_property", class(prop))
-    prop
-}
-
-new_int_property <- function(..., default = min(max(min, 0L), max),
-                             min = .Machine$integer.min,
-                             max = .Machine$integer.max)
-{
-    new_number_property(class_integer, ..., default = default, min = min,
-                        max = max)
-}
-
-prop_string <- new_string_property()
-prop_flag <- new_flag_property()
-prop_number <- new_number_property()
-prop_number_nn <- new_number_property(min = 0)
-prop_number_pos <- new_number_property(min = 1)
-prop_prob <- new_number_property(min = 0, max = 1)
-prop_int <- new_int_property()
-prop_int_nn <- new_int_property(min = 0L)
-prop_int_pos <- new_int_property(min = 1L)
 
 list_of <- function(class, ...) {
     new_list_property(of = class, ...)

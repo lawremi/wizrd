@@ -1,7 +1,8 @@
 MediaURI <- new_class("MediaURI", class_character,
                       properties = list(
-                          type = prop_string,
-                          category = new_string_property(
+                          type = scalar(class_character),
+                          category = scalar(
+                              class_character,
                               getter = \(self) {
                                   sub("/.*", "", self@type)
                               }

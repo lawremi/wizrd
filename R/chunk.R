@@ -3,8 +3,8 @@ Chunking := new_class(abstract = TRUE)
 TokenChunking := new_class(
     Chunking,
     properties = list(
-        token_limit = with_default(prop_number_pos, 512L),
-        max_overlap = with_default(prop_number_nn, 64L)
+        token_limit = scalar(class_numeric, min = 1, default = 512L),
+        max_overlap = scalar(class_numeric, min = 0, default = 64L)
     ),
     validator = \(self) {
         if (self@token_limit < self@max_overlap)
