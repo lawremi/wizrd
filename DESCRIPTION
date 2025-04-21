@@ -12,8 +12,9 @@ Description: Enables embedding Large Language Models (LLMs) in R programs by
 	     convenient encoding of examples and interconversion of JSON and S7
 	     objects. Supports local and remote LLMs, including Ollama,
 	     llama.cpp, OpenAI and Azure, via an abstraction that is extensible
-	     to other providers. There is experimental support for text
-	     embedding, vector stores and Results Augmented Generation (RAG).
+	     to other providers. Includes a Model Context Protocol (MCP) client.
+	     There is experimental support for text embedding, vector stores and
+	     Results Augmented Generation (RAG).
 License: MIT + file LICENSE
 Imports:
     tools,
