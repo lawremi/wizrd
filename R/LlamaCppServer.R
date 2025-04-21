@@ -8,10 +8,10 @@ LlamaCppServer <- new_class("LlamaCppServer", OpenAIAPIServer,
 
 method(models, LlamaCppServer) <- function(x) data.frame(id = x@model)
 
-method(language_model, LlamaCppServer) <-
+method(language_agent, LlamaCppServer) <-
     function(x, ..., params = LanguageModelParams(...))
     {
-        LanguageModel(backend = x, name = x@model, params = params)
+        Agent(backend = x, name = x@model, params = params)
     }
 
 method(perform_chat, LlamaCppServer) <- function(x, ...) {
@@ -26,17 +26,17 @@ method(perform_embedding, LlamaCppServer) <- function(x, ...) {
     perform_embedding(super(x, OpenAIAPIServer), ...)
 }
 
-llama_cpp_model_from_ollama <- function(name, ...) {
-    llama_cpp_model(ollama_weights_path(name), alias = name, ...)
+llama_cpp_agent_from_ollama <- function(name, ...) {
+    llama_cpp_agent(ollama_weights_path(name), alias = name, ...)
 }
 
-llama_cpp_model <- function(path, mode = c("chat", "embedding"), alias = NULL,
+llama_cpp_agent <- function(path, mode = c("chat", "embedding"), alias = NULL,
                             server_path = NULL, ...)
 {
     mode <- match.arg(mode)
 
     if (resembles_url(path))
-        path <- cache_llama_cpp_model(path)
+        path <- cache_llama_cpp_agent(path)
 
     if (tools::file_ext(path) == "llamafile") {
         model <- NULL
@@ -48,10 +48,10 @@ llama_cpp_model <- function(path, mode = c("chat", "embedding"), alias = NULL,
 
     run_server <- if (mode == "chat") run_llama_cpp_server else run_llamafile_v2
     server <- run_server(model, alias = alias, path = server_path)
-    language_model(server, ...)
+    language_agent(server, ...)
 }
 
-cache_llama_cpp_model <- function(url) {
+cache_llama_cpp_agent <- function(url) {
     path <- cache_file(url, "models")
     if (tools::file_ext(path) == "llamafile")
         Sys.chmod(path, "755")
@@ -59,7 +59,7 @@ cache_llama_cpp_model <- function(url) {
 }
 
 llamafile_llama <- function(temperature = 0, ...) {
-    llama_cpp_model("https://huggingface.co/Mozilla/Llama-3.2-3B-Instruct-llamafile/resolve/main/Llama-3.2-3B-Instruct.Q6_K.llamafile")
+    llama_cpp_agent("https://huggingface.co/Mozilla/Llama-3.2-3B-Instruct-llamafile/resolve/main/Llama-3.2-3B-Instruct.Q6_K.llamafile")
 }
 
 llamafile_url <- function() {

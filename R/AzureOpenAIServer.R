@@ -8,8 +8,8 @@ azure_openai_server <- function(url = getOption("wizrd_azure_openai_url"),
     AzureOpenAIServer(url = url, key_prefix = key_prefix)
 }
 
-azure_openai_model <- function(name = "gpt-4o", ...) {
-    language_model(azure_openai_server(), name, ...)
+azure_openai_agent <- function(name = "gpt-4o", ...) {
+    language_agent(azure_openai_server(), name, ...)
 }
 
 method(server_req_api_key, AzureOpenAIServer) <- function(server, req, key) {

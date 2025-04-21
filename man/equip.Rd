@@ -14,7 +14,7 @@ unequip(x, name)
 }
 \arguments{
   \item{x}{
-    The LanguageModel object
+    The Agent object
   }
   \item{tool}{The Tool object, or an object to convert to a Tool
     object, or a list of such objects.}
@@ -32,7 +32,7 @@ unequip(x, name)
   }
 }
 \value{
-  The input LanguageModel object except with a different set of tools.
+  The input Agent object except with a different set of tools.
 }
 \author{Michael Lawrence}
 \seealso{

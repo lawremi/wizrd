@@ -22,7 +22,7 @@ nomic(server = ollama_server(), temperature = 0, ...)
     The Ollama-based models require an Ollama server to be running. By
     default, this calls \code{\link{ollama_server}} to start the server,
     if it is not already running. See the cautionary note in
-    \code{\link{ollama_model}} for the potential pitfalls of this
+    \code{\link{ollama_agent}} for the potential pitfalls of this
     convenience.
   }
   \item{temperature}{
@@ -43,11 +43,11 @@ nomic(server = ollama_server(), temperature = 0, ...)
   weights as \code{llama}. No Ollama required.
 }
 \section{Issues with llamafile}{
-  See \code{\link{llama_cpp_model}} for resolving OS-specific issues
+  See \code{\link{llama_cpp_agent}} for resolving OS-specific issues
   with \code{llamafile_llama}.
 }
 \value{
-  A LanguageModel
+  An Agent
 }
 \author{Michael Lawrence}
 \examples{

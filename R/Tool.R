@@ -135,7 +135,7 @@ method(convert, list(class_function, Tool)) <- function(from, to, ...) {
 }
 
 equip <- function(x, tool, instructions = NULL, ...) {
-    stopifnot(inherits(x, LanguageModel))
+    stopifnot(inherits(x, Agent))
     if (is.list(tool) && !is.object(tool)) {
         for (t in tool)
             x <- equip(x, t)
@@ -148,7 +148,7 @@ equip <- function(x, tool, instructions = NULL, ...) {
 }
 
 unequip <- function(x, name) {
-    stopifnot(inherits(x, LanguageModel))
+    stopifnot(inherits(x, Agent))
     x@tools[[name]] <- NULL
     x
 }

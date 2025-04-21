@@ -29,7 +29,7 @@ last_message(x, role = NULL)
   object containing the raw and converted output, among other things.
 }
 \seealso{
-  \code{\link[=predict.LanguageModel]{predict}} is a convenience wrapper
+  \code{\link[=predict.Agent]{predict}} is a convenience wrapper
   that uses \code{last_output}.
 }
 \author{Michael Lawrence}

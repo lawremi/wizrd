@@ -14,7 +14,7 @@ text_store(index, text = NULL)
 }
 \arguments{
   \item{index}{
-    A TextIndex object or, more commonly, a LanguageModel object for
+    A TextIndex object or, more commonly, an Agent object for
     computing the embeddings using the default index implementation.
   }
   \item{text}{

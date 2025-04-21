@@ -9,11 +9,11 @@ LanguageModelServer <- new_class("LanguageModelServer", LanguageModelBackend,
 
 models <- new_generic("models", "x")
 
-language_model <- new_generic("language_model", "x")
+language_agent <- new_generic("language_agent", "x")
 
-method(language_model, LanguageModelBackend) <-
+method(language_agent, LanguageModelBackend) <-
     function(x, name, ..., params = LanguageModelParams(...)) {
-        LanguageModel(backend = x, name = name, params = params)
+        Agent(backend = x, name = name, params = params)
     }
 
 chat_completions_path <- new_generic("chat_completions_path", "server",

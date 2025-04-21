@@ -1,4 +1,4 @@
-LanguageModel <- new_class("LanguageModel",
+Agent <- new_class("Agent",
                            properties = list(
                                backend = LanguageModelBackend,
                                name = nullable(scalar(class_character)),
@@ -27,7 +27,7 @@ chat <- new_generic("chat", "x")
 embed_text <- new_generic("embed_text", "x",
                           function(x, text, ndim = NULL, ...) S7_dispatch())
 
-method(print, LanguageModel) <- function(x, ...) {
+method(print, Agent) <- function(x, ...) {
     cat(S7:::obj_desc(x))
     if (!is.null(x@name)) cat("", x@name)
     cat("\n")
@@ -47,14 +47,14 @@ method(print, LanguageModel) <- function(x, ...) {
     print(x@backend)
 }
 
-method(perform_chat, LanguageModel) <- function(x, messages, stream_callback,
+method(perform_chat, Agent) <- function(x, messages, stream_callback,
                                                  env, ...)
 {
     perform_chat(x@backend, x@name, messages, x@tools, x@io,
                   set_props(x@params, ...), stream_callback)
 }
 
-method(chat, LanguageModel) <- function(x, input = NULL, stream_callback = NULL,
+method(chat, Agent) <- function(x, input = NULL, stream_callback = NULL,
                                         system_params = list(),
                                         env = parent.frame(), ...)
 {
@@ -67,7 +67,7 @@ predict_via_chat <- function(object, input, env = parent.frame(), ...)
     last_output(chat(object, input, env = env, ...))
 }
 
-method(predict, LanguageModel) <- predict_via_chat
+method(predict, Agent) <- predict_via_chat
 
 instruct <- function(x, ...) {
     args <- list(...) |> vapply(textify, character(1L))
@@ -87,7 +87,7 @@ textify_system_prompt <- function(x, params = list()) {
 
 tool_instructions <- new_generic("tool_instructions", "x")
 
-method(tool_instructions, LanguageModel) <- function(x) {
+method(tool_instructions, Agent) <- function(x) {
     if (length(x@tools) == 0L)
         return("")
     
@@ -155,7 +155,7 @@ method(instructions, CodeFormat) <- function(on) {
     prompt
 }
 
-method(instructions, LanguageModel) <- function(on) on@instructions
+method(instructions, Agent) <- function(on) on@instructions
 
 textify_examples <- function(x) {
     ex <- x@examples
@@ -173,20 +173,20 @@ textify_examples <- function(x) {
 tool_input_format <- new_generic("tool_input_format", "x",
                                  function(x, tool, ...) S7_dispatch())
 
-method(tool_input_format, LanguageModel) <- function(x, tool) {
+method(tool_input_format, Agent) <- function(x, tool) {
     tool_input_json_format(tool)
 }
 
 tool_output_format <- new_generic("tool_output_format", "x",
                                   function(x, tool, ...) S7_dispatch())
 
-method(tool_output_format, LanguageModel) <- function(x, tool) {
+method(tool_output_format, Agent) <- function(x, tool) {
     PlainTextFormat()
 }
 
 bind <- new_generic("bind", c("x", "to"))
 
-method(bind, list(Tool, LanguageModel)) <- function(x, to, instructions = NULL) {
+method(bind, list(Tool, Agent)) <- function(x, to, instructions = NULL) {
     assert_string(instructions, null.ok = TRUE)
     io_binding <- TextProtocol(input = tool_input_format(to, x),
                                output = tool_output_format(to, x))
@@ -200,7 +200,7 @@ interpret_symbols <-function(x) {
     x
 }
 
-method(embed_text, LanguageModel) <- function(x, text, ndim = NULL, ...) {
+method(embed_text, Agent) <- function(x, text, ndim = NULL, ...) {
     assert_integerish(ndim, null.ok = TRUE)
 
     if (length(text) == 0L)
@@ -216,7 +216,7 @@ method(embed_text, LanguageModel) <- function(x, text, ndim = NULL, ...) {
                           ndim = ndim, ...))
 }
 
-method(on_restore, LanguageModel) <- function(x, ...) {
+method(on_restore, Agent) <- function(x, ...) {
     set_props(x, backend = on_restore(x@backend, x@name, ...))
 }
 
@@ -236,17 +236,17 @@ demonstrate_all <- function(x, examples) {
     x
 }
 
-method(textify, list(class_any, LanguageModel)) <- function(x, format) {
+method(textify, list(class_any, Agent)) <- function(x, format) {
     textify(x, format@io@input)
 }
 
-method(detextify, list(class_any, LanguageModel)) <- function(x, format) {
+method(detextify, list(class_any, Agent)) <- function(x, format) {
     detextify(x, format@io@output)
 }
 
 prompt_as := new_generic(c("x", "format"))
 
-method(prompt_as, list(LanguageModel, class_any | class_glue | File)) <-
+method(prompt_as, list(Agent, class_any | class_glue | File)) <-
     function(x, format) {
         x@io@input <- convert(format, TextFormat)
         x
@@ -260,19 +260,19 @@ interpret_format_string <- function(x) {
     else as_glue(x)
 }
 
-method(prompt_as, list(LanguageModel, class_character)) <- function(x, format) {
+method(prompt_as, list(Agent, class_character)) <- function(x, format) {
     prompt_as(x, interpret_format_string(format))
 }
 
 system_prompt_as := new_generic(c("x", "format"))
 
-method(system_prompt_as, list(LanguageModel, class_any | class_glue | File)) <-
+method(system_prompt_as, list(Agent, class_any | class_glue | File)) <-
     function(x, format) {
         x@system_prompt_format <- convert(format, TextFormat)
         x
     }
 
-method(system_prompt_as, list(LanguageModel, class_character)) <-
+method(system_prompt_as, list(Agent, class_character)) <-
     function(x, format) {
         system_prompt_as(x, interpret_format_string(format))
     }
@@ -284,4 +284,4 @@ output_as <- function(x, format) {
 
 tools := new_generic("x")
 
-method(tools, LanguageModel) <- function(x) x@tools
+method(tools, Agent) <- function(x) x@tools

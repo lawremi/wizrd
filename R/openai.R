@@ -5,6 +5,6 @@ openai_server <- function(url = getOption("wizrd.openai.url",
     OpenAIAPIServer(url = url, key_prefix = key_prefix)
 }
 
-openai_model <- function(name = "gpt-4o-mini", ...) {
-    language_model(openai_server(), name, ...)
+openai_agent <- function(name = "gpt-4o-mini", ...) {
+    language_agent(openai_server(), name, ...)
 }

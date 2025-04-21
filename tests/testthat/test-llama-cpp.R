@@ -5,7 +5,7 @@ test_that("llama.cpp chatting works with a llamafile", {
 })
 
 test_that("llama.cpp supports external weights and generating embeddings", {
-    model <- wizrd:::llama_cpp_model_from_ollama(nomic(server)@name,
+    model <- wizrd:::llama_cpp_agent_from_ollama(nomic(server)@name,
                                                  mode = "embedding",
                                                  temperature = 0)
     embedding <- embed_text(model, "test")

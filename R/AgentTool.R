@@ -1,4 +1,4 @@
-LanguageModelTool := new_class(
+AgentTool := new_class(
     Tool,
     properties = list(
         name = scalar(class_character, default = quote(model@name)),
@@ -7,7 +7,7 @@ LanguageModelTool := new_class(
             default = quote(model@instructions)
         )),
         model = new_property(
-            LanguageModel,
+            Agent,
             setter = \(self, value) {
                 self@model <- value
                 self@signature <- model_signature(value)
@@ -48,8 +48,8 @@ model_fun <- function(model, sig, predict_args) {
                               predict_args))
     body <- substitute({
         self <- sys.function()
-        if (!inherits(self, LanguageModelTool))
-            stop("model function must be a LanguageModelTool")
+        if (!inherits(self, AgentTool))
+            stop("model function must be an AgentTool")
         PREDICT_CALL
     }, list(PREDICT_CALL = predict_call))
     as.function(c(args, body))
@@ -57,7 +57,7 @@ model_fun <- function(model, sig, predict_args) {
 
 unary := new_generic("x")
 
-method(unary, LanguageModel) <- function(x) unary(x@io@input)
+method(unary, Agent) <- function(x) unary(x@io@input)
 
 method(unary, GlueFormat) <- function(x) FALSE
 
@@ -75,15 +75,15 @@ model_signature <- function(model) {
     ToolSignature(parameters = parameters, value = value)
 }
 
-method(convert, list(LanguageModel, Tool)) <-
+method(convert, list(Agent, Tool)) <-
     function(from, to, name = from@name, description = from@instructions, ...) {
-        LanguageModelTool(name = name, model = from, description = description,
+        AgentTool(name = name, model = from, description = description,
                           ...)
     }
 
-method(convert, list(LanguageModel, class_function)) <- function(from, to, ...) {
+method(convert, list(Agent, class_function)) <- function(from, to, ...) {
     convert(from, Tool, ...)
 }
 
-method(as.function, LanguageModel) <- function(x, ...)
+method(as.function, Agent) <- function(x, ...)
     convert(x, class_function, ...)

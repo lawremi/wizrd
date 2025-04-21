@@ -4,7 +4,7 @@ Chat_roles <- function(self) vapply(self@messages, prop, character(1L), "role")
 
 Chat <- new_class("Chat",
                   properties = list(
-                      model = LanguageModel | ChatPipeline,
+                      model = Agent | ChatPipeline,
                       messages = list_of(ChatMessage),
                       contents = new_property(class_list,
                                               getter = Chat_contents),
@@ -18,7 +18,7 @@ Chat <- new_class("Chat",
                       )
                   ))
 
-method(convert, list(LanguageModel, Chat)) <- function(from, to,
+method(convert, list(Agent, Chat)) <- function(from, to,
                                                        messages = list(),
                                                        system_params = list(),
                                                        ...)

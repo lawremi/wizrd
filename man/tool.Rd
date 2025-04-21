@@ -15,7 +15,7 @@ tool(x, name = deparse(substitute(x)), ...)
 }
 \arguments{
   \item{x}{
-    Object to convert to a tool, such as a function or LanguageModel
+    Object to convert to a tool, such as a function or Agent
   }
   \item{name}{Name of the new tool}
   \item{\dots}{
@@ -38,7 +38,7 @@ tool(x, name = deparse(substitute(x)), ...)
   declared by \code{\link{can_accept_as}}, without any conversion by
   default.
 
-  Converting a LanguageModel to a Tool enables a model to be called by
+  Converting an Agent to a Tool enables a model to be called by
   another model (enabling networks of agents), as well as the user by
   simply invoking it like any other function, fully realizing the goal
   of the wizrd package: to program models as functions.

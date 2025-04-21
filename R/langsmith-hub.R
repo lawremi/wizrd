@@ -83,11 +83,11 @@ pull_langsmith_template <- function(id, url = "https://api.smith.langchain.com/"
         parse_langsmith_template()
 }
 
-method(prompt_as, list(LanguageModel, HubID)) <- function(x, format) {
+method(prompt_as, list(Agent, HubID)) <- function(x, format) {
     prompt_as(x, pull_langsmith_template(format))
 }
 
-method(system_prompt_as, list(LanguageModel, HubID)) <- function(x, format) {
+method(system_prompt_as, list(Agent, HubID)) <- function(x, format) {
     system_prompt_as(x, pull_langsmith_template(format))
 }
 
@@ -103,26 +103,26 @@ method(convert, list(PromptTemplate, TextFormat)) <- function(from, to) {
     convert(convert(from, class_character), to)
 }
 
-method(prompt_as, list(LanguageModel, ChatPromptTemplate)) <- function(x, format)
+method(prompt_as, list(Agent, ChatPromptTemplate)) <- function(x, format)
 {
     for (msg in format@messages)
         x <- prompt_as(x, msg)
     x
 }
 
-method(prompt_as, list(LanguageModel, SystemMessagePromptTemplate)) <-
+method(prompt_as, list(Agent, SystemMessagePromptTemplate)) <-
     function(x, format)
     {
         system_prompt_as(x, format@prompt)
     }
 
-method(prompt_as, list(LanguageModel, HumanMessagePromptTemplate)) <-
+method(prompt_as, list(Agent, HumanMessagePromptTemplate)) <-
     function(x, format)
     {
         prompt_as(x, format@prompt)
     }
 
-method(prompt_as, list(LanguageModel, StructuredPrompt)) <- function(x, format) {
+method(prompt_as, list(Agent, StructuredPrompt)) <- function(x, format) {
     prompt_as(x, super(format, ChatPromptTemplate)) |>
         output_as(format@"schema_" |> norm_json_schema())
 }

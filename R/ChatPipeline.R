@@ -1,8 +1,8 @@
 ChatPipeline := new_class(
     class_list,
     validator = \(self) {
-        if (!all(sapply(self, S7:::class_inherits, Chat | LanguageModel)))
-            paste("all elements must inherit from Chat or LanguageModel")
+        if (!all(sapply(self, S7:::class_inherits, Chat | Agent)))
+            paste("all elements must inherit from Chat or Agent")
     }
 )
 
@@ -56,4 +56,4 @@ c_ChatPipeline <- function(...) {
 }
 
 method(c, ChatPipeline) <- c_ChatPipeline
-method(c, LanguageModel) <- c_ChatPipeline
+method(c, Agent) <- c_ChatPipeline

@@ -40,7 +40,7 @@ self-contained, cross-platform llamafile binary for the llama 3.2 3B
 model. Behind the scenes, it starts up a local HTTP server (based on
 llama.cpp) through which it communicates with the R process. For more
 general use of local LLMs, it is recommended to install Ollama and use
-`ollama_model()` to pull (if necessary) and run models with
+`ollama_agent()` to pull (if necessary) and run models with
 Ollama. The `llama()` function is a convenience to run llama 3.2 3B
 with Ollama. Convenience functions exist for some other common models.
 
@@ -75,8 +75,8 @@ We will demonstrate how the wizrd package meets each of these
 requirements in turn. We will use gpt-4o-mini for this example, in
 order to support constrained output. Set the `OPENAI_API_KEY`
 environment variable to your OpenAI key before running this.
-```{r openai_model}
-model <- openai_model("gpt-4o-mini", temperature = 0)
+```{r openai_agent}
+model <- openai_agent("gpt-4o-mini", temperature = 0)
 ```
 For reproducibility reasons, it is best to explicitly specify the
 underlying model, as above, because the default will change as new
@@ -88,8 +88,8 @@ Let's extend the above example so that it can answer the same
 questions about any given programming language.
 
 ```{r glue}
-parameterized_model <- model |> prompt_as("Who created {language}?")
-parameterized_model |> chat(list(language = "R"))
+parameterized_agent <- model |> prompt_as("Who created {language}?")
+parameterized_agent |> chat(list(language = "R"))
 ```
 
 By calling `prompt_as()`, we parameterized the model using a glue
@@ -102,7 +102,7 @@ We can define the logic of the LLM function using natural language
 instructions, inserted into the system prompt, using the `instruct()`
 function:
 ```{r instruct}
-instructed_model <- parameterized_model |>
+instructed_agent <- parameterized_agent |>
     instruct("Include the name of every author.",
              "Return only names separated by commas, no extra text.")
 ```
@@ -116,8 +116,8 @@ get_R_authors <- function() {
     authors <- R.home("doc") |> file.path("AUTHORS") |> readLines()
     paste("Here are all of the R authors:", paste(authors, collapse = "\n"))
 }
-equipped_model <- instructed_model |> equip(get_R_authors)
-equipped_model |> chat(list(language = "R"))
+equipped_agent <- instructed_agent |> equip(get_R_authors)
+equipped_agent |> chat(list(language = "R"))
 ```
 
 ## Constraining output
@@ -128,9 +128,9 @@ object. We made some progress through our instructions above, but we
 can be much more precise using the `output_as()` function:
 
 ```{r output_as}
-df_model <- equipped_model |>
+df_agent <- equipped_agent |>
     output_as(data.frame(first_name = character(), last_name = character()))
-df_model |> predict(list(language = "R"))
+df_agent |> predict(list(language = "R"))
 ```
 
 In the above example, we use a data.frame stub to specify the format,
@@ -144,8 +144,8 @@ Person <- new_class("Person",
                                       last_name = class_character))
 method(print, Person) <- function(x, ...)
     cat("People:", paste(x@first_name, x@last_name, collapse = ", "), "\n")
-s7_model <- equipped_model |> output_as(Person)
-s7_model |> predict(list(language = "R"))
+s7_agent <- equipped_agent |> output_as(Person)
+s7_agent |> predict(list(language = "R"))
 ```
 
 ## Converting a model to an actual R function
@@ -154,7 +154,7 @@ Since the model is already behaving like a function, it is relatively
 straightforward to convert it into an actual R function using the
 `convert()` generic from S7:
 ```{r function}
-model_fun <- convert(df_model, class_function)
+model_fun <- convert(df_agent, class_function)
 model_fun("R")
 ```
 

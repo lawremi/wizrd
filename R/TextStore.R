@@ -2,7 +2,7 @@ TextIndex <- new_class("TextIndex", abstract = TRUE)
 
 EmbeddingTextIndex <- new_class("EmbeddingTextIndex", TextIndex,
                                 properties = list(
-                                    embedder = LanguageModel,
+                                    embedder = Agent,
                                     vector_index_builder = new_property(
                                         class_function,
                                         default = quote(annoy_index)
@@ -30,7 +30,7 @@ TextStore <- new_class("TextStore",
                        ))
 
 text_store <- function(index, text = NULL) {
-    if (inherits(index, LanguageModel))
+    if (inherits(index, Agent))
         index <- EmbeddingTextIndex(embedder = index)
     TextStore(index = index, text = text)
 }

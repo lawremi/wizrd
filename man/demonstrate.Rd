@@ -15,7 +15,7 @@ demonstrate_all(x, examples)
 }
 \arguments{
   \item{x}{
-    The Tool or LanguageModel object.
+    The Tool or Agent object.
   }
   \item{input,output}{
     Input and output objects constituting an example. They are assumed

@@ -12,7 +12,7 @@ instruct(x, ...)
 }
 \arguments{
   \item{x}{
-    The LanguageModel object
+    The Agent object
   }
   \item{\dots}{
     Objects that are converted to text and pasted together into a block
@@ -20,7 +20,7 @@ instruct(x, ...)
   }
 }
 \value{
-  The input LanguageModel object except with a new set of instructions.
+  The input Agent object except with a new set of instructions.
 }
 \author{Michael Lawrence}
 \seealso{

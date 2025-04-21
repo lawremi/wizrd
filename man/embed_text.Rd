@@ -12,7 +12,7 @@ embed_text(x, text, ndim, ...)
 }
 \arguments{
   \item{x}{
-    The LanguageModel object, whose underlying model should be
+    The Agent object, whose underlying model should be
     specialized for generating embeddings, like \code{\link{nomic}}.
   }
   \item{text}{

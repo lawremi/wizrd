@@ -12,7 +12,7 @@ output_as(x, format)
 }
 \arguments{
   \item{x}{
-    The LanguageModel object
+    The Agent object
   }
   \item{format}{
     A TextFormat object, or something convertible to one, representing
@@ -25,7 +25,7 @@ output_as(x, format)
   }
 }
 \value{
-  The input LanguageModel object except with new output constraints.
+  The input Agent object except with new output constraints.
 }
 \author{Michael Lawrence}
 \seealso{
@@ -36,13 +36,13 @@ output_as(x, format)
 \examples{
 \dontrun{
     df <- data.frame(first_name = character(), last_name = character())
-    openai_model(temperature = 0) |> output_as(df) |> predict("Creators of R")
+    openai_agent(temperature = 0) |> output_as(df) |> predict("Creators of R")
 
     Person <- S7::new_class("Person", properties = list(
         first_name = S7::class_character,
         last_name = S7::class_character
     ))
-    openai_model(temperature=0) |> output_as(Person) |> predict("Creators of R")
+    openai_agent(temperature=0) |> output_as(Person) |> predict("Creators of R")
 }
 }
 \keyword{ utilities }

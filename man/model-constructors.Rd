@@ -1,14 +1,14 @@
 \name{model-constructors}
-\alias{azure_openai_model}
-\alias{llama_cpp_model}
-\alias{ollama_model}
-\alias{openai_model}
+\alias{azure_openai_agent}
+\alias{llama_cpp_agent}
+\alias{ollama_agent}
+\alias{openai_agent}
 
 \title{
-  LanguageModel Constructors
+  Agent Constructors
 }
 \description{
-  Convenience constructors for LanguageModel objects based on different
+  Convenience constructors for Agent objects based on different
   backends, such as Ollama or OpenAI. Users should call one of these
   functions to gain access to an LLM. For the local backends, every
   attempt is made to install the model and even the backend in some
@@ -16,11 +16,11 @@
   and expect the script to run anywhere, more or less reproducibly.
 }
 \usage{
-ollama_model(name, pull = NA, server = ollama_server(), ...)
-llama_cpp_model(path, mode = c("chat", "embedding"), alias = NULL,
+ollama_agent(name, pull = NA, server = ollama_server(), ...)
+llama_cpp_agent(path, mode = c("chat", "embedding"), alias = NULL,
                 server_path = NULL, ...)
-openai_model(name = "gpt-4o-mini", ...)
-azure_openai_model(name = "gpt-4o", ...)
+openai_agent(name = "gpt-4o-mini", ...)
+azure_openai_agent(name = "gpt-4o", ...)
 }
 
 \arguments{
@@ -74,12 +74,12 @@ azure_openai_model(name = "gpt-4o", ...)
 }
 
 \section{Commercial Providers}{
-  Using a commercial provider, like via \code{openai_model} or
-  \code{azure_openai_model}, requires some configuration, depending on
+  Using a commercial provider, like via \code{openai_agent} or
+  \code{azure_openai_agent}, requires some configuration, depending on
   the provider:
   \describe{
-    \item{openai_model}{\var{OPENAI_API_KEY} holds the API key}
-    \item{azure_openai_model}{
+    \item{openai_agent}{\var{OPENAI_API_KEY} holds the API key}
+    \item{azure_openai_agent}{
       \var{AZURE_OPENAI_API_KEY} holds the API
       key, and \code{option(wizrd_azure_openai_url=)} sets the
       account-specific URL (up to the hostname).
@@ -99,19 +99,19 @@ azure_openai_model(name = "gpt-4o", ...)
   See the \href{https://github.com/Mozilla-Ocho/llamafile}{llamafile
     README} for workarounds.
 }
-\value{A LanguageModel object}
+\value{An Agent object}
 \author{Michael Lawrence}
 \note{
   These functions rely on an unexported lower level API that will
   eventually be exported to enable extension to additional backends.
 }
 \seealso{
-  \code{\link[=predict.LanguageModel]{predict}} and \code{\link{chat}}
-  for interacting with the returned LanguageModel object.
+  \code{\link[=predict.Agent]{predict}} and \code{\link{chat}}
+  for interacting with the returned Agent object.
 }
 \examples{
 \dontrun{
-    model <- ollama_model("llama3.2:3b-instruct-q4_K_M") # or llama()
+    model <- ollama_agent("llama3.2:3b-instruct-q4_K_M") # or llama()
     predict(model, "Creators of R")
 }
 }

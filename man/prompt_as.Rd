@@ -14,7 +14,7 @@ system_prompt_as(x, format, ...)
 }
 \arguments{
   \item{x}{
-    The LanguageModel object
+    The Agent object
   }
   \item{format}{
     A TextFormat object, or something convertible to one, representing
@@ -49,7 +49,7 @@ system_prompt_as(x, format, ...)
   templates, since it can only modify the system prompt.
 }
 \value{
-  The input LanguageModel object except with a new prompt format.
+  The input Agent object except with a new prompt format.
 }
 \author{Michael Lawrence}
 \examples{

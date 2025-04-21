@@ -84,11 +84,11 @@ maybe_add_latest <- function(name) {
     else name
 }
 
-ollama_model <- function(name, pull = NA, server = ollama_server(), ...) {
+ollama_agent <- function(name, pull = NA, server = ollama_server(), ...) {
     name <- maybe_add_latest(name)
     if (!require_ollama_model(name, server, pull))
         stop("Model '", name, "' not found")
-    language_model(server, name, ...)
+    language_agent(server, name, ...)
 }
 
 ollama_dir <- function() {
@@ -126,13 +126,13 @@ method(on_restore, OllamaServer) <- function(x, name, ...) {
 }
 
 ollama_llama_vision <- function(server, temperature = 0, ...) {
-    ollama_model("llama3.2-vision:11b-instruct-q4_K_M",
+    ollama_agent("llama3.2-vision:11b-instruct-q4_K_M",
                  server = server, temperature = temperature, ...)
 }
 
 ollama_llama <- function(server, temperature = 0, ...)
 {
-    ans <- try(ollama_model("llama3.2:3b-instruct-q4_K_M",
+    ans <- try(ollama_agent("llama3.2:3b-instruct-q4_K_M",
                             server = server, temperature = temperature, ...))
     if (inherits(ans, "try-error"))
         stop("Try using llamafile_llama() as a quickstart.")
@@ -140,6 +140,6 @@ ollama_llama <- function(server, temperature = 0, ...)
 }
 
 ollama_nomic <- function(server, temperature = 0, ...) {
-    ollama_model("nomic-embed-text:v1.5", temperature = temperature,
+    ollama_agent("nomic-embed-text:v1.5", temperature = temperature,
                  server = server, ...)
 }

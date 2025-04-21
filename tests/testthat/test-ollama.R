@@ -5,5 +5,5 @@ test_that("ollama chatting works", {
 })
 
 test_that("we fail when the model does not exist", {
-    expect_error(ollama_model("madeupmodel:1000b", pull = FALSE))
+    expect_error(ollama_agent("madeupmodel:1000b", pull = FALSE))
 })
