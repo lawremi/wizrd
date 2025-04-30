@@ -26,6 +26,8 @@ export(llama, llamafile_llama, llama_vision, nomic)
 export(persist, restore)
 # MCP
 export(mcp_connect, mcp_exec_server)
+# c() methods; exported to gratiate R CMD check, since they are in \usage{}
+export(c.Chat, c.Agent, c.ChatPipeline)
 
 # S3 methods
 S3method(nameOfClass, S7_S3_class)

@@ -158,7 +158,7 @@ readline_chat <- function(model, env = parent.frame()) {
     invisible(ctx)
 }
 
-method(c, Chat) <- c_ChatPipeline
+method(c, Chat) <- c.Chat <- c.ChatPipeline
 
 method(textify, list(class_any, Chat)) <- function(x, format) {
     textify(x, format@model)

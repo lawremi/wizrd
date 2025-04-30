@@ -51,9 +51,9 @@ method(textify, list(class_any, ChatPipeline)) <- function(x, format) {
 
 method(detextify, list(class_any, ChatPipeline)) <- function(x, format) x
 
-c_ChatPipeline <- function(...) {
+c.ChatPipeline <- function(...) {
     ChatPipeline(unlist(list(...), recursive = FALSE))
 }
 
-method(c, ChatPipeline) <- c_ChatPipeline
-method(c, Agent) <- c_ChatPipeline
+method(c, ChatPipeline) <- c.ChatPipeline
+method(c, Agent) <- c.Agent <- c.ChatPipeline
