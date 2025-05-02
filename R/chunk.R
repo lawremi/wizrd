@@ -43,6 +43,14 @@ PDFChunking := new_class(HierarchicalChunking)
 
 RdChunking := new_class(Chunking)
 
+DelimitedChunking := new_class(HierarchicalChunking)
+
+ParagraphChunking := new_class(DelimitedChunking)
+
+LineChunking := new_class(DelimitedChunking)
+
+WordChunking := new_class(DelimitedChunking)
+
 method(as.data.frame, Text) <-
     function(x, row.names = NULL, optional = FALSE, ...) {
         as.data.frame(S7_data(x), row.names = row.names,
@@ -216,6 +224,18 @@ method(chunk, list(File, HTMLChunking)) <- function(x, by) {
 method(chunk, list(File, PDFChunking)) <- function(x, by) {
     require_ns("pdftools", "chunk PDF")
     chunk(paste(pdftools::pdf_text(x), collapse = "\n"), by@section_chunking)
+}
+
+delimiter := new_generic("x")
+
+method(delimiter, ParagraphChunking) <- function(x) "\n\n"
+method(delimiter, LineChunking) <- function(x) "\n"
+method(delimiter, WordChunking) <- function(x) " "
+
+method(chunk, list(Text, DelimitedChunking)) <- function(x, by) {
+    text <- strsplit(x, delimiter(by))[[1L]] |>
+        lapply(chunk, by@section_chunking) |> unlist()
+    data.frame(text)
 }
 
 packageIQR <- new_S3_class("packageIQR")
