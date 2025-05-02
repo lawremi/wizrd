@@ -181,7 +181,7 @@ The wizrd package implements experimental functionality
 for Retrieval Augmented Generation (RAG). One potentially useful
 application is in the querying of R manual pages. 
 
-### Basic example
+### Querying Rd
 
 The code below uses the `chunk()` generic to generate text chunks from
 the S7 man pages. Next, it creates a TextStore that indexes those
@@ -202,6 +202,16 @@ store <- text_store(nomic(), chunks)
 model <- llama() |> prompt_as(rag_from(store))
 cat("#### new_property example\n")
 last_message(chat(model, "new_property example"))
+```
+
+### Querying a data.frame
+
+And here is an example of querying a data.frame using RAG:
+```{r rag, results='asis'}
+chunks <- chunk(mtcars)
+store <- text_store(nomic(), chunks)
+model <- llama() |> prompt_as(rag_from(store))
+predict(model, "MPG of Datsun 710")
 ```
 
 ```{r end, include=FALSE}
