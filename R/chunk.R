@@ -120,7 +120,7 @@ method(chunk, list(class_character | class_list, Chunking | class_list)) <-
                    rbind_list(unname(chunks)) |> ensure_cols("text"))
     }
 
-method(chunk, list(File, class_any)) <- function(x, by) {
+method(chunk, list(File | S3_connection, class_any)) <- function(x, by) {
     chunk(Text(read_as_string(x)), by)
 }
 
