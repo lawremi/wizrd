@@ -43,13 +43,17 @@ PDFChunking := new_class(HierarchicalChunking)
 
 RdChunking := new_class(Chunking)
 
-DelimitedChunking := new_class(HierarchicalChunking)
+RegexChunking := new_class(
+    HierarchicalChunking,
+    properties = list(
+        regex = scalar(class_character)
+    ))
 
-ParagraphChunking := new_class(DelimitedChunking)
+paragraph_chunking <- RegexChunking(regex = "\n\n")
 
-LineChunking := new_class(DelimitedChunking)
+line_chunking <- RegexChunking(regex = "\n")
 
-WordChunking := new_class(DelimitedChunking)
+word_chunking <- RegexChunking(regex = " ")
 
 method(as.data.frame, Text) <-
     function(x, row.names = NULL, optional = FALSE, ...) {
@@ -226,14 +230,8 @@ method(chunk, list(File, PDFChunking)) <- function(x, by) {
     chunk(paste(pdftools::pdf_text(x), collapse = "\n"), by@section_chunking)
 }
 
-delimiter := new_generic("x")
-
-method(delimiter, ParagraphChunking) <- function(x) "\n\n"
-method(delimiter, LineChunking) <- function(x) "\n"
-method(delimiter, WordChunking) <- function(x) " "
-
-method(chunk, list(Text, DelimitedChunking)) <- function(x, by) {
-    text <- strsplit(x, delimiter(by))[[1L]] |>
+method(chunk, list(Text, RegexChunking)) <- function(x, by) {
+    text <- strsplit(x, by@regex)[[1L]] |>
         lapply(chunk, by@section_chunking) |> unlist()
     data.frame(text)
 }
