@@ -90,7 +90,7 @@ method(textify,
 {
     results <- fetch(x, format@store, format@params)
     paste0("Using this information:\n",
-           textify(results),
+           paste(textify(results), collapse = "\n\n"),
            "\n\nRespond to this prompt:\n",
            textify(x))
 }
