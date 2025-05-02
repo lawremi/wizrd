@@ -1,5 +1,7 @@
 Chunking := new_class(abstract = TRUE)
 
+RowChunking := new_class(Chunking)
+
 TokenChunking := new_class(
     Chunking,
     properties = list(
@@ -241,4 +243,18 @@ method(default_chunking, Rd) <- function(x) RdChunking()
 
 method(chunk, list(Rd, RdChunking)) <- function(x, by) {
     data.frame(text = Rd_src(x))
+}
+
+method(default_chunking, class_data.frame) <- function(x) RowChunking()
+
+csv_string <- function(x) {
+    con <- file()
+    on.exit(close(con))
+    write.csv(x, con)
+    read_as_string(con)
+}
+
+method(chunk, list(class_data.frame, RowChunking)) <- function(x, by) {
+    rows <- split(x, seq_len(nrow(x)))
+    data.frame(text = vapply(rows, csv_string, character(1L)))
 }

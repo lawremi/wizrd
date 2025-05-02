@@ -23,3 +23,10 @@ test_that("RAG works with vignettes", {
     ans <- predict(model, "new_property example")
     expect_match(ans, "new_property")
 })
+
+test_that("RAG works with data.frames", {
+    store <- text_store(nomic(), chunk(mtcars))
+    model <- llama() |> prompt_as(rag_from(store))
+    ans <- predict(model, "MPG of Datsun 710")
+    expect_match(ans, "22.8")
+})
