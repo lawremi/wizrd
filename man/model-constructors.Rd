@@ -20,7 +20,8 @@ ollama_agent(name, pull = NA, server = ollama_server(), ...)
 llama_cpp_agent(path, mode = c("chat", "embedding"), alias = NULL,
                 server_path = NULL, ...)
 openai_agent(name = "gpt-4o-mini", ...)
-azure_openai_agent(name = "gpt-4o", ...)
+azure_openai_agent(name = "gpt-4o", url = getOption("wizrd_azure_openai_url"),
+                   ...)
 }
 
 \arguments{
@@ -68,6 +69,7 @@ azure_openai_agent(name = "gpt-4o", ...)
     user-local installation of the llamafile utility, downloading and
     installing it if necessary and (when interactive) the user approves.
   }
+  \item{url}{The URL of the Azure endpoint, typically ending with the hostname.}
   \item{\dots}{
     Model parameters, see \code{\link{LanguageModelParams}}.
   }
