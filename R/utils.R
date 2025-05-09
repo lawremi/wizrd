@@ -431,6 +431,15 @@ assert_port <- function(port) {
     assert_integerish(port, lower = 1024L, upper = 65535L)
 }
 
+resp_await_sse <- function(resp) {
+    sse <- NULL
+    while(is.null(sse) && !httr2::resp_stream_is_complete(resp)) {
+        sse <- httr2::resp_stream_sse(resp)
+        Sys.sleep(0.01)
+    }
+    sse
+}
+
 ## Destined for S7?
 
 method(convert, list(class_any, class_logical)) <-

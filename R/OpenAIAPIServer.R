@@ -72,11 +72,10 @@ openai_body_params <- function(body, params) {
 }
 
 req_perform_sse <- function(req, callback) {
-    con <- req |> httr2::req_perform_connection()
-    while (!httr2::resp_stream_is_complete(con)) {
-        con |> httr2::resp_stream_sse() |> callback()
-    }
-    close(con)
+    con <- req |> httr2::req_perform_connection(blocking = FALSE)
+    on.exit(close(con))
+    while (!is.null(event <- resp_await_sse(con)) && callback(event)) { }
+    invisible()
 }
 
 openai_chat_perform_stream <- function(req, stream_callback) {
