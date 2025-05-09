@@ -586,8 +586,9 @@ method(convert, list(MCPPromptMessage, ChatMessage)) <- function(from, to) {
 }
 
 method(handle_notification, MCPLoggingMessageNotification) <- function(x) {
-    logger <- switch(x@level, debug = verbose_message, info =, notice = message,
-                     warning = warning, error =, critical =, alert =,
-                     emergency = stop)
-    logger(x@data)
+    class <- switch(x@level, debug = c("verbose_message", "message"), info =,
+                    notice = "message", warning =, error =, critical =, alert =,
+                    emergency = "warning")
+    condition(x@data, level = x@level, class = c(class, "mcp_condition")) |>
+        emit()
 }

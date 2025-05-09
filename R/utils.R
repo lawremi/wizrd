@@ -737,3 +737,19 @@ verbose_message <- function(...) {
         message(...)
     invisible()
 }
+
+condition <- function (message, ..., class = NULL, call = NULL) 
+    structure(list(message = as.character(message), call = call, 
+                   ...), class = c(class, "condition"))
+
+emit <- function(cond) UseMethod("emit")
+
+emit.default <- function(cond) signalCondition(cond)
+
+emit.error <- function(cond) stop(cond)
+
+emit.warning <- function(cond) warning(cond)
+
+emit.message <- function(cond) message(cond)
+
+emit.verbose_condition <- function(cond) verbose_message(cond)

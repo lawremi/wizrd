@@ -1,6 +1,6 @@
 # server.py
 
-from fastmcp import FastMCP
+from fastmcp import FastMCP, Context
 from fastmcp.prompts.prompt import Message
 
 # Create an MCP server
@@ -21,8 +21,12 @@ def get_greeting(name: str) -> str:
     return f"Hello, {name}!"
 
 @mcp.prompt()
-def ask_review(code_snippet: str, language: str = "python") -> str:
+async def ask_review(code_snippet: str, language: str = "python", ctx: Context = None) -> str:
     """Generates a standard code review request."""
+    if not code_snippet or not code_snippet.strip():
+        raise ValueError("Code snippet cannot be empty")
+    if language.lower() == "r" and ctx:
+        await ctx.warning("R is considered harmful")
     return f"Please review the following code snippet for potential bugs and style issues:\n```{language}\n{code_snippet}\n```"
 
 @mcp.prompt()
