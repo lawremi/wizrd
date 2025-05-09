@@ -76,8 +76,7 @@ method(send, list(class_any, Pipe)) <- function(x, to) {
 
 method(send, list(class_character | class_json, union_connection)) <-
     function(x, to) {
-        if (getOption("wizrd_verbose", FALSE))
-            message("SEND: ", x)
+        verbose_message("SEND: ", x)
         write_lines(to, x)
         to
     }

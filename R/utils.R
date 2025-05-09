@@ -392,9 +392,8 @@ method(print, Pipe) <- function(x, ...) {
 }
 
 pipex <- function(command, args) {
-    verbose <- isTRUE(getOption("wizrd_verbose"))
-    if (verbose)
-        message("running: ", command, " ", paste(args, collapse = " "))
+    verbose_message("running: ", command, " ", paste(args, collapse = " "))
+    verbose <- getOption("wizrd_verbose", FALSE)
     processx::process$new(command, args, stdin = "|", stdout = "|",
                           stderr = if (verbose) "") |> Pipe()
 }
@@ -722,4 +721,10 @@ cache_file <- function(url, type) {
     if (file.exists(path) || prompt_download_file(url, path))
         path
     else stop("Failed to cache ", url)
+}
+
+verbose_message <- function(...) {
+    if (getOption("wizrd_verbose", FALSE))
+        message(...)
+    invisible()
 }
