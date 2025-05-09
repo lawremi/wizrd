@@ -1,7 +1,7 @@
 # server.py
 
 from fastmcp import FastMCP
-from fastmcp.prompts.prompt import Message, UserMessage, AssistantMessage
+from fastmcp.prompts.prompt import Message
 
 # Create an MCP server
 mcp = FastMCP("Demo", log_level="WARNING") # change to DEBUG for debugging
@@ -29,10 +29,9 @@ def ask_review(code_snippet: str, language: str = "python") -> str:
 def debug_session_start(error_message: str) -> list[Message]:
     """Initiates a debugging help session."""
     return [
-        UserMessage(f"I encountered an error:\n{error_message}"),
-        AssistantMessage("Okay, I can help with that. Can you provide the full traceback and tell me what you were trying to do?")
+        Message(role="user", content=f"I encountered an error:\n{error_message}"),
+        Message(role="assistant", content="Okay, I can help with that. Can you provide the full traceback and tell me what you were trying to do?")
     ]
 
 if __name__ == "__main__":
-    print("running server")
     mcp.run()
