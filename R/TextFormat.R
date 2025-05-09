@@ -234,7 +234,8 @@ class_jsonic <- new_S3_class("jsonic")
 
 dejsonify <- new_generic("dejsonify", c("x", "spec"))
 
-method(dejsonify, list(class_list | class_data.frame, S7_class)) <-
+method(dejsonify,
+       list(class_list | class_jsonic | class_data.frame, S7_class)) <-
     function(x, spec) {
         keep <- intersect(names(x), names(spec@properties))
         do.call(spec, Map(dejsonify, x[keep], spec@properties[keep]),

@@ -352,6 +352,15 @@ MCPGetPromptResult := new_class(
     )
 )
 
+MCPLoggingMessageNotification := new_class(
+    MCPNotification,
+    properties = list(
+        level = scalar(class_character),
+        logger = optional(scalar(class_character)),
+        data = class_any
+    )
+)
+
 close.MCPSession <- function(con, ...) {
     close(con$endpoint, ...)
 }
@@ -399,8 +408,18 @@ method(send, list(MCPNotification, class_any)) <- function(x, to) {
     to
 }
 
+method_to_mcp_notification_class <- list(
+    message = MCPLoggingMessageNotification
+)
+
+mcp_notification_mapper <- function(method) {
+    name <- sub("^notifications/", "", method)
+    method_to_mcp_notification_class[[name]]
+}
+
 method(receive, list(class_any, MCPResult)) <- function(from, as, ...) {
-    receive(from, JSONRPCResponse()) |> receive(as, ...)
+    receive(from, JSONRPCResponse(), mcp_notification_mapper) |>
+        receive(as, ...)
 }
 
 method(receive, list(JSONRPCResponse, MCPResult)) <- function(from, as, ...) {
@@ -577,4 +596,11 @@ method(convert, list(MCPPromptMessage, ChatMessage)) <- function(from, to) {
     ChatMessage(role = from@role,
                 object = from@content,
                 content = textify(from@content))
+}
+
+method(handle_notification, MCPLoggingMessageNotification) <- function(x) {
+    logger <- switch(x@level, debug = verbose_message, info =, notice = message,
+                     warning = warning, error =, critical =, alert =,
+                     emergency = stop)
+    logger(x@data)
 }

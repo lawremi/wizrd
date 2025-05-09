@@ -26,10 +26,9 @@ JSONRPCNotification := new_class(
     properties = list(
         id = NULL
     ), # See S7 PR#473 for why this is necessary
-    constructor = function(.data = JSONRPCRequest(method = method,
-                                                  params = params,
-                                                  id = NULL),
-                           method, params = list())
+    constructor = function(.data = JSONRPCRequest(method = method, id = NULL,
+                                                  ...),
+                           method = "", ...)
         new_object(.data)
 )
 
@@ -49,11 +48,49 @@ JSONRPCResponse := new_class(
     )
 )
 
+S3_httr2_response <- new_S3_class("httr2_response")
+S3_httr2_request <- new_S3_class("httr2_request")
+
+PostSSEEndpoint := new_class(
+    properties = list(
+        post_req = S3_httr2_request,
+        sse_resp = S3_httr2_response
+    )
+)
+
+ws_endpoint <- function(url) {
+    require_ns("websocket", "connect to websocket-based MCP servers")
+    BufferedWebSocket(webSocket = WebSocket$new(url))
+}
+
+post_sse_endpoint <- function(url) {
+    sse_resp <- httr2::request(url) |>
+        httr2::req_perform_connection(blocking = FALSE)
+    event <- sse_resp |> resp_await_sse()
+    if (event$type == "endpoint") # could be relative or absolute
+        post_req <- event$data |> httr2::url_parse(base_url = url) |>
+            httr2::url_build() |> httr2::request()
+    else stop("expected 'endpoint' event from ", url)
+    PostSSEEndpoint(post_req = post_req, sse_resp = sse_resp)
+}
+
+json_rpc_endpoint <- function(server) {
+    if (is.character(server)) {
+        if (resembles_url(server, "ws") || resembles_url(server, "wss"))
+            ws_endpoint(server)
+        else if (resembles_url(server, "http") || resembles_url(server, "https"))
+            post_sse_endpoint(server)
+        else server
+    } else server
+}
+
 send := new_generic(c("x", "to"))
 
 receive := new_generic(c("from", "as"))
 
 response_prototype := new_generic("x")
+
+handle_notification := new_generic("x")
 
 invoke <- function(x, endpoint) {
     send(x, endpoint) |> receive(response_prototype(x))
@@ -165,6 +202,12 @@ method(receive, list(class_character, JSONRPCResponse)) <- function(from, as,
 
 method(receive, list(class_list, S7_object)) <- function(from, as) {
     dejsonify(from, S7_class(as))
+}
+
+receive_notification <- function(from, mapper) {
+    notification <- receive(from, JSONRPCNotification())
+    dejsonify(notification@params, mapper(notification@method)) |>
+        handle_notification()
 }
 
 handle_json_rpc_error <- function(e) {
