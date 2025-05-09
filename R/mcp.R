@@ -71,13 +71,6 @@ MCPSession <- setRefClass("MCPSession",
     )
     )
 
-MCPSSEEndpoint := new_class(
-    properties = list(
-        sse_con = S3_connection,
-        post_url = scalar(class_character)
-    )
-)
-
 MCPImplementation := new_class(
     properties = list(
         name = scalar(class_character,
@@ -430,19 +423,8 @@ method(receive, list(MCPSession, class_any)) <- function(from, as, ...) {
     receive(from$endpoint, as, ...)
 }
 
-ws_endpoint <- function(url) {
-    require_ns("websocket", "connect to websocket-based MCP servers")
-    BufferedWebSocket(webSocket = WebSocket$new(url))
-}
-
-mcp_endpoint <- function(server) {
-    if (is.character(server) && resembles_url(server, "ws"))
-        ws_endpoint(server)
-    else server
-}
-
 mcp_connect <- function(server) {
-    session <- MCPSession(endpoint = mcp_endpoint(server))
+    session <- MCPSession(endpoint = json_rpc_endpoint(server))
     session$mcp_initialize()
     session
 }
@@ -475,9 +457,14 @@ mcp_exec_server <- function(command, args = list()) {
     try_uv_pipex(command, args) %||% pipex(command, args)
 }
 
-mcp_test_server <- function() {
-    mcp_exec_server("uvx", c("fastmcp", "run", 
-                             system.file("mcp", "server.py", package = "wizrd")))
+mcp_test_server <- function(transport = c("stdio", "sse"), port) {
+    transport <- match.arg(transport)
+    args <- c("fastmcp", "run", 
+              system.file("mcp", "server.py", package = "wizrd"),
+              "--transport", transport)
+    if (transport == "sse")
+        args <- c(args, "--port", port)
+    mcp_exec_server("uvx", args)
 }
 
 method(tools, MCPSession) <- function(x) {

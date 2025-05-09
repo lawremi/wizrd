@@ -18,7 +18,6 @@ test_that("we can access MCP resources", {
 })
 
 test_that("we can generate prompts with MCP", {
-    options(wizrd_verbose = TRUE)
     session <- mcp_connect(wizrd:::mcp_test_server())
     pf <- prompts(session)
 
@@ -39,4 +38,17 @@ test_that("we can generate prompts with MCP", {
     info <- "Trying to use if() in R. Traceback: 1: fun(integer())"
     result <- predict(model, c(msgs, info))
     expect_match(result, "empty vector", fixed = TRUE)
+})
+
+test_that("the SSE transport layer works", {
+    options(wizrd_verbose = TRUE)
+
+    port <- wizrd:::find_available_port()
+    server <- wizrd:::mcp_test_server("sse", port)
+    url <- paste0("http://127.0.0.1:", port, "/sse")
+
+    session <- mcp_connect(url)
+    r <- resources(session)
+    result <- r$get_greeting("R")
+    expect_identical(result, "Hello, R!")
 })

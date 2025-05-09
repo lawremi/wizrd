@@ -164,23 +164,41 @@ method(send, list(class_any, BufferedWebSocket)) <- function(x, to) {
     to
 }
 
+method(send, list(class_character | class_json, PostSSEEndpoint)) <-
+    function(x, to) {
+        verbose_message("SEND: ", x)
+        to@post_req |> httr2::req_options(followlocation = 0L) |>
+            httr2::req_body_raw(x) |> httr2::req_perform()
+        to
+    }
+
 method(receive, list(Pipe, class_any)) <- function(from, as, ...) {
     receive(from@stdout, as, ...)
 }
 
-method(receive, list(union_connection, JSONRPCResponse)) <-
-    function(from, as, on_notify = function(x) invisible(NULL))
+read_json_rpc_response := new_generic("x")
+
+method(read_json_rpc_response, union_connection) <- function(x) {
+    read_lines(x, n = 1L)
+}
+
+method(read_json_rpc_response, S3_httr2_response) <- function(x) {
+    event <- x |> httr2::resp_stream_sse()
+    event$data
+}
+
+method(receive, list(union_connection | S3_httr2_response, JSONRPCResponse)) <-
+    function(from, as, notification_mapper)
     {
         ## could become a more general listener that runs asynchronously,
         ## but that would only make sense for an app with mutable state
         while(TRUE) {
-            lines <- read_lines(from, n = 1L)
-            if (length(lines) >= 1L) {
-                if (getOption("wizrd_verbose", FALSE))
-                    message("RECEIVE: ", lines)
-                response <- fromJSON(lines, simplifyDataFrame = FALSE)
+            response <- read_json_rpc_response(from)
+            if (length(response) > 0L) {
+                verbose_message("RECEIVE: ", response)
+                response <- fromJSON(response, simplifyDataFrame = FALSE)
                 if (is.null(response$id))
-                    receive(from, JSONRPCNotification()) |> on_notify()
+                    receive_notification(response, notification_mapper)
                 else break
             }
             Sys.sleep(0.01)
@@ -226,6 +244,10 @@ method(receive, list(class_list, JSONRPCResponse)) <- function(from, as) {
     response <- receive(from, super(as, S7_object))
     handle_json_rpc_error(response@error)
     response
+}
+
+method(receive, list(PostSSEEndpoint, class_any)) <- function(from, as, ...) {
+    receive(from@sse_resp, as, ...)
 }
 
 method(response_prototype, JSONRPCRequest) <- function(x) JSONRPCResponse()
