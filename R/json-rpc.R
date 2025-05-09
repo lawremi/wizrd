@@ -233,11 +233,11 @@ handle_json_rpc_error <- function(e) {
         return(invisible(NULL))
     error_msg <- paste("MCP Error:", e@message)
     error_class <- JSON_RPC_ERRORS[[as.character(e@code)]]
-    if (is.null(error_class)) {
+    stop(if (is.null(error_class)) {
         simpleError(error_msg)
     } else {
         errorCondition(error_msg, class = error_class$class)
-    } |> stop()
+    })
 }
 
 method(receive, list(class_list, JSONRPCResponse)) <- function(from, as) {
