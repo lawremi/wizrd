@@ -354,6 +354,14 @@ MCPLoggingMessageNotification := new_class(
     )
 )
 
+MCPCancelledNotification := new_class(
+    MCPNotification,
+    properties = list(
+        requestId = JSONRPCRequest@properties$id,
+        reason = optional(scalar(class_character))
+    )
+)
+
 close.MCPSession <- function(con, ...) {
     close(con$endpoint, ...)
 }
@@ -382,17 +390,23 @@ method(json_rpc_method, MCPNotification) <- function(x) {
 
 method(json_rpc_params, MCPRequest) <- function(x) jsonify(x)
 
-method(response_prototype, MCPRequest) <- function(x) {
-    match.fun(sub("wizrd::", "", sub("Request", "Result", class(x)[1L])))()
+method(response_class, MCPRequest) <- function(x) {
+    match.fun(sub("wizrd::", "", sub("Request", "Result", class(x)[1L])))
+}
+
+method(invoke, MCPRequest) <- function(x, endpoint) {
+    mcp_canceller <- function() {
+        MCPCancelledNotification(requestId = json_rpc_request@id) |>
+            notify(endpoint)
+    }
+    json_rpc_request <- convert(x, JSONRPCRequest)
+    json_rpc_request |>
+        invoke(endpoint, mcp_notification_mapper, mcp_canceller) |>
+        _@result |> dejsonify(response_class(x))
 }
 
 method(send, list(class_any, MCPSession)) <- function(x, to) {
     send(x, to$endpoint)
-    to
-}
-
-method(send, list(MCPRequest, class_any)) <- function(x, to) {
-    convert(x, JSONRPCRequest) |> send(to)
     to
 }
 
@@ -408,15 +422,6 @@ method_to_mcp_notification_class <- list(
 mcp_notification_mapper <- function(method) {
     name <- sub("^notifications/", "", method)
     method_to_mcp_notification_class[[name]]
-}
-
-method(receive, list(class_any, MCPResult)) <- function(from, as, ...) {
-    receive(from, JSONRPCResponse(), mcp_notification_mapper) |>
-        receive(as, ...)
-}
-
-method(receive, list(JSONRPCResponse, MCPResult)) <- function(from, as, ...) {
-    from@result |> receive(as, ...)
 }
 
 method(receive, list(MCPSession, class_any)) <- function(from, as, ...) {

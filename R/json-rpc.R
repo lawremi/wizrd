@@ -88,12 +88,17 @@ send := new_generic(c("x", "to"))
 
 receive := new_generic(c("from", "as"))
 
-response_prototype := new_generic("x")
+response_class := new_generic("x")
 
 handle_notification := new_generic("x")
 
-invoke <- function(x, endpoint) {
-    send(x, endpoint) |> receive(response_prototype(x))
+invoke := new_generic("x", function(x, endpoint, ...) S7_dispatch())
+
+method(invoke, JSONRPCRequest) <- function(x, endpoint, notification_mapper,
+                                           canceller)
+{
+    send(x, endpoint) |>
+        receive(JSONRPCResponse(id = x@id), notification_mapper, canceller)
 }
 
 notify <- function(x, endpoint) {
@@ -188,10 +193,13 @@ method(read_json_rpc_response, S3_httr2_response) <- function(x) {
 }
 
 method(receive, list(union_connection | S3_httr2_response, JSONRPCResponse)) <-
-    function(from, as, notification_mapper)
+    function(from, as, notification_mapper, canceller)
     {
         ## could become a more general listener that runs asynchronously,
         ## but that would only make sense for an app with mutable state
+        on.exit(canceller())
+        if (getOption("wizrd_test_json_rpc_cancel", FALSE))
+            canceller()
         while(TRUE) {
             response <- read_json_rpc_response(from)
             if (length(response) > 0L) {
@@ -199,10 +207,13 @@ method(receive, list(union_connection | S3_httr2_response, JSONRPCResponse)) <-
                 response <- fromJSON(response, simplifyDataFrame = FALSE)
                 if (is.null(response$id))
                     receive_notification(response, notification_mapper)
-                else break
+                else if (identical(response$id, as@id))
+                    break
+                else warning("Received unexpected response: ", response$id)
             }
             Sys.sleep(0.01)
         }
+        on.exit(add = FALSE)
         receive(response, as)
     }
 
@@ -250,7 +261,7 @@ method(receive, list(PostSSEEndpoint, class_any)) <- function(from, as, ...) {
     receive(from@sse_resp, as, ...)
 }
 
-method(response_prototype, JSONRPCRequest) <- function(x) JSONRPCResponse()
+method(response_class, JSONRPCRequest) <- function(x) JSONRPCResponse
 
 json_rpc_method := new_generic("x")
 json_rpc_params := new_generic("x")

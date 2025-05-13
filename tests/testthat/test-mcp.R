@@ -62,3 +62,13 @@ test_that("MCP errors work", {
     expect_error(model |> prompt_as(pf$ask_review) |>
                      predict(list(code_snippet = "", language = "R")))
 })
+
+test_that("MCP requests can be cancelled", {
+    skip("Not sure if FastMCP yet handles notifications/cancelled")
+    options(wizrd_verbose = TRUE)
+    session <- mcp_connect(wizrd:::mcp_test_server())
+    mcp_tools <- tools(session)
+    opt <- options(wizrd_test_json_rpc_cancel = TRUE)
+    on.exit(options(opt))
+    result <- mcp_tools$sleep()
+})

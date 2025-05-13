@@ -2,6 +2,7 @@
 
 from fastmcp import FastMCP, Context
 from fastmcp.prompts.prompt import Message
+import anyio
 
 # Create an MCP server
 mcp = FastMCP("Demo", log_level="WARNING") # change to DEBUG for debugging
@@ -19,6 +20,12 @@ def add(a: int, b: int) -> int:
 def get_greeting(name: str) -> str:
     """Get a personalized greeting"""
     return f"Hello, {name}!"
+
+@mcp.tool()
+async def sleep(seconds: int = 10) -> str:
+    """Sleep for the specified number of seconds."""
+    await anyio.sleep(seconds)
+    return f"Slept for {seconds} seconds"
 
 @mcp.prompt()
 async def ask_review(code_snippet: str, language: str = "python", ctx: Context = None) -> str:
