@@ -40,7 +40,7 @@ Suggests:
     httptest2,
     reticulate (>= 1.41.0)
 Depends: 
-    R (>= 3.5.0)
+    R (>= 4.3.0)
 Encoding: UTF-8
 RoxygenNote: 7.1.1
 VignetteBuilder: knitr
