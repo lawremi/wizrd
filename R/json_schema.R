@@ -260,9 +260,16 @@ schema_class <- function(x) {
            boolean = scalar(class_logical))
 }
 
+schema_property <- function(x) {
+    cls <- schema_class(x)
+    prop <- if (inherits(cls, S7_class)) new_property(cls) else cls
+    prop$default <- convert(x$default, prop$class)
+    prop
+}
+
 schema_S7_class <- function(x, ...) {
     new_class(x$"$id" %||% x$title %||% "schema",
-              properties = c(lapply(x$properties, schema_class),
+              properties = c(lapply(x$properties, schema_property),
                              `_dots` = if (isTRUE(x$additionalProperties))
                                  class_list),
               ...)
