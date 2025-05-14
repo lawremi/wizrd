@@ -406,7 +406,7 @@ method(invoke, MCPRequest) <- function(x, endpoint) {
 }
 
 method(send, list(class_any, MCPSession)) <- function(x, to) {
-    send(x, to$endpoint)
+    to$endpoint <- send(x, to$endpoint)
     to
 }
 

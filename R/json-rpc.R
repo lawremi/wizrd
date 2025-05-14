@@ -48,13 +48,13 @@ JSONRPCResponse := new_class(
     )
 )
 
-S3_httr2_response <- new_S3_class("httr2_response")
-S3_httr2_request <- new_S3_class("httr2_request")
-
 PostSSEEndpoint := new_class(
     properties = list(
         post_req = S3_httr2_request,
-        sse_resp = S3_httr2_response
+        sse_resp = S3_httr2_response,
+        auth = nullable(OAuth),
+        base_url = scalar(class_character, getter = function(self)
+            self@post_req$url |> httr2::url_modify(path = NULL))
     )
 )
 
@@ -172,8 +172,18 @@ method(send, list(class_any, BufferedWebSocket)) <- function(x, to) {
 method(send, list(class_character | class_json, PostSSEEndpoint)) <-
     function(x, to) {
         verbose_message("SEND: ", x)
-        to@post_req |> httr2::req_options(followlocation = 0L) |>
-            httr2::req_body_raw(x) |> httr2::req_perform()
+        req <- to@post_req |> httr2::req_body_raw(x)
+        if (!is.null(to@auth))
+            req <- req |> req_oauth_with(to@auth)
+        tryCatch(
+            req |> httr2::req_perform(),
+            httr2_http_403 = function(cnd) {
+                if (is.null(to@auth)) {
+                    to@auth <- oauth_auth_code(to@base_url)
+                    send(x, to)
+                } else stop(cnd)
+            }
+        )
         to
     }
 

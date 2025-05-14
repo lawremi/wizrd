@@ -354,6 +354,9 @@ S3_process <- new_S3_class("process")
 
 union_connection <- S3_connection | S3_processx_connection
 
+S3_httr2_response <- new_S3_class("httr2_response")
+S3_httr2_request <- new_S3_class("httr2_request")
+
 read_lines := new_generic("con")
 
 method(read_lines, S3_connection) <- function(con, ...) readLines(con, ...)

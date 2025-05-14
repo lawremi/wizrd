@@ -5,7 +5,7 @@ importFrom(stats, predict, setNames, aggregate)
 importFrom(glue, glue, as_glue)
 importFrom(methods, new, getClassDef)
 importFrom(utils, unzip, askYesNo, write.csv, read.csv, capture.output, help,
-           head, tail, URLencode)
+           head, tail, URLencode, packageDescription)
 
 # model constructors
 export(ollama_agent, llama_cpp_agent, openai_agent, azure_openai_agent)
