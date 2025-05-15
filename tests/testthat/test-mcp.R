@@ -43,6 +43,12 @@ test_that("we can generate prompts with MCP", {
 })
 
 test_that("the SSE transport layer works", {
+    is_mocking <- !is.null(getOption("httr2_mock"))
+    if (is_mocking) { # the dynamic POST URL confuses httptest2
+        httptest2::stop_mocking()
+        on.exit(httptest2::use_mock_api())
+    }
+
     port <- wizrd:::find_available_port()
     mcp_server <- wizrd:::mcp_test_server("sse", port)
     url <- paste0("http://127.0.0.1:", port, "/sse")
