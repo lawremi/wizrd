@@ -32,7 +32,8 @@ text_store(index, text = NULL)
 }
 \author{Michael Lawrence}
 \seealso{
-  \code{\link{rag_from}}, for using the returned object in
+  \code{\link{retrieve}} for retrieving text chunks from a
+  store. \code{\link{rag_from}}, for using the returned object in
   RAG. \code{persist} and \code{restore} for persistence of text stores.
 }
 \note{

@@ -10,8 +10,8 @@ annoy_index <- function(embedding, ntrees = ncol(embedding) %/% 5L) {
     index
 }
 
-method(fetch, list(class_numeric, Rcpp_AnnoyAngular)) <- function(x, from,
-                                                                  params)
+method(retrieve, list(class_numeric, Rcpp_AnnoyAngular)) <- function(x, from,
+                                                                     params)
 {
     nns <- from$getNNsByVectorList(x, params@k, -1L, include_distances = TRUE)
     cosine_similarity <- (2 - (nns$distance ^ 2)) / 2

@@ -20,6 +20,8 @@ export(last_output, last_message, tools, resources, prompts)
 export(embed_text)
 # chunking
 export(chunk, default_chunking)
+# querying
+export(retrieve)
 # convenience models
 export(llama, llamafile_llama, llama_vision, nomic)
 # persistence

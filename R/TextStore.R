@@ -35,15 +35,18 @@ text_store <- function(index, text = NULL) {
     TextStore(index = index, text = text)
 }
 
-fetch <- new_generic("fetch", c("x", "from"))
+retrieve <- new_generic("retrieve", c("x", "from"))
 
-method(fetch, list(class_any, TextStore)) <- function(x, from, params) {
-    from@text[fetch(x, from@index, params),]
-}
+method(retrieve, list(class_any, TextStore)) <-
+    function(x, from, params = VectorIndexRetrievalParams(...), ...) {
+        from@text[retrieve(x, from@index, params),]
+    }
 
-method(fetch, list(class_any, EmbeddingTextIndex)) <- function(x, from, params) {
+method(retrieve, list(class_any, EmbeddingTextIndex)) <- function(x, from,
+                                                                  params)
+{
     embeddings <- embed_text(from@embedder, x)
-    unique(unlist(apply(embeddings, 1L, fetch, from@vector_index, params,
+    unique(unlist(apply(embeddings, 1L, retrieve, from@vector_index, params,
                         simplify = FALSE)))
 }
 
@@ -88,7 +91,7 @@ method(textify,
        list(class_character | class_list | class_any,
             RetrievalAugmentedFormat)) <- function(x, format)
 {
-    results <- fetch(x, format@store, format@params)
+    results <- retrieve(x, format@store, format@params)
     paste0("Using this information:\n",
            paste(textify(results), collapse = "\n\n"),
            "\n\nRespond to this prompt:\n",
