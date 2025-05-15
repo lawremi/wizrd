@@ -207,7 +207,7 @@ last_message(chat(model, "new_property example"))
 ### Querying a data.frame
 
 And here is an example of querying a data.frame using RAG:
-```{r rag, results='asis'}
+```{r rag-df, results='asis'}
 chunks <- chunk(mtcars)
 store <- text_store(nomic(), chunks)
 model <- llama() |> prompt_as(rag_from(store))
