@@ -224,25 +224,6 @@ run_llama_cpp_server <- function(model,
                           gpu = gpu, port = port, ...)
 }
 
-is_port_open <- function(port) {
-    con <- try(suppressWarnings(socketConnection(port = port, blocking = TRUE)),
-               silent = TRUE)
-    if (!inherits(con, "try-error")) {
-        close(con)
-        TRUE
-    } else FALSE
-}
-
-find_available_port <- function(start = 8000, end = 8100) {
-    stopifnot(start <= end)
-    for (port in start:end) {
-        if (!is_port_open(port)) {
-            return(port)
-        }
-    }
-    stop("No available ports found in ", start, ":", end)
-}
-
 method(on_restore, LlamaCppServer) <- function(x, ...) {
     init_fun <- if (x@embedding) init_llamafile_v2_process else init_llamafile_process
     p <- R6_private(x@process)

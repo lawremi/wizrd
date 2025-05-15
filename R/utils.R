@@ -756,3 +756,30 @@ emit.warning <- function(cond) warning(cond)
 emit.message <- function(cond) message(cond)
 
 emit.verbose_condition <- function(cond) verbose_message(cond)
+
+is_port_open <- function(port) {
+    con <- try(suppressWarnings(socketConnection(port = port, blocking = TRUE)),
+               silent = TRUE)
+    if (!inherits(con, "try-error")) {
+        close(con)
+        TRUE
+    } else FALSE
+}
+
+find_available_port <- function(start = 8000, end = 8100) {
+    stopifnot(start <= end)
+    for (port in start:end) {
+        if (!is_port_open(port)) {
+            return(port)
+        }
+        Sys.sleep(0.01)
+    }
+    stop("No available ports found in ", start, ":", end)
+}
+
+wait_until_port_open <- function(port) {
+    while(!is_port_open(port)) {
+        Sys.sleep(0.01)
+    }
+    invisible(port)
+}

@@ -469,7 +469,10 @@ mcp_test_server <- function(transport = c("stdio", "sse"), port) {
               "--transport", transport)
     if (transport == "sse")
         args <- c(args, "--port", port)
-    mcp_exec_server("uvx", args)
+    server <- mcp_exec_server("uvx", args)
+    if (transport == "sse")
+        wait_until_port_open(port)
+    server
 }
 
 method(tools, MCPSession) <- function(x) {
