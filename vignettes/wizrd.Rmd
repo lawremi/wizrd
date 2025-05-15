@@ -114,7 +114,8 @@ language:
 ```{r tool}
 get_R_authors <- function() {
     authors <- R.home("doc") |> file.path("AUTHORS") |> readLines()
-    paste("Here are all of the R authors:", paste(authors, collapse = "\n"))
+    paste("Extract the R authors from this text. Do not call this tool again.",
+          paste(authors, collapse = "\n"))
 }
 equipped_agent <- instructed_agent |> equip(get_R_authors)
 equipped_agent |> chat(list(language = "R"))
