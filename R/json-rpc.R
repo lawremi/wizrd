@@ -159,6 +159,10 @@ method(close, Pipe) <- function(con, ...) {
     con@process$kill()
 }
 
+method(close, PostSSEEndpoint) <- function(con, ...) {
+    close(con@sse_resp)
+}
+
 method(send, list(class_character | class_json, WebSocket)) <- function(x, to) {
     to$send(x)
     to
