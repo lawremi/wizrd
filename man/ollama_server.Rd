@@ -8,6 +8,10 @@
   Constructs a reference to an Ollama server, optionally starting one if
   one is not running at the specified (local) URL. If the server is
   started, it will be killed when the returned object goes out of scope.
+
+  This function requires Ollama to be installed on your system. You can
+  install Ollama from \url{https://ollama.ai} and follow their
+  platform-specific installation instructions.
 }
 \usage{
 ollama_server(url = ollama_url(), start = TRUE, ...)

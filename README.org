@@ -9,4 +9,32 @@ OpenAI and Azure, via an abstraction that is extensible to other
 providers. There is experimental support for text embedding, vector
 stores and Results Augmented Generation (RAG).
 
-See the vignette(s) and manual for more details.
+* Optional System Requirements
+
+- Ollama (for local LLM support)
+  - Install from [[https://ollama.ai][ollama.ai]]
+  - Follow platform-specific installation instructions on their website
+
+* Installation
+
+#+BEGIN_SRC R
+install.packages("remotes")
+remotes::install_github("lawremi/wizrd")
+#+END_SRC
+
+* Usage
+
+See the vignettes and manual for detailed usage instructions:
+
+#+BEGIN_SRC R
+# View available vignettes
+vignette(package = "wizrd")
+
+# View package documentation
+help(package = "wizrd")
+#+END_SRC
+
+* Support
+
+- GitHub Issues: [[https://github.com/lawremi/wizrd/issues]]
+- Documentation: [[https://lawremi.github.io/wizrd/]]
