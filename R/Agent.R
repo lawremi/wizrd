@@ -277,8 +277,8 @@ method(system_prompt_as, list(Agent, class_character)) <-
         system_prompt_as(x, interpret_format_string(format))
     }
 
-output_as <- function(x, format) {
-    x@io@output <- convert(format, TextFormat)
+output_as <- function(x, format, ...) {
+    x@io@output <- convert(format, TextFormat, ...)
     x
 }
 

@@ -63,7 +63,8 @@ method(as_json_schema, S7_union) <- function(from, descriptions = NULL, ...) {
     if (identical(from, class_numeric))
         return(as_json_schema(class_double, ...))
     schemas <- Map(as_json_schema, from$classes,
-                   as.list(descriptions)[seq_along(from$classes)])
+                   as.list(descriptions)[seq_along(from$classes)],
+                   ...)
     list(anyOf = schemas,
          title = paste(unlist(lapply(schemas, `[[`, "title")), collapse=" or "))
 }

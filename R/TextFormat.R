@@ -40,10 +40,13 @@ is_schema_class <- function(x) {
     S7:::class_inherits(x, JSONFormat@properties$schema_class$class)
 }
 
-json_format <- function(schema = list())
-{
-    schema_class <- if (is_schema_class(schema)) schema else schema_class(schema)
-    schema <- box_json_schema(as_json_schema(schema))
+json_format <- function(schema = list(), ...) {
+    schema_class <- if (is_schema_class(schema)) {
+        schema
+    } else {
+        schema_class(schema)
+    }
+    schema <- box_json_schema(as_json_schema(schema, ...))
     JSONFormat(schema = schema, schema_class = schema_class)
 }
 
@@ -69,8 +72,8 @@ glue_format <- function(template) {
     GlueFormat(template = template)
 }
 
-method(convert, list(class_any, TextFormat)) <- function(from, to) {
-    json_format(from)
+method(convert, list(class_any, TextFormat)) <- function(from, to, ...) {
+    json_format(from, ...)
 }
 
 method(convert, list(TextFormat, TextFormat)) <- function(from, to) {
