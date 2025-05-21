@@ -60,6 +60,8 @@ method(as_json_schema, S7_class) <- function(from, description = NULL, ...) {
 }
 
 method(as_json_schema, S7_union) <- function(from, descriptions = NULL, ...) {
+    if (identical(from, class_numeric))
+        return(as_json_schema(class_double, ...))
     schemas <- Map(as_json_schema, from$classes,
                    as.list(descriptions)[seq_along(from$classes)])
     list(anyOf = schemas,
@@ -262,8 +264,8 @@ schema_class <- function(x) {
 
 schema_property <- function(x) {
     cls <- schema_class(x)
-    prop <- if (inherits(cls, S7_class)) new_property(cls) else cls
-    prop$default <- convert(x$default, prop$class)
+    prop <- if (inherits(cls, S7_property)) cls else new_property(cls)
+    prop$default <- dejsonify(x$default, prop$class)
     prop
 }
 

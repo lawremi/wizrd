@@ -291,7 +291,9 @@ method(dejsonify, list(class_any, S7_S3_class | S7_base_class)) <- function(x,
 }
 
 method(dejsonify, list(class_any, S7_union)) <- function(x, spec) {
-    for(class in spec$classes) {
+    if (identical(spec, class_numeric))
+        return(type.convert(x, as.is = TRUE))
+    for (class in spec$classes) {
         ans <- try(dejsonify(x, class), silent = TRUE)
         if (!inherits(ans, "try-error"))
             return(ans)
