@@ -6,25 +6,21 @@
 \alias{chat.Chat}
 
 \title{
-  Chat Functions
+  Chat with an Agent
 }
 \description{
-  Functions for chatting with LLMs. They accept user input and return
-  the model response. The primary function is \code{chat}, which returns
-  a Chat object, representing the history (context) of the chat with the
-  model. Passing the Chat object to these functions enables the model to
-  consider the entire context when generating its response.
+  Chat with a model, either by a single exchange or by maintaining context over multiple exchanges.
 }
 \usage{
+# generic, see methods below
 chat(x, ...)
 }
 \arguments{
   \item{x}{
-    An Agent or Chat object, which receives the input and
-    generates a response.
+    A Chat or Agent object.
   }
   \item{\dots}{
-    Arguments passed to the underlying backend.
+    Additional arguments passed to the backend.
   }
 }
 \section{Methods}{
@@ -84,19 +80,18 @@ chat(x, ...)
   }
 }
 \value{
-  For \code{predict}, an object converted from the LLM output, typically
-  a string representing the direct output of the model. For \code{chat},
-  a Chat object representing the chat history.
+  For \code{predict}, the model response. For \code{chat}, a Chat object.
 }
 \author{Michael Lawrence}
 \examples{
 \dontrun{
-    model <- llama()
-
-    predict(model, "Creators of R")
-
-    chat <- chat(model, "Questions about R")
-    predict(chat, "Creators of the language")
+    agent <- llama() |>
+        instruct("Answer questions about the mtcars dataset:", mtcars)
+    predict(agent, "What is the relationship between hp and fuel efficiency?")
+    chat <- chat(agent,
+                 "What is the relationship between hp and fuel efficiency?")
+    chat <- chat(chat, "Can you suggest ways to visualize this relationship?")
+    last_output(chat)
 }
 }
 \keyword{ utilities }

@@ -35,14 +35,38 @@ output_as(x, format)
 }
 \examples{
 \dontrun{
-    df <- data.frame(first_name = character(), last_name = character())
-    openai_agent(temperature = 0) |> output_as(df) |> predict("Creators of R")
+    agent <- openai_agent("gpt-4o-mini", temperature = 0) |>
+        instruct("Answer questions about this dataset:", mtcars)
 
+    # Return a filtered subset of mtcars, which serves as the prototype
+    filtered_agent <- agent |>
+        output_as(mtcars)
+    filtered_agent |>
+        predict("Cars with mpg > 20")
+    
+    # Return a summary data.frame
+    summary_agent <- agent |>
+        output_as(data.frame(
+            cyl = integer(),
+            avg_mpg = numeric(),
+            avg_hp = numeric()
+        ))
+    summary_agent |>
+        predict("Average mpg and hp by number of cylinders.")
+    
+    # Using class_data.frame for more general output
+    agent |>
+        output_as(S7::class_data.frame) |>
+        predict("Top 5 most fuel efficient cars including mpg, hp, and wt.")
+
+    # Using a custom S7 class for more specialized data
     Person <- S7::new_class("Person", properties = list(
         first_name = S7::class_character,
         last_name = S7::class_character
     ))
-    openai_agent(temperature=0) |> output_as(Person) |> predict("Creators of R")
+    openai_agent(temperature = 0) |>
+        output_as(Person) |>
+        predict("Creators of R")
 }
 }
 \keyword{ utilities }

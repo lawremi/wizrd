@@ -35,7 +35,9 @@ ollama_server(url = ollama_url(), start = TRUE, ...)
 \dontrun{
     server <- ollama_server() # keep a reference to this object
     model <- llama(server)
-    predict(model, "Creators of R")
+    model |>
+        instruct("Answer questions about this dataset:", mtcars) |>
+        predict("What is the relationship between horsepower and mpg?")
 }
 }
 \keyword{ utilities }

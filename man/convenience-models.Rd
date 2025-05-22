@@ -5,11 +5,10 @@
 \alias{nomic}
 
 \title{
-  Convenience Models
+  Convenience Functions for Common Models
 }
 \description{
-  These are shortcuts for installing and loading some general, small
-  models for the purpose of testing and demonstration.
+  These functions provide convenient access to common local models.
 }
 \usage{
 llama(server = ollama_server(), temperature = 0, ...)
@@ -52,7 +51,9 @@ nomic(server = ollama_server(), temperature = 0, ...)
 \author{Michael Lawrence}
 \examples{
 \dontrun{
-    llamafile_llama() |> predict("Creators of R")
+    llamafile_llama() |>
+        instruct("Answer questions about the mtcars dataset:", mtcars) |> 
+        predict("Relationship between hp and fuel efficiency")
 }
 }
 \keyword{ utilities }
