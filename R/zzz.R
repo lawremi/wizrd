@@ -2,5 +2,5 @@
 globalVariables("properties")
 
 .onLoad <- function(...) {
-  S7::methods_register()
+    S7::methods_register()
 }

@@ -71,9 +71,11 @@ ext_to_chunking <- local({
             old_map <- map
             map[names(args)] <<- args
             old_map
-        } else if (length(args) == 1L)
+        } else if (length(args) == 1L) {
             map[args[[1L]]]
-        else stop("multiple arguments must be named")
+        } else {
+            stop("multiple arguments must be named")
+        }
     }
 })
 
@@ -89,27 +91,32 @@ method(default_chunking, class_any) <- function(x) {
 
 chunk := new_generic(c("x", "by"))
 
-method(chunk, list(class_any, class_any)) <- function(x, by)
+method(chunk, list(class_any, class_any)) <- function(x, by) {
     chunk(as.character(x), by)
+}
 
-method(chunk, list(Text | class_character, NULL)) <- function(x, by)
+method(chunk, list(Text | class_character, NULL)) <- function(x, by) {
     data.frame(text = x)
+}
 
 method(chunk, list(class_any, class_missing)) <- function(x, by, ...) {
     chunk(x, default_chunking(x), ...)
 }
 
-is_text <- function(x)
+is_text <- function(x) {
     if (is.character(x)) resembles_text(x) else rep(TRUE, length(x))
+}
 
 chunk_text_or_file <- function(x, by, ...) {
     props(by) <- list(...)
     is_file <- is.character(x) && !is_text(x)
     if (is_file) {
-        if (file.info(x)[,"isdir"])
+        if (file.info(x)[, "isdir"])
             chunk(list.files(x, full.names = TRUE), by)
         else chunk(File(x), by)
-    } else chunk(if(is.character(x)) Text(x) else x, by)
+    } else {
+        chunk(if (is.character(x)) Text(x) else x, by)
+    }
 }
 
 method(chunk, list(class_character | class_list, Chunking | class_list)) <-
@@ -117,7 +124,9 @@ method(chunk, list(class_character | class_list, Chunking | class_list)) <-
         by <- if (is.list(by)) {
             path <- ifelse(is_text(x), names(x) %||% list(NULL), x)
             by[match(tolower(tools::file_ext(path)), tolower(names(by)))]
-        } else list(by)
+        } else {
+            list(by)
+        }
         chunks <- Map(chunk_text_or_file, x, by, MoreArgs = list(...))
         source <- names(x) %||% ifelse(is_text(x), seq_along(x), x)
         data.frame(source = rep(source, sapply(chunks, nrow)),
@@ -139,8 +148,7 @@ chunk_starts <- function(by, len) {
     starts[len - starts >= by@max_overlap]
 }
 
-method(chunk, list(Text, TokenChunking)) <- function(x, by)
-{
+method(chunk, list(Text, TokenChunking)) <- function(x, by) {
     require_ns("stringi", "generate word-aligned chunks")
     stopifnot(length(x) == 1L && !is.na(x))
 
@@ -149,12 +157,11 @@ method(chunk, list(Text, TokenChunking)) <- function(x, by)
     ends <- c(starts[-1L] - 1L, length(starts))
     text <- substring(x, token_boundaries[starts, "start"],
                       token_boundaries[ends, "end"])
-    
+
     data.frame(text)
 }
 
-method(chunk, list(Text, SentenceAlignedTokenChunking)) <- function(x, by)
-{
+method(chunk, list(Text, SentenceAlignedTokenChunking)) <- function(x, by) {
     require_ns("stringi", "generate sentence-aligned chunks")
     sentence_boundaries <-
         stringi::stri_locate_all_boundaries(x, type = "sentence")[[1L]]
@@ -166,22 +173,21 @@ method(chunk, list(Text, SentenceAlignedTokenChunking)) <- function(x, by)
     token_indices <- findInterval(token_starts, sentence_starts)
     token_counts <- tabulate(token_indices, nbins = length(sentence_starts))
 
-    chunk_indices <- cumsum_breaks(token_counts, by@token_limit, by@max_overlap) 
+    chunk_indices <- cumsum_breaks(token_counts, by@token_limit,
+                                   by@max_overlap)
     chunk_starts <- sentence_starts[chunk_indices$starts]
     chunk_ends <- sentence_ends[chunk_indices$ends]
     text <- substring(x, chunk_starts, chunk_ends)
-    
+
     data.frame(text)
 }
 
-method(chunk, list(Text, RMarkdownChunking)) <- function(x, by)
-{
+method(chunk, list(Text, RMarkdownChunking)) <- function(x, by) {
     require_ns("parsermd", "chunk RMarkdown")
     chunk(parsermd::parse_rmd(x), by)
 }
 
-method(chunk, list(Text, QuartoChunking)) <- function(x, by)
-{
+method(chunk, list(Text, QuartoChunking)) <- function(x, by) {
     stopifnot(length(x) == 1L && !is.na(x))
     require_ns("parsermd", "chunk Quarto")
     chunk(parsermd::parse_qmd(x), by)
@@ -212,7 +218,8 @@ method(chunk, list(rmd_ast, MarkdownChunking)) <- function(x, by) {
                         simplify = FALSE)
     expand_ind <- rep(seq_len(nrow(chunks)), sapply(chunks$ast, nrow))
     meta <- chunks[expand_ind, grp_cols, drop = FALSE] |>
-        ensure_cols(sec_cols) |> _[sec_cols]
+        ensure_cols(sec_cols) |>
+        _[sec_cols]
     title <- unlist(subset(df, type == "rmd_yaml_list")$ast,
                     recursive = FALSE)$title
     cbind(title = rep(title, nrow(meta)), meta, do.call(rbind, chunks$ast))
@@ -232,7 +239,8 @@ method(chunk, list(File, PDFChunking)) <- function(x, by) {
 
 method(chunk, list(Text, RegexChunking)) <- function(x, by) {
     text <- strsplit(x, by@regex)[[1L]] |>
-        lapply(chunk, by@section_chunking) |> unlist()
+        lapply(chunk, by@section_chunking) |>
+        unlist()
     data.frame(text)
 }
 
@@ -247,7 +255,7 @@ method(chunk, list(packageIQR, class_list)) <- function(x, by) {
     r <- x$results
     if (nrow(r) == 0L)
         return(chunk(character(), by))
-    path <- file.path(r[,"LibPath"], r[,"Package"], "doc", r[,"Item"]) |>
+    path <- file.path(r[, "LibPath"], r[, "Package"], "doc", r[, "Item"]) |>
         outer(names(by), \(x, y) paste0(x, ".", y))
     path_existant <- path[file.exists(path)]
     path_existant <-

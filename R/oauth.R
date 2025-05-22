@@ -28,7 +28,8 @@ oauth_server_metadata <- function(url) {
     httr2::request(url) |>
         httr2::req_url_path_append(".well-known",
                                    "oauth-authorization-server") |>
-        httr2::req_perform() |> httr2::resp_body_json()
+        httr2::req_perform() |>
+        httr2::resp_body_json()
 }
 
 oauth_server_metadata_with_fallbacks <- function(url) {
@@ -43,10 +44,13 @@ oauth_server_metadata_with_fallbacks <- function(url) {
     })
 }
 
-oauth_register_client <- function(url, package_name = getNamespaceName(topenv()))
-{
-    httr2::request(url) |> httr2::req_body_json(dcr_body(package_name)) |>
-        httr2::req_perform() |> httr2::resp_body_json() |> dcr_client()
+oauth_register_client <- function(url,
+                                  package_name = getNamespaceName(topenv())) {
+    httr2::request(url) |>
+        httr2::req_body_json(dcr_body(package_name)) |>
+        httr2::req_perform() |>
+        httr2::resp_body_json() |>
+        dcr_client()
 }
 
 dcr_body <- function(package_name) {
@@ -66,7 +70,7 @@ check_oauth_server_metadata <- function(meta) {
     if (!is.null(meta$token_endpoint_auth_methods_supported) &&
             !any(c("none", "client_secret_post") %in%
                      meta$token_endpoint_auth_methods_supported))
-        stop("server does not support 'client_secret_post' client authorization")
+        stop("server does not support 'client_secret_post' authorization")
     if (!is.null(meta$grant_types_supported) %%
             !"authorization_code" %in% meta$grant_types_supported)
         stop("server does not support 'authorization_code' grants")

@@ -1,15 +1,17 @@
 test_that("models can call R functions as tools", {
     model <- llama(server)
-    
+
     get_mean <- function(name) mean(get(name))
-    model <- equip(model, get_mean, "Use to get the mean of an R variable whose name matches the 'name' argument.")
+    model <- equip(model, get_mean,
+                   "Use to get the mean of an R variable whose name matches the 'name' argument.")
     var <- 1:10
     model@instructions <-
         "Always respond JSON, with field 'mean'. Only JSON. No text. No prefix."
     output <- predict(model, "What is the mean of var?")
     expect_equal(jsonlite::fromJSON(output)$mean, mean(var))
 
-    model <- model |> unequip("get_mean") |>
+    model <- model |>
+        unequip("get_mean") |>
         equip(tool(mean) |> describe_with_Rd() |> can_accept_as(class_name))
     output <- predict(model, "What is the mean of var? Respond in pure JSON.")
     expect_equal(jsonlite::fromJSON(output)$mean, mean(var))
@@ -19,7 +21,8 @@ test_that("models can call R functions as tools", {
     expect_equal(jsonlite::fromJSON(output)$mean, mean(var))
 
     model <- llama(server)
-    aggregate_tool <- tool(aggregate) |> describe_with_Rd() |>
+    aggregate_tool <- tool(aggregate) |>
+        describe_with_Rd() |>
         can_accept_as(x = class_formula, data = class_name, FUN = class_name)
     model <- equip(model, aggregate_tool)
     data(Cars93, package = "MASS")
@@ -28,7 +31,8 @@ test_that("models can call R functions as tools", {
     expect_match(ans, "Lexus: 18")
 
     aggregate_tool <- tool(aggregate) |>
-        demonstrate(c(x = MPG.city ~ Origin, alist(data = Cars93, FUN = median)),
+        demonstrate(c(x = MPG.city ~ Origin,
+                      alist(data = Cars93, FUN = median)),
                     "the median of MPG.city by Origin in Cars93")
     expect_equal(aggregate_tool@examples[[1L]][[1L]]@"_dots",
                  alist(data = Cars93, FUN = median))
@@ -49,7 +53,8 @@ test_that("We can make a model callable as a tool", {
     expect_contains(ans$first_name, "Robert")
 
     meanie <- llama(server) |>
-        equip(tool(mean) |> describe_with_Rd() |>
+        equip(tool(mean) |> 
+                describe_with_Rd() |>
                   can_accept_as(x = class_name)) |>
         instruct("Compute the mean of a named variable.",
                  "Assume the type of the variable to be nuzmeric.")

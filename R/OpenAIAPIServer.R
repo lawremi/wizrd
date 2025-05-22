@@ -21,13 +21,13 @@ openai_body_messages <- function(body, messages) {
 openai_body_tools <- function(body, tools) {
     assert_list(tools, "wizrd::ToolBinding")
     put(body, tools = if (length(tools) > 0L)
-        unname(lapply(tools, openai_encode_tool)))
+            unname(lapply(tools, openai_encode_tool)))
 }
 
 openai_response_format <- new_generic("openai_response_format", "x")
 
 method(openai_response_format, TextFormat) <- function(x) {
-   NULL 
+    NULL
 }
 
 schema_name_regex <- "^[a-zA-Z0-9_-]+$"
@@ -39,9 +39,11 @@ schema_is_strict <- function(x) {
         identical(x$additionalProperties, FALSE) &&
             all(names(x$properties) %in% x$required) &&
             all(vapply(x$properties, schema_is_strict, logical(1L)))
-    } else if (identical(x$type, "array") && !is.null(x$items))
+    } else if (identical(x$type, "array") && !is.null(x$items)) {
         schema_is_strict(x$items)
-    else TRUE
+    } else {
+        TRUE
+    }
 }
 
 method(openai_response_format, JSONFormat) <- function(x) {
@@ -54,18 +56,22 @@ method(openai_response_format, JSONFormat) <- function(x) {
             schema = x@schema,
             strict = schema_is_strict(x@schema)
         ))
-    } else list(type = "json_object")
+    } else {
+        list(type = "json_object")
+    }
 }
 
 openai_body_response_format <- function(body, output_format) {
     put(body, response_format = openai_response_format(output_format))
 }
 
-openai_chat_body <- function(model, messages, tools, output_format, params, ...)
-{
-    assert_string(model)    
-    list(model = model, ...) |> openai_body_messages(messages) |>
-        openai_body_params(params) |> openai_body_tools(tools) |>
+openai_chat_body <- function(model, messages, tools, output_format, params,
+                             ...) {
+    assert_string(model)
+    list(model = model, ...) |>
+        openai_body_messages(messages) |>
+        openai_body_params(params) |>
+        openai_body_tools(tools) |>
         openai_body_response_format(output_format)
 }
 
@@ -97,8 +103,7 @@ openai_chat_perform_stream <- function(req, stream_callback) {
 
 method(perform_chat, OpenAIAPIServer) <- function(x, model, messages, tools,
                                                   io, params, stream_callback,
-                                                  ...)
-{
+                                                  ...) {
     openai_chat_body(model, messages, tools, io@output, params,
                      stream = !is.null(stream_callback), ...) |>
         openai_chat_perform(x, stream_callback) |>
@@ -219,11 +224,10 @@ openai_embedding_body <- function(model, input, dimensions) {
 }
 
 method(perform_embedding, OpenAIAPIServer) <- function(x, model, data,
-                                                       ndim = NULL)
-{
+                                                       ndim = NULL) {
     assert_string(model)
     assert_integerish(ndim, lower = 1L, null.ok = TRUE)
-    
+
     openai_embedding_body(model, data, ndim) |>
         openai_embedding_perform(x) |>
         openai_response_embedding()

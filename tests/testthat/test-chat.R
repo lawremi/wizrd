@@ -1,7 +1,7 @@
 test_that("chat() and predict() work for text messages", {
     model <- llama(server)
     model@instructions <- "Respond with a single sentence"
-    
+
     chat <- chat(model, "Who created R?")
     expect_length(chat@messages, 3L)
     expect_match(last_output(chat), "Robert.*Ross|Ross.*Robert")
@@ -9,7 +9,7 @@ test_that("chat() and predict() work for text messages", {
     chat2 <- chat(chat, "When did they do it?")
     expect_length(chat2@messages, 5L)
     expect_match(last_output(chat2), "1993")
-    
+
     expect_match(predict(model, "Who created R?"), "Robert.*Ross|Ross.*Robert")
     expect_match(predict(chat, "When did they do it?"), "1993")
 })
@@ -30,14 +30,15 @@ test_that("chat() and predict() work for images", {
     chat <- chat(model, raster)
     expect_match(last_output(chat), "scatter.*plot")
     msgs <- list(raster,
-                 "Is there positive correlation in this plot? Answer yes or no.")
+                 paste("Is there positive correlation in this plot?",
+                       "Answer yes or no."))
     chat <- chat(model, msgs) # as a multipart message
     expect_match(tolower(last_output(chat)), "yes")
 })
 
 test_that("chat() can stream responses", {
     model <- llama(server)
-    
+
     model@instructions <- "Respond with a single sentence"
 
     all_content <- ""
@@ -51,4 +52,3 @@ test_that("chat() can stream responses", {
     expect_equal(ans, all_content)
     expect_equal(predict(model, prompt), all_content)
 })
-

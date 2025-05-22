@@ -102,8 +102,7 @@ handle_notification := new_generic("x")
 invoke := new_generic("x", function(x, endpoint, ...) S7_dispatch())
 
 method(invoke, JSONRPCRequest) <- function(x, endpoint, notification_mapper,
-                                           canceller)
-{
+                                           canceller) {
     send(x, endpoint) |>
         receive(JSONRPCResponse(id = x@id), notification_mapper, canceller)
 }
@@ -192,7 +191,9 @@ method(send, list(class_character | class_json, PostSSEEndpoint)) <-
                 if (is.null(to@auth)) {
                     to@auth <- oauth_auth_code(to@base_url)
                     send(x, to)
-                } else stop(cnd)
+                } else {
+                    stop(cnd)
+                }
             }
         )
         to
@@ -214,14 +215,13 @@ method(read_json_rpc_response, S3_httr2_response) <- function(x) {
 }
 
 method(receive, list(union_connection | S3_httr2_response, JSONRPCResponse)) <-
-    function(from, as, notification_mapper, canceller)
-    {
+    function(from, as, notification_mapper, canceller) {
         ## could become a more general listener that runs asynchronously,
         ## but that would only make sense for an app with mutable state
         on.exit(canceller())
         if (getOption("wizrd_test_json_rpc_cancel", FALSE))
             canceller()
-        while(TRUE) {
+        while (TRUE) {
             response <- read_json_rpc_response(from)
             if (length(response) > 0L) {
                 verbose_message("RECEIVE: ", response)
@@ -239,14 +239,12 @@ method(receive, list(union_connection | S3_httr2_response, JSONRPCResponse)) <-
     }
 
 method(receive, list(BufferedWebSocket, JSONRPCResponse)) <- function(from, as,
-                                                                      ...)
-{
+                                                                      ...) {
     receive(from@buffer, as, ...)
 }
 
 method(receive, list(class_character, JSONRPCResponse)) <- function(from, as,
-                                                                    ...)
-{
+                                                                    ...) {
     fromJSON(from) |> receive(as, ...)
 }
 
@@ -290,7 +288,7 @@ json_rpc_params := new_generic("x")
 method(convert, list(class_any, JSONRPCRequest | JSONRPCNotification)) <-
     function(from, to) {
         to(method = json_rpc_method(from),
-           params = json_rpc_params(from)) 
+           params = json_rpc_params(from))
     }
 
 new_error_class <- function(x) new_S3_class(c(x, "error", "condition"))

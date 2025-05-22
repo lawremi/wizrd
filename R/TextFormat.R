@@ -58,8 +58,7 @@ method(as_col_classes, class_data.frame) <- function(x) {
     vapply(x, \(xi) class(xi)[1L], character(1L))
 }
 
-csv_format <- function(col_classes = NA)
-{
+csv_format <- function(col_classes = NA) {
     col_classes <- as_col_classes(col_classes)
     CSVFormat(col_classes = col_classes)
 }
@@ -107,7 +106,7 @@ method(convert, list(PlainTextFormat, S7_property)) <- function(from, to) {
 }
 
 glue_params <- function(x) {
-    regmatches(x, gregexec("\\{(.*?)\\}", x))[[1L]][2L,]
+    regmatches(x, gregexec("\\{(.*?)\\}", x))[[1L]][2L, ]
 }
 
 method(convert, list(GlueFormat, S7_class)) <- function(from, to) {
@@ -116,7 +115,8 @@ method(convert, list(GlueFormat, S7_class)) <- function(from, to) {
     new_class("glue_parameters", Parameters, properties = props)
 }
 
-method(convert, list(class_data.frame, S7_property)) <- function(from, to, ...) {
+method(convert, list(class_data.frame, S7_property)) <- function(from, to,
+                                                                 ...) {
     new_data_frame_property(prototype = from)
 }
 
@@ -153,7 +153,8 @@ method(textify, list(class_list, PlainTextFormat)) <- function(x, format) {
 method(textify, list(class_json, PlainTextFormat)) <-
     function(x, format) unclass(x)
 
-method(textify, list(class_data.frame, PlainTextFormat)) <- function(x, format) {
+method(textify, list(class_data.frame, PlainTextFormat)) <- function(x,
+                                                                     format) {
     con <- file()
     on.exit(close(con))
     write.csv(x, con, row.names = FALSE)
@@ -185,8 +186,9 @@ method(jsonify_as, class_any) <- function(x, val) jsonify(val)
 
 method(jsonify_as, scalar_S7_property) <- function(x, val) jsonlite::unbox(val)
 
-method(jsonify_as, list_S7_property) <- function(x, val)
+method(jsonify_as, list_S7_property) <- function(x, val) {
     lapply(val, jsonify_as, x = x$of)
+}
 
 method(jsonify, S7_object) <- function(x) {
     prop_jsonify <- function(property) {
@@ -206,9 +208,10 @@ method(jsonify, S7_object) <- function(x) {
 }
 
 method(textify, list(class_list | class_any | class_data.frame, JSONFormat)) <-
-    function(x, format)
-    {
-        jsonify(x) |> box_json() |> toJSON(null = "null", POSIXt = "ISO8601") |>
+    function(x, format) {
+        jsonify(x) |>
+            box_json() |>
+            toJSON(null = "null", POSIXt = "ISO8601") |>
             unclass()
     }
 
@@ -227,7 +230,8 @@ method(textify, list(template_contexts, WhiskerFormat)) <- function(x, format) {
     whisker::whisker.render(format@template, as.environment(x))
 }
 
-method(textify, list(template_contexts, FunctionFormat)) <- function(x, format) {
+method(textify, list(template_contexts, FunctionFormat)) <- function(x,
+                                                                     format) {
     do.call(format@fun, x)
 }
 
@@ -253,9 +257,9 @@ method(dejsonify, list(class_any, list_S7_property)) <- function(x, spec) {
     lapply(x, dejsonify, spec$of)
 }
 
-method(dejsonify, list(class_data.frame, list_S7_property)) <- function(x, spec)
-{
-    dejsonify(split(x, seq(nrow(x))), spec)
+method(dejsonify, list(class_data.frame, list_S7_property)) <- function(x,
+                                                                        spec) {
+    dejsonify(split(x, seq_len(nrow(x))), spec)
 }
 
 method(convert, list(class_jsonic, class_raw)) <- function(from, to) {
@@ -264,12 +268,12 @@ method(convert, list(class_jsonic, class_raw)) <- function(from, to) {
 }
 
 method(convert, list(class_jsonic, class_function)) <- function(from, to) {
-    p <- parse(text=from)[[1L]]
+    p <- parse(text = from)[[1L]]
     as.function(c(p[[2L]], p[[3L]]), .GlobalEnv)
 }
 
 method(convert, list(class_jsonic, class_call)) <- function(from, to) {
-    parse(text=from)[[1L]]
+    parse(text = from)[[1L]]
 }
 
 as.data.frame.jsonic <- as.data.frame.list
@@ -288,7 +292,7 @@ method(dejsonify, list(class_any, S3_or_base)) <- function(x, spec) {
     if (identical(spec, class_vector))
         return(as.vector(x))
     if (identical(spec, class_language))
-        return(parse(text=x)[[1L]])
+        return(parse(text = x)[[1L]])
     convert(jsonic(x), spec)
 }
 

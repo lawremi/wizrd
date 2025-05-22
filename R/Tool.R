@@ -11,8 +11,8 @@ validate_Tool <- function(self) {
         extra_param_descs <- setdiff(names(self@param_descriptions),
                                      formal_names)
         c(if (length(extra_sig_args))
-            paste("@signature@parameters contains extra args:",
-                  paste(extra_sig_args, collapse = ", ")),
+              paste("@signature@parameters contains extra args:",
+                    paste(extra_sig_args, collapse = ", ")),
           if (length(extra_param_descs))
               paste("@param_descriptions contains extra args:",
                     paste(extra_param_descs, collapse = ", ")))
@@ -70,7 +70,7 @@ any_signature <- function(FUN) {
 param_fun <- function(x) {
     p <- x@signature@parameters
     if ("_dots" %in% names(formals(p))) {
-        formals(p)$"..." <- alist(x =)
+        formals(p)$"..." <- alist(x = )
         formals(p)$"_dots" <- NULL
     }
     p
@@ -83,7 +83,8 @@ norm_examples <- function(examples, self) {
     p <- param_fun(self)
     examples$input <- lapply(examples$input, \(input) {
         mc <- match.call(p, as.call(c(list(p), input)), expand.dots = FALSE) |>
-            dodge_dots() |> as.list()
+            dodge_dots() |>
+            as.list()
         mc$"_dots" <- if ("_dots" %in% names(mc)) as.list(mc$"_dots")
         do.call(self@signature@parameters, mc[-1L], quote = TRUE)
     })
@@ -110,7 +111,7 @@ describe_with_Rd <- function(tool) {
         !is.null(tool@value_description) && length(params_to_describe) == 0L
     if (fully_described)
         return(tool)
-    
+
     Rd <- Rd_for_function(S7_data(tool), tool@name)
     if (is.null(Rd))
         return(tool)
@@ -137,8 +138,9 @@ method(convert, list(class_function, Tool)) <- function(from, to, ...) {
 equip <- function(x, tool, instructions = NULL, ...) {
     stopifnot(inherits(x, Agent))
     if (is.list(tool) && !is.object(tool)) {
-        for (t in tool)
+        for (t in tool) {
             x <- equip(x, t)
+        }
         return(x)
     }
     if (!inherits(tool, Tool))
@@ -238,7 +240,7 @@ tool_output_json_format <- function(tool) {
     desc <- c(tool@value_description, schema$description)
     if (!is.null(desc))
         schema$description <- paste(desc, collapse = " ")
-    
+
     JSONFormat(schema = schema,
                schema_class = tool@signature@value$class)
 }
@@ -253,7 +255,8 @@ describe_tool_examples <- function(binding) {
     ex <- tool@examples
     if (nrow(ex) == 0L)
         return(NULL)
-    call <- lapply(ex$input, \(args) as.call(c(as.name(tool@name), props(args))))
+    call <- lapply(ex$input,
+                   \(args) as.call(c(as.name(tool@name), props(args))))
     value <- vapply(ex$output, textify, character(1L), binding@io@output)
     ex_text <- paste0(call, " returns: ", value, collapse = "\n")
     paste0("Example(s):\n", ex_text)

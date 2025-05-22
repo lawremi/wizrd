@@ -13,8 +13,7 @@ ChatMessage <- new_class("ChatMessage",
                          ))
 
 method(convert, list(class_any, ChatMessage)) <- function(from, to,
-                                                          role = "user")
-{
+                                                          role = "user") {
     ChatMessage(role = role, object = from, content = from)
 }
 
@@ -32,10 +31,10 @@ method(detextify, list(ChatMessage, TextFormat)) <- function(x, format) {
 
 split_into_blocks <- function(x) {
     regex <- "(?s)(.*?)```(.*?)\n(.*?)```|(.*)$"
-    g gregexec(regex, x, perl = TRUE)
+    g <- gregexec(regex, x, perl = TRUE)
     m <- regmatches(x, g)[[1L]][-1L, , drop = FALSE]
-    labels <- rbind("text", m[2L,], "text")
-    Filter(nzchar, setNames(as.list(m[-2L,]), labels))
+    labels <- rbind("text", m[2L, ], "text")
+    Filter(nzchar, setNames(as.list(m[-2L, ]), labels))
 }
 
 esc <- function(x) paste0("{", x, "}")

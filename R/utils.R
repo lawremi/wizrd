@@ -2,9 +2,11 @@ assert_scalar <- function(scalar, class, arg = deparse(substitute(scalar))) {
     if (length(scalar) != 1L || !S7:::class_inherits(scalar, class)) {
         type_name <- if (identical(class, class_numeric)) {
             "numeric"
-        } else if (inherits(class, "S7_union"))
+        } else if (inherits(class, "S7_union")) {
             paste(class$classes, collapse = " | ")
-        else class$class
+        } else {
+            class$class
+        }
         msg <- sprintf("`%s` must be a single %s value", arg, type_name)
         stop(msg, call. = FALSE)
     }
@@ -32,11 +34,14 @@ named <- function(prop) {
     if (S7:::is_foundation_class(prop))
         prop <- new_property(prop)
     validator <- prop$validator
-    prop$validator <- \(value)
-        c(if (is.vector(value) && is.null(names(value)))
-            "must have names",
-          if (!is.null(validator))
-              validator(value))
+    prop$validator <- \(value) {
+        c(
+            if (is.vector(value) && is.null(names(value)))
+                "must have names",
+            if (!is.null(validator))
+                validator(value)
+        )
+    }
     if (is.null(prop$default))
         prop$default <- S7:::prop_default(prop)
     if (!is.null(prop$default) && is.null(names(prop$default)))
@@ -64,7 +69,7 @@ literal <- function(value) {
 }
 
 static_inherits <- function(x, parent) {
-    while(!is.null(x) && !identical(x@parent, parent))
+    while (!is.null(x) && !identical(x@parent, parent))
         x <- x@parent
     !is.null(x)
 }
@@ -72,13 +77,13 @@ static_inherits <- function(x, parent) {
 S7_class_with_parent <- function(parent, validator = NULL, ...) {
     new_property(S7_class, validator = function(value) {
         c(if (!static_inherits(value, parent))
-            paste("must be a descendant of", parent@name),
+              paste("must be a descendant of", parent@name),
           if (!is.null(validator))
               validator(value))
     }, ...)
 }
 
-missing_name <- function() alist(x=)[[1L]]
+missing_name <- function() alist(x = )[[1L]]
 
 scalar <- function(x, ..., validator = x$validator, default = x$default,
                    choices = NULL, min = -Inf, max = Inf) {
@@ -100,19 +105,21 @@ scalar <- function(x, ..., validator = x$validator, default = x$default,
     x$validator <- function(value) {
         if (is.null(value))
             return(NULL)
-        c(if (length(value) != 1L || is.na(value))
-            "must be of length one and not missing",
-          if (!is.null(choices) && !all(value %in% choices))
-              paste("contains values not in", deparse(choices)),
-          if (is.numeric(value))
-              c(if (any(value < min))
-                  paste("must be >=", min),
-                if (any(value > max))
-                    paste("must be <=", max)
+        c(
+            if (length(value) != 1L || is.na(value))
+                "must be of length one and not missing",
+            if (!is.null(choices) && !all(value %in% choices))
+                paste("contains values not in", deparse(choices)),
+            if (is.numeric(value))
+                c(
+                    if (any(value < min))
+                        paste("must be >=", min),
+                    if (any(value > max))
+                        paste("must be <=", max)
                 ),
-          if (!is.null(validator))
-              validator(value)
-          )
+            if (!is.null(validator))
+                validator(value)
+        )
     }
     class(x) <- c("scalar_S7_property", class(x))
     x
@@ -129,30 +136,36 @@ new_list_property <- function(..., validator = NULL,
                               of = class_any, named = NA,
                               min_length = 0L, max_length = Inf) {
     prop <- new_property(class_list, ..., validator = function(value) {
-        c(if (!identical(of, class_any) &&
-                  !all(vapply(value, S7:::class_inherits, logical(1L), of)))
-            paste("must only contain elements of class", S7:::class_desc(of)),
-          if (!is.null(of_validator)) {
-              msgs <- unlist(lapply(value, of_validator))
-              if (length(msgs) > 0L)
-                  paste("element(s) failed validation:",
-                        paste0("'", unique(msgs), "'", collapse = ", "))
-          },
-          if (isTRUE(named) && is.null(names(value)))
-              "must have names",
-          if (identical(named, FALSE) && !is.null(names(value)))
-              "must not have names",
-          if (length(value) < min_length || length(value) > max_length)
-              paste0("must have length in [", min_length, ", ", max_length, "]"),
-          if (!is.null(validator))
-              validator(value)
-          )
+        c(
+            if (!identical(of, class_any) &&
+                    !all(vapply(value, S7:::class_inherits, logical(1L), of)))
+                paste("must only contain elements of class",
+                      S7:::class_desc(of)),
+            if (!is.null(of_validator)) {
+                msgs <- unlist(lapply(value, of_validator))
+                if (length(msgs) > 0L) {
+                    paste("element(s) failed validation:",
+                          paste0("'", unique(msgs), "'", collapse = ", "))
+                }
+            },
+            if (isTRUE(named) && is.null(names(value)))
+                "must have names",
+            if (identical(named, FALSE) && !is.null(names(value)))
+                "must not have names",
+            if (length(value) < min_length || length(value) > max_length)
+                paste0("must have length in [", min_length, ", ", max_length,
+                       "]"),
+            if (!is.null(validator))
+                validator(value)
+        )
     }, default = default)
     prop$of <- of
     if (inherits(of, "S7_property")) {
         of_validator <- of$validator
         of <- of$class
-    } else of_validator <- NULL
+    } else {
+        of_validator <- NULL
+    }
     prop$named <- named
     class(prop) <- c("list_S7_property", class(prop))
     prop
@@ -170,19 +183,20 @@ new_data_frame_property <- function(..., validator = NULL,
                                     prototype = NULL) {
     types <- lapply(prototype, class_object)
     prop <- new_property(class_data.frame, ..., validator = function(value) {
-        c(if (!is.null(col.names) &&
-                  !identical(colnames(value), col.names))
-            paste("colnames() must be", deparse(col.names))
-          else if (!is.null(prototype)) {
+        c(
+            if (!is.null(col.names) &&
+                    !identical(colnames(value), col.names))
+                paste("colnames() must be", deparse(col.names))
+            else if (!is.null(prototype)) {
                 wrong_type <- !mapply(inherits, value, types)
                 if (any(wrong_type))
                     paste(colnames(value)[wrong_type], "must be a",
                           vapply(types[wrong_type], S7:::class_desc,
                                  character(1L)),
                           collapse = ", ")
-          },
-        if (!is.null(validator))
-            validator(value)
+            },
+            if (!is.null(validator))
+                validator(value)
         )
     }, default = default)
     prop$prototype <- prototype
@@ -204,10 +218,10 @@ vswitch <- function(EXPR, ...) {
             (is.null(dot_names) || !all(nzchar(dot_names))))
         stop("all arguments in '...' except for the last must be named")
     if (!all(lengths(dots) == 1L))
-        stop("all arguments in '...' must be length one") 
+        stop("all arguments in '...' must be length one")
     if (anyDuplicated(names(dots)))
         stop("all arguments in '...' must have unique names")
-    
+
     cases <- c(...)
     if (is.null(cases))
         cases <- logical()
@@ -216,8 +230,10 @@ vswitch <- function(EXPR, ...) {
     notfound <- is.na(names(ans)) & !is.na(EXPR)
     ans[notfound] <- if (identical(names(dots)[length(dots)], "")) {
         dots[[length(dots)]]
-    } else EXPR[notfound]
-    
+    } else {
+        EXPR[notfound]
+    }
+
     ans
 }
 
@@ -267,7 +283,9 @@ Rd_args <- function(Rd) {
 Rd_src <- function(Rd) {
     src <- if (is.list(Rd)) {
         vapply(Rd, Rd_src, character(1L))
-    } else Rd
+    } else {
+        Rd
+    }
     src <- paste(src, collapse = "")
     tag <- attr(Rd, "Rd_tag")
     if (!is.null(tag) && startsWith(tag, "\\"))
@@ -278,9 +296,9 @@ Rd_src <- function(Rd) {
 Rd_parse_args <- function(args) {
     items <- Filter(\(x) attr(x, "Rd_tag") == "\\item", args)
     ans <- vapply(items, \(x) Rd_src(x[[2L]]), character(1L))
-    ans_names <- vapply(items, \(x) gsub("\\dots{}", "...", Rd_src(x[[1L]]),
-                                         fixed = TRUE),
-                        character(1L))
+    ans_names <- vapply(items, \(x) {
+        gsub("\\dots{}", "...", Rd_src(x[[1L]]), fixed = TRUE)
+    }, character(1L))
     ans_names_split <- strsplit(ans_names, ",", fixed = TRUE)
     setNames(rep(ans, lengths(ans_names_split)),
              trimws(unlist(ans_names_split)))
@@ -323,7 +341,7 @@ find_name <- function(what, env) {
     stopifnot(is.name(sym))
     call <- substitute(y)
     stopifnot(is.call(call))
-    
+
     nm <- deparse(sym)
     call$name <- nm
 
@@ -356,19 +374,20 @@ S3_httr2_request <- new_S3_class("httr2_request")
 read_lines := new_generic("con")
 
 method(read_lines, S3_connection) <- function(con, ...) readLines(con, ...)
-method(read_lines, S3_processx_connection) <- function(con, ...)
+method(read_lines, S3_processx_connection) <- function(con, ...) {
     processx::conn_read_lines(con, ...)
+}
 
 write_lines := new_generic("con", function(con, text, ...) S7_dispatch())
 
 method(write_lines, S3_connection) <- function(con, text, ...) {
     writeLines(text, con, ...)
-    flush(to)
+    flush(con)
 }
 method(write_lines, S3_processx_connection) <- function(con, text, ...) {
     if (length(text) > 0L)
         text[length(text)] <- paste0(text[length(text)], "\n")
-    while(length(text) > 0L)
+    while (length(text) > 0L)
         text <- processx::conn_write(con, text, ...)
 }
 
@@ -403,7 +422,7 @@ init_process <- function(path, args, ready_callback, error_callback,
 
     error <- ""
     output <- ""
-    while(p$is_alive()) {
+    while (p$is_alive()) {
         io <- p$poll_io(poll_timeout)
         if (io["output"] == "ready") {
             output <- paste0(output, p$read_output())
@@ -431,7 +450,7 @@ assert_port <- function(port) {
 
 resp_await_sse <- function(resp) {
     sse <- NULL
-    while(is.null(sse) && !httr2::resp_stream_is_complete(resp)) {
+    while (is.null(sse) && !httr2::resp_stream_is_complete(resp)) {
         sse <- httr2::resp_stream_sse(resp)
         Sys.sleep(0.01)
     }
@@ -547,7 +566,8 @@ prop_read_only <- function(prop) {
 
 writable_props <- function(x) {
     stopifnot(inherits(x, S7_object))
-    static_names <- names(Filter(Negate(prop_read_only), S7_class(x)@properties))
+    static_names <- names(Filter(Negate(prop_read_only),
+                                 S7_class(x)@properties))
     props(x, static_names)
 }
 
@@ -562,8 +582,9 @@ method(persist, class_any) <- function(x, file) {
 method(on_persist, class_any) <- function(x, ...) { }
 
 method(on_persist, S7_object) <- function(x, ...) {
-    for (p in writable_props(x))
+    for (p in writable_props(x)) {
         on_persist(p, ...)
+    }
 }
 
 on_restore <- new_generic("on_restore", "x")
@@ -736,9 +757,10 @@ verbose_message <- function(...) {
     invisible()
 }
 
-condition <- function (message, ..., class = NULL, call = NULL) 
-    structure(list(message = as.character(message), call = call, 
+condition <- function(message, ..., class = NULL, call = NULL) {
+    structure(list(message = as.character(message), call = call,
                    ...), class = c(class, "condition"))
+}
 
 emit <- function(cond) UseMethod("emit")
 
@@ -758,7 +780,9 @@ is_port_open <- function(port) {
     if (!inherits(con, "try-error")) {
         close(con)
         TRUE
-    } else FALSE
+    } else {
+        FALSE
+    }
 }
 
 find_available_port <- function(start = 8000, end = 8100) {
@@ -773,7 +797,7 @@ find_available_port <- function(start = 8000, end = 8100) {
 }
 
 wait_until_port_open <- function(port) {
-    while(!is_port_open(port)) {
+    while (!is_port_open(port)) {
         Sys.sleep(0.01)
     }
     invisible(port)

@@ -29,14 +29,15 @@ test_that("structured output works", {
     model <- output_as(model, model@io@output@schema)
     ans <- predict(model, "Who created R?")
     expect_contains(ans$first_name, "Robert")
-    
+
     model <- output_as(model, TRUE) # unconstrained JSON output
     ans <- predict(model, "Who created R?")
     expect_true(ans) # obviously wrong, but...
 })
 
 test_that("glue templating works", {
-    model <- llama(server) |> instruct("Return a single word.") |>
+    model <- llama(server) |>
+        instruct("Return a single word.") |>
         prompt_as("Output a {nchar}-letter word starting with '{initial}'.")
     ans <- model |> predict(list(nchar = 4L, initial = "a"))
     expect_equal(trimws(ans), "Able")
@@ -49,4 +50,3 @@ test_that("glue templating works", {
         predict("Who created the language?")
     expect_match(ans, "Robert|Ross")
 })
-

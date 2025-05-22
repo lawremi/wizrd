@@ -1,7 +1,7 @@
 test_that("llama.cpp chatting works with a llamafile", {
     ans <- llamafile_llama() |>
         predict("How was R created, in three sentences?")
-    expect_match(ans, "Robert.*Ross|Ross.*Robert")    
+    expect_match(ans, "Robert.*Ross|Ross.*Robert")
 })
 
 test_that("llama.cpp supports external weights and generating embeddings", {

@@ -5,7 +5,8 @@ test_that("we can call MCP tools", {
     expect_match(result, "3")
 
     model <- llama(server)
-    result <- model |> equip(mcp_tools) |>
+    result <- model |>
+        equip(mcp_tools) |>
         predict("use the add tool to add 1 and 2")
     expect_identical(result, "The result of adding 1 and 2 is 3.")
 })
@@ -23,12 +24,14 @@ test_that("we can generate prompts with MCP", {
 
     model <- llama(server)
 
-    result <- model |> prompt_as(pf$ask_review) |>
+    result <- model |>
+        prompt_as(pf$ask_review) |>
         predict(list(code_snippet = "print \"foo\""))
     expect_match(result, "Python 3.0", fixed = TRUE)
-    
+
     expect_warning(
-        result <- model |> prompt_as(pf$ask_review) |>
+        result <- model |>
+            prompt_as(pf$ask_review) |>
             predict(list(code_snippet = "for (i in 1:length(n)) v <- c(v, i)",
                          language = "R"))
     )
@@ -65,7 +68,8 @@ test_that("MCP errors work", {
 
     model <- llama(server)
 
-    expect_error(model |> prompt_as(pf$ask_review) |>
+    expect_error(model |>
+                     prompt_as(pf$ask_review) |>
                      predict(list(code_snippet = "", language = "R")))
 })
 

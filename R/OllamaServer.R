@@ -19,8 +19,7 @@ ollama_server <- function(url = ollama_url(), start = TRUE, ...) {
 }
 
 start_ollama_server <- function(server, path = Sys.which("ollama"),
-                                max_seconds = 10L)
-{
+                                max_seconds = 10L) {
     require_ns("processx", "run ollama")
 
     stopifnot(inherits(server, OllamaServer))
@@ -28,7 +27,7 @@ start_ollama_server <- function(server, path = Sys.which("ollama"),
         stop("Cannot find the ", sQuote("ollama"), " binary. Ensure that ",
              "it is installed and on the $PATH.")
     assert_file_exists(path, "x")
-    
+
     p <- processx::process$new(path, "serve")
 
     wait_until_ready(set_props(server, process = p), max_seconds)
@@ -50,8 +49,11 @@ ollama_list <- function(server = ollama_server()) {
             as.data.frame(m)
         }))
     }
-    httr2::request(server@url) |> httr2::req_url_path_append("api", "tags") |>
-        httr2::req_perform() |> httr2::resp_body_json() |> to_df()
+    httr2::request(server@url) |>
+        httr2::req_url_path_append("api", "tags") |>
+        httr2::req_perform() |>
+        httr2::resp_body_json() |>
+        to_df()
 }
 
 method(models, OllamaServer) <- function(x) {
@@ -71,10 +73,10 @@ require_ollama_model <- function(name, server = ollama_server(), pull = NA) {
     installed <- name %in% ollama_list(server)$name
     if (installed)
         return(invisible(TRUE))
-    
+
     if (is.na(pull))
         pull <- !interactive() || askYesNo(paste0("Pull ", name, "?"))
-    
+
     invisible(pull && ollama_pull(name, server))
 }
 
@@ -113,7 +115,8 @@ ollama_weights_path <- function(name) {
 
 wait_until_ready <- function(server, max_seconds) {
     assert_integerish(max_seconds, lower = 0L)
-    httr2::request(server@url) |> httr2::req_url_path_append("api", "tags") |>
+    httr2::request(server@url) |>
+        httr2::req_url_path_append("api", "tags") |>
         httr2::req_retry(max_seconds = max_seconds, retry_on_failure = TRUE) |>
         httr2::req_perform()
     server
@@ -130,8 +133,7 @@ ollama_llama_vision <- function(server, temperature = 0, ...) {
                  server = server, temperature = temperature, ...)
 }
 
-ollama_llama <- function(server, temperature = 0, ...)
-{
+ollama_llama <- function(server, temperature = 0, ...) {
     ans <- try(ollama_agent("llama3.2:3b-instruct-q4_K_M",
                             server = server, temperature = temperature, ...))
     if (inherits(ans, "try-error"))

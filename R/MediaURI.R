@@ -23,7 +23,7 @@ AudioURI <- new_class("ImageURI", MediaURI, validator = validate_MediaURI)
 
 method(convert, list(union_raster, MediaURI)) <- function(from, to) {
     require_ns(c("base64enc", "png"), "encode images")
-    
+
     if (inherits(from, "nativeRaster")) { # like from dev.capture() or readPNG()
         image <- from
     } else {
@@ -31,7 +31,7 @@ method(convert, list(union_raster, MediaURI)) <- function(from, to) {
         rgb <- col2rgb(m, alpha = TRUE) / 255L
         image <- array(t(rgb), c(dim(m), 4L))
     }
-    
+
     uri <- base64enc::dataURI(png::writePNG(image), mime = "image/png")
 
     ImageURI(uri, type = "image/png")
