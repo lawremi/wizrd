@@ -1,5 +1,5 @@
 test_that("we can call MCP tools", {
-    session <- mcp_connect(wizrd:::mcp_test_server())
+    session <- connect_mcp(wizrd:::mcp_test_server())
     mcp_tools <- tools(session)
     result <- mcp_tools$add(1L, 2L)
     expect_match(result, "3")
@@ -11,14 +11,14 @@ test_that("we can call MCP tools", {
 })
 
 test_that("we can access MCP resources", {
-    session <- mcp_connect(wizrd:::mcp_test_server())
+    session <- connect_mcp(wizrd:::mcp_test_server())
     r <- resources(session)
     result <- r$get_greeting("R")
     expect_identical(result, "Hello, R!")
 })
 
 test_that("we can generate prompts with MCP", {
-    session <- mcp_connect(wizrd:::mcp_test_server())
+    session <- connect_mcp(wizrd:::mcp_test_server())
     pf <- prompts(session)
 
     model <- llama(server)
@@ -53,14 +53,14 @@ test_that("the SSE transport layer works", {
     mcp_server <- wizrd:::mcp_test_server("sse", port)
     url <- paste0("http://127.0.0.1:", port, "/sse")
 
-    session <- mcp_connect(url)
+    session <- connect_mcp(url)
     r <- resources(session)
     result <- r$get_greeting("R")
     expect_identical(result, "Hello, R!")
 })
 
 test_that("MCP errors work", {
-    session <- mcp_connect(wizrd:::mcp_test_server())
+    session <- connect_mcp(wizrd:::mcp_test_server())
     pf <- prompts(session)
 
     model <- llama(server)
@@ -72,7 +72,7 @@ test_that("MCP errors work", {
 test_that("MCP requests can be cancelled", {
     skip("Not sure if FastMCP yet handles notifications/cancelled")
     options(wizrd_verbose = TRUE)
-    session <- mcp_connect(wizrd:::mcp_test_server())
+    session <- connect_mcp(wizrd:::mcp_test_server())
     mcp_tools <- tools(session)
     opt <- options(wizrd_test_json_rpc_cancel = TRUE)
     on.exit(options(opt))

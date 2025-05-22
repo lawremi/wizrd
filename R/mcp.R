@@ -433,7 +433,7 @@ method(receive, list(MCPSession, class_any)) <- function(from, as, ...) {
     receive(from$endpoint, as, ...)
 }
 
-mcp_connect <- function(server) {
+connect_mcp <- function(server) {
     session <- MCPSession(endpoint = json_rpc_endpoint(server))
     session$mcp_initialize()
     session
@@ -460,7 +460,7 @@ try_uv_pipex <- function(command, args) {
         uv_pipex(args[1L], args[-1L])
 }
 
-mcp_exec_server <- function(command, args = list()) {
+exec_mcp_server <- function(command, args = list()) {
     assert_string(command)
     assert_character(args, any.missing = FALSE)
     require_ns("processx", "connect to stdio-based MCP servers")
@@ -474,7 +474,7 @@ mcp_test_server <- function(transport = c("stdio", "sse"), port) {
               "--transport", transport)
     if (transport == "sse")
         args <- c(args, "--port", port)
-    server <- mcp_exec_server("uvx", args)
+    server <- exec_mcp_server("uvx", args)
     if (transport == "sse")
         wait_until_port_open(port)
     server
