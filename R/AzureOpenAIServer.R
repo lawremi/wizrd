@@ -3,14 +3,12 @@ AzureOpenAIServer <- new_class("AzureOpenAIServer", OpenAIAPIServer)
 AZURE_OPENAI_API_VERSION <- "2024-08-01-preview"
 
 azure_openai_server <- function(url = getOption("wizrd_azure_openai_url"),
-                                key_prefix = "AZURE_OPENAI")
-{
+                                key_prefix = "AZURE_OPENAI") {
     AzureOpenAIServer(url = url, key_prefix = key_prefix)
 }
 
 azure_openai_agent <- function(name = "gpt-4o",
-                               url = getOption("wizrd_azure_openai_url"), ...)
-{
+                               url = getOption("wizrd_azure_openai_url"), ...) {
     language_agent(azure_openai_server(url), name, ...)
 }
 

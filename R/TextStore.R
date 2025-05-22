@@ -39,12 +39,11 @@ retrieve <- new_generic("retrieve", c("x", "from"))
 
 method(retrieve, list(class_any, TextStore)) <-
     function(x, from, params = VectorIndexRetrievalParams(...), ...) {
-        from@text[retrieve(x, from@index, params),]
+        from@text[retrieve(x, from@index, params), ]
     }
 
 method(retrieve, list(class_any, EmbeddingTextIndex)) <- function(x, from,
-                                                                  params)
-{
+                                                                  params) {
     embeddings <- embed_text(from@embedder, x)
     unique(unlist(apply(embeddings, 1L, retrieve, from@vector_index, params,
                         simplify = FALSE)))
@@ -82,8 +81,12 @@ RetrievalAugmentedFormat <- new_class("RetrievalAugmentedFormat", TextFormat,
 param_class := new_generic("x")
 
 rag_from <- function(store, k = 5L, min_similarity = 0L, ...) {
-    params <- param_class(store@index@vector_index)(k = as.integer(k),
-        min_similarity = min_similarity, ...)
+    vector_index <- store@index@vector_index
+    params <- param_class(vector_index)(
+        k = as.integer(k),
+        min_similarity = min_similarity,
+        ...
+    )
     RetrievalAugmentedFormat(store = store, params = params)
 }
 

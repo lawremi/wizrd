@@ -1,5 +1,4 @@
-assert_scalar <- function(scalar, class, arg = deparse(substitute(scalar)))
-{
+assert_scalar <- function(scalar, class, arg = deparse(substitute(scalar))) {
     if (length(scalar) != 1L || !S7:::class_inherits(scalar, class)) {
         type_name <- if (identical(class, class_numeric)) {
             "numeric"
@@ -82,8 +81,7 @@ S7_class_with_parent <- function(parent, validator = NULL, ...) {
 missing_name <- function() alist(x=)[[1L]]
 
 scalar <- function(x, ..., validator = x$validator, default = x$default,
-                   choices = NULL, min = -Inf, max = Inf)
-{
+                   choices = NULL, min = -Inf, max = Inf) {
     if (S7:::is_foundation_class(x))
         x <- new_property(x, ...)
     stopifnot(inherits(x, "S7_property"))
@@ -129,8 +127,7 @@ new_list_property <- function(..., validator = NULL,
                                   quote(setNames(list(), character()))
                               else quote(list()),
                               of = class_any, named = NA,
-                              min_length = 0L, max_length = Inf)
-{
+                              min_length = 0L, max_length = Inf) {
     prop <- new_property(class_list, ..., validator = function(value) {
         c(if (!identical(of, class_any) &&
                   !all(vapply(value, S7:::class_inherits, logical(1L), of)))
@@ -170,8 +167,7 @@ new_data_frame_property <- function(..., validator = NULL,
                                     col.names = colnames(prototype),
                                     default = substitute(prototype) %||%
                                         zero_row_data_frame(col.names),
-                                    prototype = NULL)
-{
+                                    prototype = NULL) {
     types <- lapply(prototype, class_object)
     prop <- new_property(class_data.frame, ..., validator = function(value) {
         c(if (!is.null(col.names) &&
@@ -402,8 +398,7 @@ pipex <- function(command, args) {
 }
 
 init_process <- function(path, args, ready_callback, error_callback,
-                         poll_timeout = 10L)
-{
+                         poll_timeout = 10L) {
     p <- processx::process$new(path, args, stdout = "|", stderr = "|")
 
     error <- ""

@@ -3,8 +3,10 @@ OpenAIAPIServer <- new_class("OpenAIAPIServer", LanguageModelServer)
 openai_response_models <- function(x) x$data
 
 openai_models_perform <- function(x) {
-    server_request(x) |> httr2::req_url_path_append(models_path(x)) |>
-        httr2::req_perform() |> httr2::resp_body_json()
+    server_request(x) |>
+        httr2::req_url_path_append(models_path(x)) |>
+        httr2::req_perform() |>
+        httr2::resp_body_json()
 }
 
 method(models, OpenAIAPIServer) <- function(x) {
@@ -228,7 +230,7 @@ method(perform_embedding, OpenAIAPIServer) <- function(x, model, data,
 }
 
 openai_embedding_perform <- function(body, server) {
-    req <- server_request(server) |>
+    server_request(server) |>
         httr2::req_url_path_append(embeddings_path(server, body$model)) |>
         httr2::req_body_json(body) |>
         httr2::req_perform() |>

@@ -1,27 +1,28 @@
 Agent <- new_class("Agent",
-                           properties = list(
-                               backend = LanguageModelBackend,
-                               name = nullable(scalar(class_character)),
-                               instructions = scalar(
-                                   class_character,
-                                   default = "You are a helpful assistant."
-                               ),
-                               io = TextProtocol,
-                               tools = list_of(ToolBinding),
-                               params = LanguageModelParams,
-                               examples = new_data_frame_property(
-                                   col.names = c("input", "output")
-                               ),
-                               system_prompt_format = new_property(
-                                   TextFormat,
-                                   default = paste(c("{tool_instructions}",
-                                                     "{output_instructions}",
-                                                     "{task_instructions}",
-                                                     "{examples}"),
-                                                   collapse = "\n\n") |>
-                                       GlueFormat() |> quote()
-                               )
-                           ))
+                   properties = list(
+                       backend = LanguageModelBackend,
+                       name = nullable(scalar(class_character)),
+                       instructions = scalar(
+                           class_character,
+                           default = "You are a helpful assistant."
+                       ),
+                       io = TextProtocol,
+                       tools = list_of(ToolBinding),
+                       params = LanguageModelParams,
+                       examples = new_data_frame_property(
+                           col.names = c("input", "output")
+                       ),
+                       system_prompt_format = new_property(
+                           TextFormat,
+                           default = paste(c("{tool_instructions}",
+                                             "{output_instructions}",
+                                             "{task_instructions}",
+                                             "{examples}"),
+                                           collapse = "\n\n") |>
+                               GlueFormat() |>
+                               quote()
+                       )
+                   ))
 
 chat <- new_generic("chat", "x")
 embed_text <- new_generic("embed_text", "x",
@@ -48,22 +49,19 @@ method(print, Agent) <- function(x, ...) {
 }
 
 method(perform_chat, Agent) <- function(x, messages, stream_callback,
-                                                 env, ...)
-{
+                                        env, ...) {
     perform_chat(x@backend, x@name, messages, x@tools, x@io,
-                  set_props(x@params, ...), stream_callback)
+                 set_props(x@params, ...), stream_callback)
 }
 
 method(chat, Agent) <- function(x, input = NULL, stream_callback = NULL,
-                                        system_params = list(),
-                                        env = parent.frame(), ...)
-{
+                                system_params = list(), env = parent.frame(),
+                                ...) {
     chat(convert(x, Chat, env = env, system_params = system_params), input,
          stream_callback, ...)
 }
 
-predict_via_chat <- function(object, input, env = parent.frame(), ...)
-{
+predict_via_chat <- function(object, input, env = parent.frame(), ...) {
     last_output(chat(object, input, env = env, ...))
 }
 
@@ -90,7 +88,7 @@ tool_instructions <- new_generic("tool_instructions", "x")
 method(tool_instructions, Agent) <- function(x) {
     if (length(x@tools) == 0L)
         return("")
-    
+
     paste0("You have access to one or more tools named ",
            paste(names(x@tools), collapse = ", "),
            ". Use them when relevant or requested to answer user queries.\n\n",
@@ -115,8 +113,8 @@ instructions <- new_generic("instructions", "on")
 method(instructions, TextFormat) <- function(on) ""
 
 method(instructions, JSONFormat) <- function(on) {
-    prompt <- paste0("Return only JSON, without any explanation or other text. ",
-                     "If the user input is incompatible with the task, ",
+    prompt <- paste0("Return only JSON, without any explanation or other ",
+                     "text. If the user input is incompatible with the task, ",
                      "issue an informative refusal.\n")
     prompt
 }
@@ -135,7 +133,8 @@ method(instructions, CSVFormat) <- function(on) {
                     "The CSV should adhere to the RFC 4180 standard,",
                     "so use double quotes (\"\") to escape quotes.",
                     "Never use \\ to escape quotes.",
-                    "Do not embed in markdown and do not send any other text.\n")
+                    "Do not embed in markdown and do not send any other text.",
+                    "\n")
     if (length(names(on@col_classes)) > 0L)
         prompt <- paste0(prompt,
                          "The CSV should contain these columns: ",
@@ -161,7 +160,7 @@ textify_examples <- function(x) {
     ex <- x@examples
     if (nrow(ex) == 0L)
         return("")
-    ex_text <- 
+    ex_text <-
         paste0("Input: ", vapply(ex$input, textify, character(1L), x@io@input),
                "\n",
                "Output: ", vapply(ex$output, textify, character(1L),
@@ -195,8 +194,19 @@ method(bind, list(Tool, Agent)) <- function(x, to, instructions = NULL) {
 
 ## Idea for unambiguously communicating references to R
 ## variables. Small models struggle to interpret this correctly.
-interpret_symbols <-function(x) {
-    x@instructions <- "You are an assistant embedded in an R session, where users will reference variables using backticks (``). When responding to user requests and calling tools, always preserve these backticks around variable names to correctly identify them as R variables. Do not remove the backticks when passing variable names to tools or functions, as the backticks identify them as R variables. Do not wrap other types of strings in backticks. If backticks are present around a word, treat it as a variable name, and use it as-is when calling tools."
+interpret_symbols <- function(x) {
+    x@instructions <- paste(
+        "You are an assistant embedded in an R session, where users will",
+        "reference variables using backticks (``). When responding to user",
+        "requests and calling tools, always preserve these backticks around",
+        "variable names to correctly identify them as R variables. Do not",
+        "remove the backticks when passing variable names to tools or",
+        "functions, as the backticks identify them as R variables. Do not",
+        "wrap other types of strings in backticks. If backticks are present",
+        "around a word, treat it as a variable name, and use it as-is when",
+        "calling tools.",
+        sep = "\n"
+    )
     x
 }
 
@@ -205,23 +215,22 @@ method(embed_text, Agent) <- function(x, text, ndim = NULL, ...) {
 
     if (length(text) == 0L)
         return(matrix(numeric(), ncol = ndim %||% 0L))
-    
+
     text <- textify(text, x@io@input)
     if (length(text) == 1L && (!is.list(text) || is.object(text)))
         text <- list(text)
     if (any(lengths(text) != 1L))
         stop("elements of 'text' must be length one")
-    
-    do.call(rbind, lapply(text, perform_embedding, model = x@name, x = x@backend,
-                          ndim = ndim, ...))
+
+    do.call(rbind, lapply(text, perform_embedding, model = x@name,
+                          x = x@backend, ndim = ndim, ...))
 }
 
 method(on_restore, Agent) <- function(x, ...) {
     set_props(x, backend = on_restore(x@backend, x@name, ...))
 }
 
-demonstrate <- function(x, input, output)
-{
+demonstrate <- function(x, input, output) {
     if (!is.atomic(input))
         input <- I(list(input))
     if (!is.atomic(output))

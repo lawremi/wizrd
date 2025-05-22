@@ -4,15 +4,15 @@ Rcpp_AnnoyAngular <- setClass("Rcpp_AnnoyAngular", package = "RcppAnnoy")
 annoy_index <- function(embedding, ntrees = ncol(embedding) %/% 5L) {
     require_ns("RcppAnnoy", "index vectors (by default)")
     index <- new(RcppAnnoy::AnnoyAngular, ncol(embedding))
-    for (i in seq_len(nrow(embedding)))
-        index$addItem(i, embedding[i,])
+    for (i in seq_len(nrow(embedding))) {
+        index$addItem(i, embedding[i, ])
+    }
     index$build(ntrees)
     index
 }
 
 method(retrieve, list(class_numeric, Rcpp_AnnoyAngular)) <- function(x, from,
-                                                                     params)
-{
+                                                                     params) {
     nns <- from$getNNsByVectorList(x, params@k, -1L, include_distances = TRUE)
     cosine_similarity <- (2 - (nns$distance ^ 2)) / 2
     nns$item[cosine_similarity >= params@min_similarity]

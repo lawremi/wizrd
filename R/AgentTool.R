@@ -43,7 +43,9 @@ model_fun <- function(model, sig, predict_args) {
     if (unary(model)) {
         stopifnot(length(args) == 1L)
         args_language <- as.name(names(args))
-    } else args_language <- as.call(c(quote(list), sapply(names(args), as.name)))
+    } else {
+        args_language <- as.call(c(quote(list), sapply(names(args), as.name)))
+    }
     predict_call <- as.call(c(quote(predict), quote(self@model), args_language,
                               predict_args))
     body <- substitute({
@@ -77,13 +79,11 @@ model_signature <- function(model) {
 
 method(convert, list(Agent, Tool)) <-
     function(from, to, name = from@name, description = from@instructions, ...) {
-        AgentTool(name = name, model = from, description = description,
-                          ...)
+        AgentTool(name = name, model = from, description = description, ...)
     }
 
 method(convert, list(Agent, class_function)) <- function(from, to, ...) {
     convert(from, Tool, ...)
 }
 
-method(as.function, Agent) <- function(x, ...)
-    convert(x, class_function, ...)
+method(as.function, Agent) <- function(x, ...) convert(x, class_function, ...)

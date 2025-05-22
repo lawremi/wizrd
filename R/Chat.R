@@ -19,10 +19,9 @@ Chat <- new_class("Chat",
                   ))
 
 method(convert, list(Agent, Chat)) <- function(from, to,
-                                                       messages = list(),
-                                                       system_params = list(),
-                                                       ...)
-{
+                                               messages = list(),
+                                               system_params = list(),
+                                               ...) {
     system_prompt <- textify_system_prompt(from, system_params)
     system_msg <- ChatMessage(role = "system", content = system_prompt)
     Chat(model = from, messages = c(system_msg, messages), ...)
@@ -69,15 +68,18 @@ method(print, Chat) <- function(x, full = FALSE, ...) {
         cat(cli::rule(center = "Latest messages", line = " -"))
         cat("\n")
     }
-    for(i in seq_along(messages))
+    for (i in seq_along(messages)) {
         print(messages[[i]])
+    }
 }
 
 last_message <- function(x, role = NULL) {
     assert_string(role, null.ok = TRUE)
-    msg <- if (is.null(role))
-               x@messages[[length(x@messages)]]
-           else Find(function(m) m@role == role, x@messages, right = TRUE)
+    msg <- if (is.null(role)) {
+        x@messages[[length(x@messages)]]
+    }  else {
+        Find(function(m) m@role == role, x@messages, right = TRUE)
+    }
     if (is.null(msg))
         stop("No message found",
              if (!is.null(role)) paste0(" for role '", role, "'"))
@@ -102,7 +104,7 @@ append_messages <- function(x, ...) {
 backticked_strings <- function(x) {
     cnt <- unlist(Filter(is.character, x@contents[x@roles == "user"]))
     m <- do.call(cbind, regmatches(cnt, regexec("`([^`]*?)`", cnt)))
-    unique(matrix(m, 2)[2,])
+    unique(matrix(m, 2)[2, ])
 }
 
 backticked_strings_as_names <- function(args, chat) {
@@ -125,7 +127,8 @@ handle_tool_calls <- function(x) {
     msgs <- lapply(tool_calls, function(tool_call) {
         binding <- x@model@tools[[tool_call@tool_name]]
         args <- props(detextify(tool_call@arguments, binding@io@input)) |>
-            backticked_strings_as_names(x) |> expand_dots()
+            backticked_strings_as_names(x) |>
+            expand_dots()
         value <- do.call(binding@tool, args, envir = x@env)
         ChatMessage(role = "tool", object = value,
                     content = textify(value, binding@io@output),

@@ -9,8 +9,7 @@ LlamaCppServer <- new_class("LlamaCppServer", OpenAIAPIServer,
 method(models, LlamaCppServer) <- function(x) data.frame(id = x@model)
 
 method(language_agent, LlamaCppServer) <-
-    function(x, ..., params = LanguageModelParams(...))
-    {
+    function(x, ..., params = LanguageModelParams(...)) {
         Agent(backend = x, name = x@model, params = params)
     }
 
@@ -22,7 +21,7 @@ method(perform_chat, LlamaCppServer) <- function(x, ...) {
 
 method(perform_embedding, LlamaCppServer) <- function(x, ...) {
     if (!x@embedding)
-        stop("llama.cpp server does not embed when not started with --embedding")
+        stop("llama.cpp must be started with --embedding")
     perform_embedding(super(x, OpenAIAPIServer), ...)
 }
 
@@ -31,8 +30,7 @@ llama_cpp_agent_from_ollama <- function(name, ...) {
 }
 
 llama_cpp_agent <- function(path, mode = c("chat", "embedding"), alias = NULL,
-                            server_path = NULL, ...)
-{
+                            server_path = NULL, ...) {
     mode <- match.arg(mode)
 
     if (resembles_url(path))
@@ -73,7 +71,7 @@ llamafile_bin_dir <- function() {
 }
 
 llamafile_path <- function() {
-     file.path(llamafile_bin_dir(), "llamafile")
+    file.path(llamafile_bin_dir(), "llamafile")
 }
 
 install_llamafile <- function() {
@@ -84,7 +82,7 @@ install_llamafile <- function() {
 
     user_dir <- tools::R_user_dir("wizrd", which = "cache")
     dir.create(user_dir, recursive = TRUE, showWarnings = FALSE)
-    
+
     unzip(dest_file, exdir = user_dir)
     unlink(dest_file)
 
@@ -94,14 +92,18 @@ install_llamafile <- function() {
 }
 
 prompt_install_llamafile <- function() {
-    answer <- if (interactive())
-                  askYesNo("Do you want to download llamafile in order to use llama.cpp models?")
-              else TRUE
-    
+    answer <- if (interactive()) {
+        askYesNo("Download llamafile to use llama.cpp models?")
+    } else {
+        TRUE
+    }
+
     if (isTRUE(answer)) {
         install_llamafile()
         TRUE
-    } else FALSE
+    } else {
+        FALSE
+    }
 }
 
 llamafile_ready <- function(stdout) {
@@ -118,8 +120,8 @@ llamafile_v2_error <- function(stderr) {
     if (length(msgs) > 0L) tail(msgs, 1L) else stderr
 }
 
-llama_cpp_server <- function(model_name, url, embedding = FALSE, process = NULL)
-{
+llama_cpp_server <- function(model_name, url, embedding = FALSE,
+                             process = NULL) {
     assert_string(model_name)
     assert_string(url)
     assert_flag(embedding)
@@ -131,8 +133,7 @@ llama_cpp_server <- function(model_name, url, embedding = FALSE, process = NULL)
 
 .run_llama_cpp_server <- function(path = llamafile_path(),
                                   model = NULL, alias = NULL, embedding = FALSE,
-                                  gpu = FALSE, port = 0L, ...)
-{
+                                  gpu = FALSE, port = 0L, ...) {
     if (!file.exists(path) && identical(path, llamafile_path()))
         prompt_install_llamafile()
     assert_file_exists(path, access = "x")
@@ -159,7 +160,7 @@ llama_cpp_server <- function(model_name, url, embedding = FALSE, process = NULL)
                       nobrowser = if (is_llamafile) TRUE,
                       ngl = if (gpu) 9999, ...)
     p <- init_llamafile_process(path, args)
-    
+
     url <- paste0("http://localhost:", port)
     llama_cpp_server(alias, url, embedding, process = p)
 }
@@ -169,8 +170,7 @@ init_llamafile_process <- function(path, args) {
 }
 
 run_llamafile_v2 <- function(model, port = 0L, path = llamafile_path(),
-                             alias = NULL, ...)
-{
+                             alias = NULL, ...) {
     if (!file.exists(path) && identical(path, llamafile_path()))
         prompt_install_llamafile()
     assert_file_exists(path, access = "x")
@@ -189,7 +189,9 @@ run_llamafile_v2 <- function(model, port = 0L, path = llamafile_path(),
                       model = model, listen = addr, ...)
     p <- init_llamafile_v2_process(path, args)
 
-    model_name <- alias %||% tools::file_path_sans_ext(basename(model %||% path))
+    model_name <- alias %||%
+        tools::file_path_sans_ext(basename(model %||% path))
+
     llama_cpp_server(model_name, url, embedding = TRUE, process = p)
 }
 
@@ -208,15 +210,14 @@ run_llama_cpp_server <- function(model,
                                  temp = 0.8, flash_attn = FALSE, port = 0L,
                                  embedding = FALSE, gpu = FALSE,
                                  path = llamafile_path(),
-                                 ...)
-{
+                                 ...) {
     assert_integerish(threads, lower = 1L)
     assert_integerish(ctx_size, lower = 0L)
     assert_integerish(n_predict, lower = -2L)
     assert_integerish(batch_size, lower = 1L)
     assert_number(temp, lower = 0)
     assert_flag(flash_attn)
-    
+
     .run_llama_cpp_server(path, model = model, threads = threads,
                           ctx_size = ctx_size, n_predict = n_predict,
                           batch_size = batch_size, temp = temp,
@@ -225,7 +226,11 @@ run_llama_cpp_server <- function(model,
 }
 
 method(on_restore, LlamaCppServer) <- function(x, ...) {
-    init_fun <- if (x@embedding) init_llamafile_v2_process else init_llamafile_process
+    init_fun <- if (x@embedding) {
+        init_llamafile_v2_process
+    } else {
+        init_llamafile_process
+    }
     p <- R6_private(x@process)
     set_props(x, process = init_fun(p$command, p$args))
 }

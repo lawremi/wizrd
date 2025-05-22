@@ -191,22 +191,19 @@ method(as_json_schema, list_S7_property) <- function(from, description = NULL)
 }
 
 method(as_json_schema, data_frame_S7_property) <- function(from,
-                                                           description = NULL)
-{
+                                                           description = NULL) {
     as_json_schema(from$prototype, description)
 }
 
 method(as_json_schema, numeric_S7_property) <- function(from,
-                                                        description = NULL)
-{
+                                                        description = NULL) {
     schema <- as_json_schema(s3_super(from, scalar_S7_property), description)
     c(schema, minimum = from$min, maximum = from$max)
 }
 
 json_schema_for_object <- function(x, ...) as_json_schema(class_object(x), ...)
 
-method(as_json_schema, class_data.frame) <- function(from, description = NULL)
-{
+method(as_json_schema, class_data.frame) <- function(from, description = NULL) {
     schema <- list(title = "data_frame",
                    type = "array",
                    items = list(

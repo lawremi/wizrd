@@ -69,7 +69,7 @@ MCPSession <- setRefClass("MCPSession",
             close(.self)
         }
     )
-    )
+)
 
 MCPImplementation := new_class(
     properties = list(
@@ -77,14 +77,16 @@ MCPImplementation := new_class(
                       default = getNamespaceName(environment())),
         version = scalar(class_character,
                          default = getNamespaceVersion(environment()))
-    ))
+    )
+)
 
 MCPClientCapabilities := new_class(
     properties = list(
         experimental = optional(named(class_list)),
         sampling = optional(class_list),
         roots = optional(class_list)
-    ))
+    )
+)
 
 MCPServerCapabilities := new_class(
     properties = list(
@@ -94,7 +96,8 @@ MCPServerCapabilities := new_class(
         prompts = optional(class_list),
         resources = optional(class_list),
         tools = optional(class_list)
-    ))
+    )
+)
 
 MCPRequest := new_class(abstract = TRUE)
 
@@ -376,8 +379,9 @@ method(json_rpc_method, MCPListResourcesRequest) <- function(x) "resources/list"
 
 method(json_rpc_method, MCPReadResourceRequest) <- function(x) "resources/read"
 
-method(json_rpc_method, MCPListResourceTemplatesRequest) <- function(x)
+method(json_rpc_method, MCPListResourceTemplatesRequest) <- function(x) {
     "resources/templates/list"
+}
 
 method(json_rpc_method, MCPListPromptsRequest) <- function(x) "prompts/list"
 
@@ -402,7 +406,8 @@ method(invoke, MCPRequest) <- function(x, endpoint) {
     json_rpc_request <- convert(x, JSONRPCRequest)
     json_rpc_request |>
         invoke(endpoint, mcp_notification_mapper, mcp_canceller) |>
-        _@result |> dejsonify(response_class(x))
+        _@result |>
+        dejsonify(response_class(x))
 }
 
 method(send, list(class_any, MCPSession)) <- function(x, to) {
@@ -464,7 +469,7 @@ mcp_exec_server <- function(command, args = list()) {
 
 mcp_test_server <- function(transport = c("stdio", "sse"), port) {
     transport <- match.arg(transport)
-    args <- c("fastmcp", "run", 
+    args <- c("fastmcp", "run",
               system.file("mcp", "server.py", package = "wizrd"),
               "--transport", transport)
     if (transport == "sse")
@@ -495,7 +500,8 @@ method(convert, list(MCPTool, Tool)) <- function(from, to, session) {
         session$callTool(NAME, ARGS)
     }, list(NAME = name,
             ARGS = as.call(c(quote(parameters), sapply(names(args), as.name)))))
-    envir <- list2env(list(session = session, parameters = signature@parameters),
+    envir <- list2env(list(session = session,
+                           parameters = signature@parameters),
                       parent = topenv())
     FUN <- as.function(c(args, body), envir)
     Tool(FUN,
@@ -558,7 +564,7 @@ method(as.function, MCPResourceTemplate) <- function(x, session, ...) {
         session$readResource(uri)
     }, list(URI_TEMPLATE = x@uriTemplate,
             ARGS = as.call(c(quote(list), sapply(params, as.name))))))
-    formals(ans)[params] <- alist(x=)
+    formals(ans)[params] <- alist(x = )
     environment(ans) <- list2env(list(session = session), parent = topenv())
     ans
 }
@@ -582,7 +588,7 @@ method(as.function, MCPPrompt) <- function(x, session, ...) {
         }, list(MISSING_ARGS = missing_args_call, NAME = x@name,
                 ARGS = args_call)))
     }
-    formals(ans)[args] <- ifelse(required, alist(x=), list(NULL))
+    formals(ans)[args] <- ifelse(required, alist(x = ), list(NULL))
     environment(ans) <- list2env(list(session = session), parent = topenv())
     ans
 }
@@ -594,9 +600,9 @@ method(convert, list(MCPPromptMessage, ChatMessage)) <- function(from, to) {
 }
 
 method(handle_notification, MCPLoggingMessageNotification) <- function(x) {
-    class <- switch(x@level, debug = c("verbose_message", "message"), info =,
-                    notice = "message", warning =, error =, critical =, alert =,
-                    emergency = "warning")
+    class <- switch(x@level, debug = c("verbose_message", "message"), info = ,
+                    notice = "message", warning = , error = , critical = ,
+                    alert = , emergency = "warning")
     condition(x@data, level = x@level, class = c(class, "mcp_condition")) |>
         emit()
 }

@@ -28,8 +28,9 @@ JSONRPCNotification := new_class(
     ), # See S7 PR#473 for why this is necessary
     constructor = function(.data = JSONRPCRequest(method = method, id = NULL,
                                                   ...),
-                           method = "", ...)
+                           method = "", ...) {
         new_object(.data)
+    }
 )
 
 JSONRPCError := new_class(
@@ -53,8 +54,9 @@ PostSSEEndpoint := new_class(
         post_req = S3_httr2_request,
         sse_resp = S3_httr2_response,
         auth = nullable(OAuth),
-        base_url = scalar(class_character, getter = function(self)
-            self@post_req$url |> httr2::url_modify(path = NULL))
+        base_url = scalar(class_character, getter = function(self) {
+            self@post_req$url |> httr2::url_modify(path = NULL)
+        })
     )
 )
 
@@ -68,8 +70,10 @@ post_sse_endpoint <- function(url) {
         httr2::req_perform_connection(blocking = FALSE)
     event <- sse_resp |> resp_await_sse()
     if (event$type == "endpoint") # could be relative or absolute
-        post_req <- event$data |> httr2::url_parse(base_url = url) |>
-            httr2::url_build() |> httr2::request()
+        post_req <- event$data |>
+            httr2::url_parse(base_url = url) |>
+            httr2::url_build() |>
+            httr2::request()
     else stop("expected 'endpoint' event from ", url)
     PostSSEEndpoint(post_req = post_req, sse_resp = sse_resp)
 }
@@ -78,10 +82,13 @@ json_rpc_endpoint <- function(server) {
     if (is.character(server)) {
         if (resembles_url(server, "ws") || resembles_url(server, "wss"))
             ws_endpoint(server)
-        else if (resembles_url(server, "http") || resembles_url(server, "https"))
+        else if (resembles_url(server, "http") ||
+                     resembles_url(server, "https"))
             post_sse_endpoint(server)
         else server
-    } else server
+    } else {
+        server
+    }
 }
 
 send := new_generic(c("x", "to"))

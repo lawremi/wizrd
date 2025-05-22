@@ -32,7 +32,8 @@ method(detextify, list(ChatMessage, TextFormat)) <- function(x, format) {
 
 split_into_blocks <- function(x) {
     regex <- "(?s)(.*?)```(.*?)\n(.*?)```|(.*)$"
-    m <- regmatches(x, gregexec(regex, x, perl = TRUE))[[1L]][-1L,,drop = FALSE]
+    g gregexec(regex, x, perl = TRUE)
+    m <- regmatches(x, g)[[1L]][-1L, , drop = FALSE]
     labels <- rbind("text", m[2L,], "text")
     Filter(nzchar, setNames(as.list(m[-2L,]), labels))
 }

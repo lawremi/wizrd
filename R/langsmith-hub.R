@@ -61,7 +61,7 @@ StructuredPrompt := new_class(
 )
 
 parse_langsmith_id <- function(id) {
-    assert_string(id)    
+    assert_string(id)
     parts <- strsplit(id, "/")[[1L]]
     name_parts <- strsplit(tail(parts, 1L), ":")[[1L]]
     parts[length(parts)] <- name_parts[1L]
@@ -73,10 +73,11 @@ parse_langsmith_template <- function(x) {
     construct_langchain_object(x$manifest)
 }
 
-pull_langsmith_template <- function(id, url = "https://api.smith.langchain.com/")
-{
+pull_langsmith_template <- function(id,
+                                    url = "https://api.smith.langchain.com/") {
     parts <- parse_langsmith_id(id)
-    httr2::request(url) |> httr2::req_url_path_append("commits", parts) |>
+    httr2::request(url) |>
+        httr2::req_url_path_append("commits", parts) |>
         httr2::req_perform() |>
         httr2::resp_body_json(simplifyVector = TRUE,
                               simplifyDataFrame = FALSE) |>
@@ -93,7 +94,7 @@ method(system_prompt_as, list(Agent, HubID)) <- function(x, format) {
 
 method(convert, list(PromptTemplate, class_character)) <- function(from, to) {
     ans <- switch(from@template_format, "f-string" = as_glue(from@template),
-                  mustache = as_whisker(from@template))
+                  mustache = whisker(from@template))
     if (is.null(ans))
         stop("unsupported template format: ", from@template_format)
     ans
@@ -103,22 +104,20 @@ method(convert, list(PromptTemplate, TextFormat)) <- function(from, to) {
     convert(convert(from, class_character), to)
 }
 
-method(prompt_as, list(Agent, ChatPromptTemplate)) <- function(x, format)
-{
-    for (msg in format@messages)
+method(prompt_as, list(Agent, ChatPromptTemplate)) <- function(x, format) {
+    for (msg in format@messages) {
         x <- prompt_as(x, msg)
+    }
     x
 }
 
 method(prompt_as, list(Agent, SystemMessagePromptTemplate)) <-
-    function(x, format)
-    {
+    function(x, format) {
         system_prompt_as(x, format@prompt)
     }
 
 method(prompt_as, list(Agent, HumanMessagePromptTemplate)) <-
-    function(x, format)
-    {
+    function(x, format) {
         prompt_as(x, format@prompt)
     }
 

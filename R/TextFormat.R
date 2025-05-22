@@ -278,9 +278,8 @@ as.Date.jsonic <- as.Date.character
 
 as.POSIXlt.jsonic <- as.POSIXlt.character
 
-method(dejsonify, list(class_any, S7_S3_class | S7_base_class)) <- function(x,
-                                                                            spec)
-{
+S3_or_base <- S7_S3_class | S7_base_class
+method(dejsonify, list(class_any, S3_or_base)) <- function(x, spec) {
     ## cannot target unions with convert()
     if (identical(spec, class_numeric))
         return(as.numeric(x))
@@ -304,15 +303,15 @@ method(dejsonify, list(class_any, S7_union)) <- function(x, spec) {
     stop("failed to convert to ", capture.output(print(spec)))
 }
 
-method(dejsonify, list(class_list, class_data.frame)) <- function(x, spec)
-{
-    do.call(rbind, c(list(spec), x))
-}
+method(dejsonify, list(class_list, class_data.frame)) <-
+    function(x, spec) {
+        do.call(rbind, c(list(spec), x))
+    }
 
-method(dejsonify, list(class_data.frame, class_data.frame)) <- function(x, spec)
-{
-    x[colnames(spec)] # JSON schema does not ensure order
-}
+method(dejsonify, list(class_data.frame, class_data.frame)) <-
+    function(x, spec) {
+        x[colnames(spec)] # JSON schema does not ensure order
+    }
 
 method(dejsonify, list(class_data.frame, data_frame_S7_property)) <-
     function(x, spec) {
@@ -347,7 +346,7 @@ method(detextify, list(class_character, CSVFormat)) <- function(x, format) {
     header <- has_header(x, col_names)
     if (!header) warning("missing header")
     read.csv(text = x, colClasses = format@col_classes,
-                    col.names = col_names, header = header)
+             col.names = col_names, header = header)
 }
 
 method(detextify, list(class_any, TextFormat)) <- function(x, format) x

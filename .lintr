@@ -1,0 +1,2 @@
+linters: linters_with_defaults(indentation_linter(4), object_name_linter = NULL, semicolon_linter = NULL, object_length_linter = NULL)
+encoding: "UTF-8"
