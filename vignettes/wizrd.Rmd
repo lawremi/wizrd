@@ -11,8 +11,8 @@ vignette: >
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
+    collapse = TRUE,
+    comment = "#>"
 )
 httptest2::start_vignette("http")
 ```
@@ -25,14 +25,20 @@ science tools and workflows implemented in any programming
 language. To accomplish this, wizrd defines a grammar and implements a
 fluent API for programming with LLMs.
 
+Just a utility for pretty-printing in Rmd block quotes:
+```{r pretty-print}
+pretty_rmd <- function(x) {
+    x |> strwrap() |> paste(">", text = _, collapse = "\n") |> cat()
+}
+```
+
 # Quick start
 
-To start chatting with a model:
+To start analyzing data with an agentl:
 ```{r quickstart, results='asis'}
 library(wizrd)
-model <- llamafile_llama()
-ans <- predict(model, "Who created R?")
-ans |> strwrap() |> paste(">", text = _, collapse = "\n") |> cat()
+agent <- llamafile_llama()
+predict(agent, "Describe the mtcars dataset") |> pretty_rmd()
 ```
 
 The call to `llamafile_llama()` will download, cache and run the
@@ -45,18 +51,20 @@ Ollama. The `llama()` function is a convenience to run llama 3.2 3B
 with Ollama. Convenience functions exist for some other common models.
 
 The `predict()` function is the most convenient way to execute single
-exchanges with a model. To maintain a context over multiple exchanges,
+exchanges with an agent. To maintain a context over multiple exchanges,
 use the `chat()` function:
 ```{r chat}
-ctx <- model |> chat("Who created R?") |> chat("When was it created?")
+ctx <- agent |>
+    chat("Describe the mtcars dataset") |>
+    chat("How can I manipulate it in R?")
 ctx
 ```
 A useful feature of the returned Chat object is that it prints the
 context in a readable format.
 
 To extract the last output from the Chat object, call `last_output()`:
-```{r last_output}
-last_output(ctx)
+```{r last_output, results='asis'}
+last_output(ctx) |> pretty_rmd()
 ```
 The returned value can then be used in further computations.
 
@@ -76,25 +84,34 @@ requirements in turn. We will use gpt-4o-mini for this example, in
 order to support constrained output. Set the `OPENAI_API_KEY`
 environment variable to your OpenAI key before running this.
 ```{r openai_agent}
-model <- openai_agent("gpt-4o-mini", temperature = 0)
+agent <- openai_agent("gpt-4o-mini", temperature = 0) |>
+    instruct("Answer questions about this dataset:", mtcars)
 ```
 For reproducibility reasons, it is best to explicitly specify the
 underlying model, as above, because the default will change as new
 models are released.
 
+The `instruct()` function configures the agent with a system prompt,
+instructing the agent and providing basic context. In this case, we
+insert the mtcars dataset verbatim as context, which the agent can
+reference in its responses. The agent will now be able to answer
+questions about the dataset's characteristics.
+
 ## Parameterized input
 
-Let's extend the above example so that it can answer the same
-questions about any given programming language.
+Let's extend the above example so that it can analyze any given
+variable in the mtcars dataset.
 
 ```{r glue}
-parameterized_agent <- model |> prompt_as("Who created {language}?")
-parameterized_agent |> chat(list(language = "R"))
+parameterized_agent <- agent |>
+    prompt_as("Analyze the relationship between {var1} and {var2}.")
+parameterized_agent |> chat(list(var1 = "mpg", var2 = "wt"))
 ```
 
-By calling `prompt_as()`, we parameterized the model using a glue
-template to accept a parameter named `language`. By passing `"R"` as
-the `language`, we get the same result as in the previous section.
+By calling `prompt_as()`, we parameterized the agent using a glue
+template to accept parameters named `var1` and `var2`. By passing
+`"mpg"` and `"wt"` as the variables, we get an analysis of the
+relationship between fuel efficiency and weight.
 
 ## Implementing logic
 
@@ -103,78 +120,122 @@ instructions, inserted into the system prompt, using the `instruct()`
 function:
 ```{r instruct}
 instructed_agent <- parameterized_agent |>
-    instruct("Include the name of every author.",
-             "Return only names separated by commas, no extra text.")
+    instruct("Answer questions about this dataset:", mtcars,
+             "When comparing variables, calculate their correlation.")
+chat(instructed_agent, list(var1 = "mpg", var2 = "wt"))
 ```
-The model obeys the instructions to include every contributor and only
-return the actual names.
+The agent will now provide a more structured analysis including
+correlation, interpretation, and visualization suggestions. However,
+it is not able to carry out the correlation calculation.
 
-We can also provide a tool that queries for the authors of the R
-language:
+To solve this, we can provide a tool that performs the actual
+correlation calculation:
 ```{r tool}
-get_R_authors <- function() {
-    authors <- R.home("doc") |> file.path("AUTHORS") |> readLines()
-    paste("Extract the R authors from this text. Do not call this tool again.",
-          paste(authors, collapse = "\n"))
+calculate_correlation <- function(var1, var2) {
+    cor(mtcars[[var1]], mtcars[[var2]])
 }
-equipped_agent <- instructed_agent |> equip(get_R_authors)
-equipped_agent |> chat(list(language = "R"))
+equipped_agent <- instructed_agent |> equip(calculate_correlation)
+equipped_agent |> chat(list(var1 = "mpg", var2 = "wt"))
 ```
 
 ## Constraining output
 
 In order to incorporate the output into a larger program, it is often
 necessary to convert the output to a more standardized and computable
-object. We made some progress through our instructions above, but we
-can be much more precise using the `output_as()` function:
+object. We can use the `output_as()` function to structure our
+analysis results:
 
 ```{r output_as}
-df_agent <- equipped_agent |>
-    output_as(data.frame(first_name = character(), last_name = character()))
-df_agent |> predict(list(language = "R"))
+# Return the correlation as a single number
+equipped_agent |>
+    output_as(S7::class_numeric) |>
+    predict(list(var1 = "mpg", var2 = "wt"))
+
+# Return a filtered subset of mtcars, which serves as the prototype
+filtered_agent <- agent |>
+    output_as(mtcars)
+filtered_agent |>
+    predict("Cars with mpg > 20")
+
+# Return a summary data.frame
+summary_agent <- agent |>
+    output_as(data.frame(
+        cyl = integer(),
+        avg_mpg = numeric(),
+        avg_hp = numeric()
+    ))
+summary_agent |>
+    predict("Average mpg and hp by number of cylinders.")
+
+# Using class_data.frame for more general output
+agent |>
+    output_as(S7::class_data.frame) |>
+    predict("Top 5 most fuel efficient cars including mpg, hp, and wt.")
 ```
 
-In the above example, we use a data.frame stub to specify the format,
-so the model returns a completed data.frame, with the same columns. 
+In the above examples, we demonstrate different ways to structure the output:
+1. Using an existing data.frame (`mtcars`) as a template
+2. Using a data.frame stub with specific columns
+3. Using `class_data.frame` for more general output
 
-We could also use an S7 object to capture the output:
-```{r S7}
-library(S7)
-Person <- new_class("Person",
-                    properties = list(first_name = class_character,
-                                      last_name = class_character))
-method(print, Person) <- function(x, ...)
-    cat("People:", paste(x@first_name, x@last_name, collapse = ", "), "\n")
-s7_agent <- equipped_agent |> output_as(Person)
-s7_agent |> predict(list(language = "R"))
-```
+The agent will return properly structured data.frames that can be used
+directly in further analysis or visualization.
 
-## Converting a model to an actual R function
+Note that `output_as()` supports any S7 class as a constraint, not
+just data.frames.  This allows for type-safe conversion of agent
+outputs into any R object structure defined using S7.
 
-Since the model is already behaving like a function, it is relatively
+## Converting an agent to an actual R function
+
+Since the agent is already behaving like a function, it is relatively
 straightforward to convert it into an actual R function using the
 `convert()` generic from S7:
 ```{r function}
-model_fun <- convert(df_agent, class_function)
-model_fun("R")
+# Convert the filtered agent to a function
+filter_cars <- S7::convert(filtered_agent, S7::class_function)
+filter_cars("Cars with mpg > 30")
 ```
 
 # Additional features
 
-## Sharing LLM-based programs across languages
+## Model Context Protocol (MCP)
 
-As shown above, we can implement LLM programs using natural language,
-along with standard JSON schema for defining output and tool calling
-contracts. None of that is specific to R or any other programming
-language. Thus, we can share the underlying implementation across
-languages.
+The wizrd package implements a client for the Model Context Protocol
+(MCP), which enables constructing agents from shared ingredients,
+including tools, prompts, and resources.
 
-The Langsmith Hub is a community platform for sharing prompt templates
-and output schema. We can load a program from the hub by passing the
-hub ID to `prompt_as()`:
-```{r langsmith}
-model |> prompt_as("lawremi/creators") |> predict(list(language = "R"))
+Here's an example of using MCP to interact with a data analysis server:
+
+```{r mcp}
+# Start the data analysis server
+mcp_args <- c("fastmcp", "run",
+              system.file("mcp", "data_server.py", package = "wizrd"))
+server <- mcp_exec_server("uvx", mcp_args)
+
+# Create an MCP session
+session <- mcp_connect(server)
+
+# List available tools
+tools <- tools(session)
+
+# Tools are just ordinary R functions
+tools$get_mean(mtcars$mpg)
+
+# Equip a agent with the MCP tools and analyze the data
+mcp_agent <- agent |>
+    output_as(S7::class_numeric) |>
+    equip(tools)
+predict(mcp_agent, "What is the mean fuel efficiency in the mtcars dataset?")
 ```
+
+The MCP protocol provides a standardized way to:
+1. Discover available tools, prompts, and resources
+2. Call tools with structured arguments
+3. Access and use predefined prompts
+4. Handle resources and templates
+
+This makes it easier to work with different agent implementations while
+maintaining a consistent interface in R.
 
 ## Retrieval Augmented Generation (RAG)
 
@@ -197,7 +258,7 @@ including markdown derivatives, HTML and PDF.
 Since the output is markdown, we embed it
 directly in this document. 
 
-```{r rag, results='asis'}
+```{r rag}
 chunks <- chunk(tools::Rd_db("S7"))
 store <- text_store(nomic(), chunks)
 model <- llama() |> prompt_as(rag_from(store))
@@ -208,7 +269,7 @@ last_message(chat(model, "new_property example"))
 ### Querying a data.frame
 
 And here is an example of querying a data.frame using RAG:
-```{r rag-df, results='asis'}
+```{r rag-df}
 chunks <- chunk(mtcars)
 store <- text_store(nomic(), chunks)
 model <- llama() |> prompt_as(rag_from(store))
