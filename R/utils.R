@@ -726,17 +726,20 @@ put <- function(x, `_list` = list(...), ...) {
     x
 }
 
-download_file <- function(url, destfile, timeout) {
+download_file <- function(url, destfile, ...) {
     if (!dir.exists(dirname(destfile)))
         dir.create(dirname(destfile), recursive = TRUE)
-    curl::multi_download(url, destfile, resume = TRUE)
+    result <- curl::multi_download(url, destfile, resume = TRUE, ...)
+    if (!result$success) {
+        stop("Failed to download ", url, ": ", result$error)
+    }
     invisible(TRUE)
 }
 
-prompt_download_file <- function(url, path) {
+prompt_download_file <- function(url, path, ...) {
     download <- !interactive() ||
         askYesNo(paste0("Do you want to download ", basename(url), "?"))
-    invisible(download && download_file(url, path))
+    invisible(download && download_file(url, path, ...))
 }
 
 file_cache_path <- function(url, type) {

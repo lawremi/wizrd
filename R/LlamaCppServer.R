@@ -78,7 +78,7 @@ install_llamafile <- function() {
     url <- llamafile_url()
 
     dest_file <- tempfile(fileext = ".zip")
-    download_file(url, dest_file, 500L)
+    download_file(url, dest_file)
 
     user_dir <- tools::R_user_dir("wizrd", which = "cache")
     dir.create(user_dir, recursive = TRUE, showWarnings = FALSE)
