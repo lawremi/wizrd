@@ -80,9 +80,8 @@ RetrievalAugmentedFormat <- new_class("RetrievalAugmentedFormat", TextFormat,
 
 param_class := new_generic("x")
 
-rag_from <- function(store, k = 5L, min_similarity = 0L, ...) {
-    vector_index <- store@index@vector_index
-    params <- param_class(vector_index)(
+rag_with <- function(store, k = 5L, min_similarity = 0L, ...) {
+    params <- param_class(store@index@vector_index)(
         k = as.integer(k),
         min_similarity = min_similarity,
         ...
@@ -92,8 +91,7 @@ rag_from <- function(store, k = 5L, min_similarity = 0L, ...) {
 
 method(textify,
        list(class_character | class_list | class_any,
-            RetrievalAugmentedFormat)) <- function(x, format)
-{
+            RetrievalAugmentedFormat)) <- function(x, format) {
     results <- retrieve(x, format@store, format@params)
     paste0("Using this information:\n",
            paste(textify(results), collapse = "\n\n"),

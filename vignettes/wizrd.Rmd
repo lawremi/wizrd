@@ -261,7 +261,7 @@ directly in this document.
 ```{r rag}
 chunks <- chunk(tools::Rd_db("S7"))
 store <- text_store(nomic(), chunks)
-model <- llama() |> prompt_as(rag_from(store))
+model <- llama() |> prompt_as(rag_with(store))
 cat("#### new_property example\n")
 last_message(chat(model, "new_property example"))
 ```
@@ -272,7 +272,7 @@ And here is an example of querying a data.frame using RAG:
 ```{r rag-df}
 chunks <- chunk(mtcars)
 store <- text_store(nomic(), chunks)
-model <- llama() |> prompt_as(rag_from(store))
+model <- llama() |> prompt_as(rag_with(store))
 predict(model, "MPG of Datsun 710")
 ```
 

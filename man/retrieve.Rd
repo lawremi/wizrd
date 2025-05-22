@@ -31,7 +31,7 @@ retrieve(x, from, ...)
 }
 \author{Michael Lawrence}
 \seealso{
-  \code{\link{rag_from}}, which implements the full RAG workflow.
+  \code{\link{rag_with}}, which implements the full RAG workflow.
 }
 \note{
   The RAG capabilities of \pkg{wizrd} are currently experimental and quite

@@ -33,7 +33,7 @@ text_store(index, text = NULL)
 \author{Michael Lawrence}
 \seealso{
   \code{\link{retrieve}} for retrieving text chunks from a
-  store. \code{\link{rag_from}}, for using the returned object in
+  store. \code{\link{rag_with}}, for using the returned object in
   RAG. \code{persist} and \code{restore} for persistence of text stores.
 }
 \note{
@@ -51,7 +51,7 @@ text_store(index, text = NULL)
 \dontrun{
     chunks <- chunk(tools::Rd_db("S7"))
     store <- text_store(nomic(), chunks)
-    model <- llama() |> prompt_as(rag_from(store))
+    model <- llama() |> prompt_as(rag_with(store))
     predict(model, "new_property example")
 }
 }

@@ -40,7 +40,7 @@ system_prompt_as(x, format, ...)
   is sufficient, and the user can pass template parameters as a list (or
   similar object, like an environment) as the \code{input} argument to
   e.g. \code{\link{chat}}. An example of a more complex conversion is
-  Retrieval Augmented Generation (RAG), via \code{\link{rag_from}}.
+  Retrieval Augmented Generation (RAG), via \code{\link{rag_with}}.
 
   When passing Langsmith Hub IDs, note that \code{prompt_as} is
   considered the more general entry point, supporting chat and

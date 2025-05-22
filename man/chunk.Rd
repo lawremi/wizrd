@@ -108,7 +108,7 @@ default_chunking(x, ...)
 \dontrun{
     chunks <- chunk(tools::Rd_db("S7"))
     store <- text_store(nomic(), chunks)
-    model <- llama() |> prompt_as(rag_from(store))
+    model <- llama() |> prompt_as(rag_with(store))
     predict(model, "new_property example")
 }
 }
