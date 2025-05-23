@@ -36,8 +36,8 @@ restore(file)
     file <- tempfile("text", fileext = ".rds")
     persist(store, file)
     store <- restore(file)
-    model <- llama() |> prompt_as(rag_with(store))
-    predict(model, "new_property example")
+    agent <- llama() |> prompt_as(rag_with(store))
+    predict(agent, "new_property example")
 }
 }
 \keyword{ utilities }

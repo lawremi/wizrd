@@ -34,9 +34,9 @@ describe_with_Rd(tool)
         can_accept_as(x = class_formula, data = class_name, FUN = class_name) |>
         demonstrate(c(x = MPG.city ~ Origin, alist(data = Cars93, FUN = median)),
                     "the median of MPG.city by Origin in Cars93")
-    model <- equip(llama(), aggregate_tool)
+    agent <- equip(llama(), aggregate_tool)
     data(Cars93, package = "MASS")
-    predict(model,
+    predict(agent,
             "Mean of MPG.city for each Manufacturer in the Cars93 dataset")
 }
 }

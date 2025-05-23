@@ -27,7 +27,7 @@ text_store(index, text = NULL)
   }
 }
 \value{
-  A TextFormat object to be used as the prompt format for the model by
+  A TextFormat object to be used as the prompt format for the agent by
   passing it to \code{\link{prompt_as}}.
 }
 \author{Michael Lawrence}
@@ -42,7 +42,7 @@ text_store(index, text = NULL)
   the future.
 }
 \details{
-  The default index uses an embedding model to embed the chunks in an
+  The default index uses an embedding agent to embed the chunks in an
   N-dimensional space and indexes the embedding using the Annoy
   (Approximate Nearest Neighbors Oh Yeah) algorithm. Nearest neighbors
   are resolved using cosine similarity.
@@ -51,8 +51,8 @@ text_store(index, text = NULL)
 \dontrun{
     chunks <- chunk(tools::Rd_db("S7"))
     store <- text_store(nomic(), chunks)
-    model <- llama() |> prompt_as(rag_with(store))
-    predict(model, "new_property example")
+    agent <- llama() |> prompt_as(rag_with(store))
+    predict(agent, "new_property example")
 }
 }
 \keyword{ utilities }

@@ -6,7 +6,7 @@
   Prompt Construction
 }
 \description{
-  Configure a model to be prompted in a systematic way.
+  Configure an agent to be prompted in a systematic way.
 }
 \usage{
 prompt_as(x, format, ...)
@@ -26,7 +26,7 @@ system_prompt_as(x, format, ...)
     \href{https://smith.langchain.com/hub}{Langsmith Hub} ID. If it
     resembles a file, the file is read as a string and treated as a glue
     template. If it is a Langsmith Hub ID, the corresponding prompt
-    template is downloaded and set on the model (including the system
+    template is downloaded and set on the agent (including the system
     prompt). Both fstring (via \pkg{glue}) and mustache (via
     \pkg{whisker}) templates are supported from the hub.
   }

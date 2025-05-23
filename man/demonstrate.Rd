@@ -6,7 +6,7 @@
   Demonstrating with Examples
 }
 \description{
-  Decorates a tool or model with one or more examples, which is an
+  Decorates a tool or agent with one or more examples, which is an
   effective way to ensure correct behavior.
 }
 \usage{
@@ -30,13 +30,13 @@ demonstrate_all(x, examples)
 }
 \details{
   The input and output objects for each example are converted to/from
-  text in the same way as the actual input and output. For models, those
+  text in the same way as the actual input and output. For agents, those
   mappings are configured by \code{\link{prompt_as}} and
   \code{\link{output_as}}. For tools, the input should be a list of
   arguments corresponding to the function formals, modulo any
   customization via \code{\link{can_accept_as}}. The tool output is probably
   best described as a string, as anything more complex, like JSON
-  schema, tends to confuse models.
+  schema, tends to confuse agents.
 }
 \value{
   The input object except with newly declared examples.
@@ -48,9 +48,9 @@ demonstrate_all(x, examples)
         can_accept_as(x = class_formula, data = class_name, FUN = class_name) |>
         demonstrate(c(x = MPG.city ~ Origin, alist(data = Cars93, FUN = median)),
                     "the median of MPG.city by Origin in Cars93")
-    model <- equip(llama(), aggregate_tool)
+    agent <- equip(llama(), aggregate_tool)
     data(Cars93, package = "MASS")
-    predict(model,
+    predict(agent,
             "Mean of MPG.city for each Manufacturer in the Cars93 dataset")
 }
 }

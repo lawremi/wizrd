@@ -5,9 +5,9 @@
   Declaring Tool Parameters
 }
 \description{
-  Declares the tool parameters and their classes. The model is expected
+  Declares the tool parameters and their classes. The agent is expected
   to only provide the arguments specified, and \pkg{wizrd} will attempt
-  to convert whatever the model sends to the declared class.
+  to convert whatever the agent sends to the declared class.
 }
 \usage{
 can_accept_as(`_x`, ..., `_parameters` = list(...))
@@ -32,9 +32,9 @@ can_accept_as(`_x`, ..., `_parameters` = list(...))
   underlying function are taken as the parameters, and each accepts any
   value. \code{\dots}, if present, is declared as a list.
   
-  The model is expected to send only the declared parameters, with some
+  The agent is expected to send only the declared parameters, with some
   potentially being captured by \code{\dots} in the underlying
-  function. To request that the model send extra arguments (as a list)
+  function. To request that the agent send extra arguments (as a list)
   that would be captured by \code{\dots}, pass an argument named
   \code{"\dots"}, e.g. \code{accept_as(x, "..." = class_list)}, which is
   the default behavior as mentioned above.
@@ -51,7 +51,7 @@ can_accept_as(`_x`, ..., `_parameters` = list(...))
 \examples{
 \dontrun{
     var <- 1:10
-    model <- llama() |>
+    agent <- llama() |>
         equip(tool(mean) |> describe_with_Rd() |> can_accept_as(class_name)) |>
         predict("What is the mean of var?")
 }

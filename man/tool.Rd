@@ -2,11 +2,11 @@
 \alias{tool}
 
 \title{
-  Model Tools
+  Agent Tools
 }
 \description{
-  Convert an object, such as an R function or a model, into a Tool
-  object for use by a model. The \code{\link{equip}} function performs
+  Convert an object, such as an R function or an agent, into a Tool
+  object for use by an agent. The \code{\link{equip}} function performs
   this conversion automatically, but by calling \code{tool} directly,
   the user can customize the tool before equipping it.
 }
@@ -29,7 +29,7 @@ tool(x, name = deparse(substitute(x)), ...)
   the argument types and return type.
 }
 \details{
-  The more annotations on a tool, the more the model will understand how
+  The more annotations on a tool, the more the agent will understand how
   to use it. \code{\link{describe_with_Rd}} is a convenient way to
   annotate a tool based on a packaged R function with information from
   its man page.
@@ -38,14 +38,14 @@ tool(x, name = deparse(substitute(x)), ...)
   declared by \code{\link{can_accept_as}}, without any conversion by
   default.
 
-  Converting an Agent to a Tool enables a model to be called by
-  another model (enabling networks of agents), as well as the user by
+  Converting an Agent to a Tool enables an agent to be called by
+  another agent (enabling networks of agents), as well as the user by
   simply invoking it like any other function, fully realizing the goal
-  of the wizrd package: to program models as functions.
+  of the wizrd package: to program agents as functions.
   
   The call to the tool is evaluated in the \code{env} provided to
   \code{\link{chat}}, so any arguments converted to language objects
-  will be evaluated as R code. If the model sends a backquoted string,
+  will be evaluated as R code. If the agent sends a backquoted string,
   like \code{`x`}, it will be converted to a name and resolved
   dynamically, as shown in the examples.
 
@@ -55,7 +55,7 @@ tool(x, name = deparse(substitute(x)), ...)
 }
 \author{Michael Lawrence}
 \seealso{
-  \code{\link{equip}} for equipping a model with a tool; functions like
+  \code{\link{equip}} for equipping an agent with a tool; functions like
   \code{\link{can_accept_as}}, \code{\link{demonstrate}} and
   \code{\link{describe_with_Rd}} for further specifying a tool
 }

@@ -33,7 +33,7 @@ rag_with(store, k = 5L, min_similarity = 0L, ...)
 \author{Michael Lawrence}
 \seealso{
   \code{\link{prompt_as}}, to which the return value of \code{rag_with}
-  should be passed in order to configure a model to use RAG.
+  should be passed in order to configure an agent to use RAG.
 }
 \note{
   The RAG capabilities of \pkg{wizrd} are currently experimental and
@@ -44,8 +44,8 @@ rag_with(store, k = 5L, min_similarity = 0L, ...)
 \dontrun{
     chunks <- chunk(tools::Rd_db("S7"))
     store <- text_store(nomic(), chunks)
-    model <- llama() |> prompt_as(rag_with(store))
-    predict(model, "new_property example")
+    agent <- llama() |> prompt_as(rag_with(store))
+    predict(agent, "new_property example")
 }
 }
 \keyword{ utilities } 

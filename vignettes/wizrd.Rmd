@@ -46,7 +46,7 @@ self-contained, cross-platform llamafile binary for the llama 3.2 3B
 model. Behind the scenes, it starts up a local HTTP server (based on
 llama.cpp) through which it communicates with the R process. For more
 general use of local LLMs, it is recommended to install Ollama and use
-`ollama_agent()` to pull (if necessary) and run models with
+`ollama_agent()` to pull (if necessary) and run agents with
 Ollama. The `llama()` function is a convenience to run llama 3.2 3B
 with Ollama. Convenience functions exist for some other common models.
 
@@ -261,9 +261,9 @@ directly in this document.
 ```{r rag}
 chunks <- chunk(tools::Rd_db("S7"))
 store <- text_store(nomic(), chunks)
-model <- llama() |> prompt_as(rag_with(store))
+agent <- llama() |> prompt_as(rag_with(store))
 cat("#### new_property example\n")
-last_message(chat(model, "new_property example"))
+last_message(chat(agent, "new_property example"))
 ```
 
 ### Querying a data.frame
@@ -272,8 +272,8 @@ And here is an example of querying a data.frame using RAG:
 ```{r rag-df}
 chunks <- chunk(mtcars)
 store <- text_store(nomic(), chunks)
-model <- llama() |> prompt_as(rag_with(store))
-predict(model, "MPG of Datsun 710")
+agent <- llama() |> prompt_as(rag_with(store))
+predict(agent, "MPG of Datsun 710")
 ```
 
 ```{r end, include=FALSE}
