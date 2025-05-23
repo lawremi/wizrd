@@ -8,7 +8,7 @@
   Configure a model to adhere to specific output constraints.
 }
 \usage{
-output_as(x, format)
+output_as(x, format, ...)
 }
 \arguments{
   \item{x}{
@@ -22,6 +22,10 @@ output_as(x, format)
     directly encoding a JSON schema, it is usually more convenient to
     pass a stubbed data.frame (for data.frame outputs) or an S7 class,
     in which case the output is an instance of the class.
+  }
+  \item{\dots}{
+    Arguments passed to \code{convert} when converting \code{format} to
+    a TextFormat.
   }
 }
 \value{
