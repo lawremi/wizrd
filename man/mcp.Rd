@@ -1,7 +1,6 @@
 \name{mcp}
 \alias{connect_mcp}
-\alias{exec_mcp_server}
-\alias{mcp_test_server}
+\alias{start_mcp}
 \alias{tools}
 \alias{resources}
 \alias{prompts}
@@ -12,31 +11,40 @@
 }
 \description{
   Functions for interacting with MCP servers, which provide a standardized
-  interface for language models to access tools and resources.
+  interface for agents to access tools, resources and prompts.
 }
 \usage{
 connect_mcp(server)
 
-exec_mcp_server(server, ...)
+start_mcp(command, args = list())
 
-mcp_test_server(...)
+tools(x, ...)
 
-\method{tools}{MCPSession}(x)
+resources(x, ...)
 
-\method{resources}{MCPSession}(x)
-
-\method{prompts}{MCPSession}(x)
+prompts(x, ...)
 }
 \arguments{
   \item{server}{
-    URL to the MCP server. For \code{exec_mcp_server}, this can be a
-    command to start the server.
+    A specification of an MCP server. For local servers, this is
+    typically a commandline. For remote servers, it should be a
+    URL, typically just a hostname.
   }
-  \item{\dots}{
-    Arguments passed to the server process.
+  \item{command}{
+    Name of command to execute. If this is \dQuote{uvx},
+    and \command{uvx} is not found on the path, \pkg{reticulate} is used to
+    install \command{uvx} and run the command (\command{uvx} is a
+    popular Python package manager, so this ensures that a registered
+    Python MCP server can be automatically installed anywhere).
+  }
+  \item{args}{
+    List of string arguments to pass to \code{command}
   }
   \item{x}{
     The MCP session returned by \code{connect_mcp}
+  }
+  \item{\dots}{
+    Additional arguments for methods.
   }
 }
 \value{
@@ -47,8 +55,7 @@ mcp_test_server(...)
 \author{Michael Lawrence}
 \examples{
 \dontrun{
-    server <- exec_mcp_server("python -m wizrd.mcp")
-    session <- connect_mcp(wizrd:::mcp_test_server())
+    session <- connect_mcp(wizrd:::start_test_mcp())
     mcp_tools <- tools(session)
     result <- mcp_tools$add(1L, 2L)
 }

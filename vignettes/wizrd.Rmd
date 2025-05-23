@@ -210,7 +210,7 @@ Here's an example of using MCP to interact with a data analysis server:
 # Start the data analysis server
 mcp_args <- c("fastmcp", "run",
               system.file("mcp", "data_server.py", package = "wizrd"))
-server <- exec_mcp_server("uvx", mcp_args)
+server <- start_mcp("uvx", mcp_args)
 
 # Create an MCP session
 session <- connect_mcp(server)

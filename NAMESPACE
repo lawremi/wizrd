@@ -27,7 +27,7 @@ export(llama, llamafile_llama, llama_vision, nomic)
 # persistence
 export(persist, restore)
 # MCP
-export(connect_mcp, exec_mcp_server)
+export(connect_mcp, start_mcp)
 # c() methods; exported to gratiate R CMD check, since they are in \usage{}
 export(c.Chat, c.Agent, c.ChatPipeline)
 

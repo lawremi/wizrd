@@ -460,21 +460,21 @@ try_uv_pipex <- function(command, args) {
         uv_pipex(args[1L], args[-1L])
 }
 
-exec_mcp_server <- function(command, args = list()) {
+start_mcp <- function(command, args = list()) {
     assert_string(command)
     assert_character(args, any.missing = FALSE)
     require_ns("processx", "connect to stdio-based MCP servers")
     try_uv_pipex(command, args) %||% pipex(command, args)
 }
 
-mcp_test_server <- function(transport = c("stdio", "sse"), port) {
+start_test_mcp <- function(transport = c("stdio", "sse"), port) {
     transport <- match.arg(transport)
     args <- c("fastmcp", "run",
               system.file("mcp", "server.py", package = "wizrd"),
               "--transport", transport)
     if (transport == "sse")
         args <- c(args, "--port", port)
-    server <- exec_mcp_server("uvx", args)
+    server <- start_mcp("uvx", args)
     if (transport == "sse")
         wait_until_port_open(port)
     server
@@ -484,11 +484,15 @@ method(tools, MCPSession) <- function(x) {
     x$listTools()
 }
 
-resources <- function(x) {
+resources := new_generic("x")
+
+method(resources, MCPSession) <- function(x) {
     c(x$listResources(), x$listResourceTemplates())
 }
 
-prompts <- function(x) {
+prompts := new_generic("x")
+
+method(prompts, MCPSession) <- function(x) {
     x$listPrompts()
 }
 
