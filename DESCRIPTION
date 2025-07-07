@@ -44,7 +44,7 @@ Depends:
 Encoding: UTF-8
 RoxygenNote: 7.1.1
 VignetteBuilder: knitr
-URL: https://github.com/lawremi/wizrd
+URL: https://github.com/lawremi/wizrd, https://lawremi.github.io/wizrd, https://lawremi.github.io/wizrd/
 BugReports: https://github.com/lawremi/wizrd/issues
 Collate: utils.R ToolCall.R TextFormat.R ChatMessage.R LanguageModelParams.R
 	 TextProtocol.R ToolSignature.R Tool.R MediaURI.R LanguageModelBackend.R 

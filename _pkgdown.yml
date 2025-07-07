@@ -1,0 +1,32 @@
+url: https://lawremi.github.io/wizrd/
+template:
+  params:
+    bootswatch: cosmo
+    bs_version: 5
+articles:
+- title: Vignettes
+  contents: wizrd
+navbar:
+  structure:
+    left:
+    - intro
+    - reference
+    - articles
+    - news
+    right: github
+  components:
+    news: ~
+    github:
+      icon: fa-github fa-lg
+      href: https://github.com/lawremi/wizrd
+
+footer:
+  left:
+    - href: https://github.com/lawremi/wizrd
+      text: Source code
+    - href: https://github.com/lawremi/wizrd/issues
+      text: Report a bug
+  right:
+  - href: https://lawremi.github.io/wizrd/
+    text: Documentation
+
