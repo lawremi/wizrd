@@ -72,7 +72,7 @@
                         <h4 data-toc-skip class="author">Michael
 Lawrence</h4>
             
-            <h4 data-toc-skip class="date">2025-07-09</h4>
+            <h4 data-toc-skip class="date">2025-07-15</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/lawremi/wizrd/blob/main/vignettes/wizrd.Rmd" class="external-link"><code>vignettes/wizrd.Rmd</code></a></small>
       <div class="hidden name"><code>wizrd.Rmd</code></div>
@@ -314,36 +314,36 @@ variable in the mtcars dataset.</p>
 <span><span class="co">#&gt; To analyze the relationship between miles per gallon (mpg) and weight (wt) in</span></span>
 <span><span class="co">#&gt; the provided dataset, we can consider the following points:</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; 1. **General Trend**: Typically, in automotive datasets, there is an inverse</span></span>
-<span><span class="co">#&gt; relationship between mpg and weight. As the weight of a vehicle increases, the</span></span>
-<span><span class="co">#&gt; fuel efficiency (mpg) tends to decrease. Heavier vehicles require more energy</span></span>
-<span><span class="co">#&gt; to move, which can lead to lower fuel efficiency.</span></span>
+<span><span class="co">#&gt; 1. **General Trend**: Typically, there is an inverse relationship between mpg</span></span>
+<span><span class="co">#&gt; and weight. As the weight of a vehicle increases, the fuel efficiency (mpg)</span></span>
+<span><span class="co">#&gt; tends to decrease. Heavier vehicles require more energy to move, which often</span></span>
+<span><span class="co">#&gt; results in lower fuel efficiency.</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; 2. **Visual Representation**: A scatter plot of mpg against wt would help</span></span>
-<span><span class="co">#&gt; visualize this relationship. In such a plot, we would expect to see a downward</span></span>
-<span><span class="co">#&gt; trend, indicating that as weight increases, mpg decreases.</span></span>
+<span><span class="co">#&gt; 2. **Data Visualization**: A scatter plot of mpg versus wt would help visualize</span></span>
+<span><span class="co">#&gt; this relationship. In such a plot, we would expect to see a downward trend,</span></span>
+<span><span class="co">#&gt; indicating that as weight increases, mpg decreases.</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; 3. **Statistical Analysis**: To quantify the relationship, we could calculate</span></span>
-<span><span class="co">#&gt; the correlation coefficient between mpg and wt. A negative correlation</span></span>
-<span><span class="co">#&gt; coefficient would suggest that as weight increases, mpg decreases.</span></span>
+<span><span class="co">#&gt; 3. **Statistical Analysis**: We could calculate the correlation coefficient</span></span>
+<span><span class="co">#&gt; between mpg and wt to quantify the strength and direction of the relationship.</span></span>
+<span><span class="co">#&gt; A negative correlation would suggest that as weight increases, mpg decreases.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 4. **Regression Analysis**: Performing a linear regression analysis could</span></span>
 <span><span class="co">#&gt; provide a more detailed understanding of the relationship. The regression</span></span>
 <span><span class="co">#&gt; equation would help predict mpg based on weight and provide insights into how</span></span>
-<span><span class="co">#&gt; much mpg decreases for each unit increase in weight.</span></span>
+<span><span class="co">#&gt; much mpg decreases with each unit increase in weight.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 5. **Outliers**: It would be important to identify any outliers in the dataset</span></span>
-<span><span class="co">#&gt; that may skew the results. For example, very heavy vehicles with unexpectedly</span></span>
-<span><span class="co">#&gt; high mpg or very light vehicles with low mpg could affect the overall trend.</span></span>
+<span><span class="co">#&gt; that may skew the results. For example, very light or very heavy vehicles with</span></span>
+<span><span class="co">#&gt; unusually high or low mpg could affect the overall trend.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 6. **Categorical Analysis**: It may also be useful to analyze the relationship</span></span>
 <span><span class="co">#&gt; within different categories of cylinders (cyl) or transmission types (am) to</span></span>
 <span><span class="co">#&gt; see if the relationship holds across different types of vehicles.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; In summary, the relationship between mpg and wt is expected to be negative,</span></span>
-<span><span class="co">#&gt; indicating that as weight increases, fuel efficiency decreases. Further</span></span>
-<span><span class="co">#&gt; statistical analysis would provide more concrete insights into the strength and</span></span>
-<span><span class="co">#&gt; nature of this relationship.</span></span></code></pre></div>
+<span><span class="co">#&gt; with heavier vehicles generally having lower fuel efficiency. Further analysis</span></span>
+<span><span class="co">#&gt; through visualization and statistical methods would provide a clearer picture</span></span>
+<span><span class="co">#&gt; of this relationship.</span></span></code></pre></div>
 <p>By calling <code><a href="../reference/prompt_as.html">prompt_as()</a></code>, we parameterized the agent using
 a glue template to accept parameters named <code>var1</code> and
 <code>var2</code>. By passing <code>"mpg"</code> and <code>"wt"</code>
@@ -360,8 +360,8 @@ instructions, inserted into the system prompt, using the
 <code class="sourceCode R"><span><span class="va">instructed_agent</span> <span class="op">&lt;-</span> <span class="va">parameterized_agent</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="../reference/instruct.html">instruct</a></span><span class="op">(</span><span class="st">"Answer questions about this dataset:"</span>, <span class="va">mtcars</span>,</span>
 <span>             <span class="st">"When comparing variables, calculate their correlation."</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/chat.html">chat</a></span><span class="op">(</span><span class="va">instructed_agent</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>var1 <span class="op">=</span> <span class="st">"mpg"</span>, var2 <span class="op">=</span> <span class="st">"wt"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">#&gt; &lt;Chat&gt;: 3 messages</span></span>
+<span><span class="fu"><a href="../reference/chat.html">chat</a></span><span class="op">(</span><span class="va">instructed_agent</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>var1 <span class="op">=</span> <span class="st">"mpg"</span>, var2 <span class="op">=</span> <span class="st">"wt"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;Chat&gt;: 3 messages</span></span>
 <span><span class="co">#&gt;  - - - - - - - - - - - - - - - - Latest messages  - - - - - - - - - - - - - - - </span></span>
 <span><span class="co">#&gt;                                     ┌──────────────────────────────────────────┐</span></span>
 <span><span class="co">#&gt;                                     │                                          │</span></span>
@@ -370,37 +370,36 @@ instructions, inserted into the system prompt, using the
 <span><span class="co">#&gt;                                     │                                          │</span></span>
 <span><span class="co">#&gt;                                     └──────────────────────────────────────────┘</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; To analyze the relationship between miles per gallon (mpg) and weight (wt), we</span></span>
-<span><span class="co">#&gt; can calculate the correlation coefficient. The correlation coefficient (often</span></span>
-<span><span class="co">#&gt; denoted as "r") measures the strength and direction of a linear relationship</span></span>
-<span><span class="co">#&gt; between two variables.</span></span>
+<span><span class="co">#&gt; To analyze the relationship between miles per gallon (mpg) and weight (wt) in</span></span>
+<span><span class="co">#&gt; the dataset, we can calculate the correlation coefficient. The correlation</span></span>
+<span><span class="co">#&gt; coefficient (Pearson's r) measures the strength and direction of the linear</span></span>
+<span><span class="co">#&gt; relationship between two variables.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 1. **Data Extraction**: We will extract the mpg and wt values from the dataset.</span></span>
+<span><span class="co">#&gt; 2. **Calculation of Correlation**: We will calculate the correlation</span></span>
+<span><span class="co">#&gt; coefficient using the formula for Pearson's r.</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; 2. **Calculation of Correlation**: The correlation coefficient can be</span></span>
-<span><span class="co">#&gt; calculated using the formula:</span></span>
+<span><span class="co">#&gt; Here are the steps to calculate the correlation coefficient:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; - Calculate the mean of mpg and wt.</span></span>
+<span><span class="co">#&gt; - Calculate the covariance between mpg and wt.</span></span>
+<span><span class="co">#&gt; - Calculate the standard deviation of mpg and wt.</span></span>
+<span><span class="co">#&gt; - Use the formula for Pearson's r:</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; \[</span></span>
-<span><span class="co">#&gt; r = \frac{n(\sum xy) - (\sum x)(\sum y)}{\sqrt{[n\sum x^2 - (\sum x)^2][n\sum</span></span>
-<span><span class="co">#&gt; y^2 - (\sum y)^2]}}</span></span>
+<span><span class="co">#&gt; r = \frac{cov(X, Y)}{std(X) \cdot std(Y)}</span></span>
 <span><span class="co">#&gt; \]</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; where:</span></span>
-<span><span class="co">#&gt; - \( n \) is the number of pairs,</span></span>
-<span><span class="co">#&gt; - \( x \) represents mpg values,</span></span>
-<span><span class="co">#&gt; - \( y \) represents wt values.</span></span>
+<span><span class="co">#&gt; Where:</span></span>
+<span><span class="co">#&gt; - \( cov(X, Y) \) is the covariance between mpg (X) and wt (Y).</span></span>
+<span><span class="co">#&gt; - \( std(X) \) is the standard deviation of mpg.</span></span>
+<span><span class="co">#&gt; - \( std(Y) \) is the standard deviation of wt.</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; 3. **Interpretation**: The value of r ranges from -1 to 1:</span></span>
-<span><span class="co">#&gt; - r = 1 indicates a perfect positive correlation,</span></span>
-<span><span class="co">#&gt; - r = -1 indicates a perfect negative correlation,</span></span>
-<span><span class="co">#&gt; - r = 0 indicates no correlation.</span></span>
+<span><span class="co">#&gt; ### Calculation</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Let's calculate the correlation coefficient for mpg and wt using the provided</span></span>
-<span><span class="co">#&gt; dataset.</span></span>
+<span><span class="co">#&gt; Using the provided dataset, we can compute the correlation coefficient:</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### Data Points</span></span>
-<span><span class="co">#&gt; Here are the mpg and wt values extracted from the dataset:</span></span>
-<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; 1. **Extracted Values**:</span></span>
 <span><span class="co">#&gt; - mpg: [21, 21, 22.8, 21.4, 18.7, 18.1, 14.3, 24.4, 22.8, 19.2, 17.8, 16.4,</span></span>
 <span><span class="co">#&gt; 17.3, 15.2, 10.4, 10.4, 14.7, 32.4, 30.4, 33.9, 21.5, 15.5, 15.2, 13.3, 19.2,</span></span>
 <span><span class="co">#&gt; 27.3, 26, 30.4, 15.8, 19.7, 15, 21.4]</span></span>
@@ -408,43 +407,23 @@ instructions, inserted into the system prompt, using the
 <span><span class="co">#&gt; 4.07, 3.73, 3.78, 5.25, 5.424, 5.345, 2.2, 1.615, 1.835, 2.465, 3.52, 3.435,</span></span>
 <span><span class="co">#&gt; 3.84, 3.845, 1.935, 2.14, 1.513, 3.17, 2.77, 3.57, 2.78]</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### Calculation</span></span>
-<span><span class="co">#&gt; Using statistical software or a programming language like Python or R, we can</span></span>
-<span><span class="co">#&gt; compute the correlation coefficient.</span></span>
+<span><span class="co">#&gt; 2. **Performing the Calculation**:</span></span>
+<span><span class="co">#&gt; - After performing the calculations (which can be done using statistical</span></span>
+<span><span class="co">#&gt; software or programming languages like Python or R), we find that the</span></span>
+<span><span class="co">#&gt; correlation coefficient \( r \) between mpg and wt is approximately -0.87.</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; For example, in Python, you could use:</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ```python</span></span>
-<span><span class="co">#&gt; import numpy as np</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; mpg = np.array([21, 21, 22.8, 21.4, 18.7, 18.1, 14.3, 24.4, 22.8, 19.2, 17.8,</span></span>
-<span><span class="co">#&gt; 16.4, 17.3, 15.2, 10.4, 10.4, 14.7, 32.4, 30.4, 33.9, 21.5, 15.5, 15.2, 13.3,</span></span>
-<span><span class="co">#&gt; 19.2, 27.3, 26, 30.4, 15.8, 19.7, 15, 21.4])</span></span>
-<span><span class="co">#&gt; wt = np.array([2.62, 2.875, 2.32, 3.215, 3.44, 3.46, 3.57, 3.19, 3.15, 3.44,</span></span>
-<span><span class="co">#&gt; 3.44, 4.07, 3.73, 3.78, 5.25, 5.424, 5.345, 2.2, 1.615, 1.835, 2.465, 3.52,</span></span>
-<span><span class="co">#&gt; 3.435, 3.84, 3.845, 1.935, 2.14, 1.513, 3.17, 2.77, 3.57, 2.78])</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; correlation = np.corrcoef(mpg, wt)[0, 1]</span></span>
-<span><span class="co">#&gt; print(correlation)</span></span>
-<span><span class="co">#&gt; ```</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### Result</span></span>
-<span><span class="co">#&gt; After performing the calculation, you would find that the correlation</span></span>
-<span><span class="co">#&gt; coefficient between mpg and wt is typically negative, indicating that as the</span></span>
-<span><span class="co">#&gt; weight of the car increases, the miles per gallon tends to decrease. This is a</span></span>
-<span><span class="co">#&gt; common relationship in automotive data, as heavier vehicles generally consume</span></span>
-<span><span class="co">#&gt; more fuel.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### Conclusion</span></span>
-<span><span class="co">#&gt; In summary, the analysis of the relationship between mpg and wt shows a</span></span>
-<span><span class="co">#&gt; negative correlation, suggesting that increased weight is associated with lower</span></span>
-<span><span class="co">#&gt; fuel efficiency (mpg).</span></span></code></pre>
+<span><span class="co">#&gt; ### Interpretation</span></span>
+<span><span class="co">#&gt; The correlation coefficient of -0.87 indicates a strong negative correlation</span></span>
+<span><span class="co">#&gt; between mpg and wt. This means that as the weight of the vehicle increases, the</span></span>
+<span><span class="co">#&gt; miles per gallon (fuel efficiency) tends to decrease. This is consistent with</span></span>
+<span><span class="co">#&gt; the expectation that heavier vehicles generally consume more fuel, leading to</span></span>
+<span><span class="co">#&gt; lower fuel efficiency.</span></span></code></pre></div>
 <p>The agent will now provide a more structured analysis including
 correlation, interpretation, and visualization suggestions. However, it
 is not able to carry out the correlation calculation.</p>
 <p>To solve this, we can provide a tool that performs the actual
 correlation calculation:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">calculate_correlation</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">var1</span>, <span class="va">var2</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cor</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">[[</span><span class="va">var1</span><span class="op">]</span><span class="op">]</span>, <span class="va">mtcars</span><span class="op">[[</span><span class="va">var2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
@@ -452,15 +431,15 @@ correlation calculation:</p>
 <span><span class="va">equipped_agent</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/chat.html">chat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>var1 <span class="op">=</span> <span class="st">"mpg"</span>, var2 <span class="op">=</span> <span class="st">"wt"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;Chat&gt;: 5 messages</span></span>
 <span><span class="co">#&gt;  - - - - - - - - - - - - - - - - Latest messages  - - - - - - - - - - - - - - - </span></span>
-<span><span class="co">#&gt;                               + call_5DxwNK37PaGI… +</span></span>
+<span><span class="co">#&gt;                               + call_azyzl55mXeY3… +</span></span>
 <span><span class="co">#&gt;                               |                    |</span></span>
 <span><span class="co">#&gt;                               |   [1] -0.8676594   |</span></span>
 <span><span class="co">#&gt;                               |                    |</span></span>
 <span><span class="co">#&gt;                               +--------------------+</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; The correlation between miles per gallon (mpg) and weight (wt) is approximately</span></span>
-<span><span class="co">#&gt; -0.87. This indicates a strong negative correlation, meaning that as the weight</span></span>
-<span><span class="co">#&gt; of the vehicle increases, the miles per gallon tends to decrease.</span></span></code></pre></div>
+<span><span class="co">#&gt; The correlation coefficient between miles per gallon (mpg) and weight (wt) is</span></span>
+<span><span class="co">#&gt; approximately -0.87. This indicates a strong negative correlation, meaning that</span></span>
+<span><span class="co">#&gt; as the weight of the vehicle increases, the miles per gallon tends to decrease.</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="constraining-output">Constraining output<a class="anchor" aria-label="anchor" href="#constraining-output"></a>
@@ -469,7 +448,7 @@ correlation calculation:</p>
 necessary to convert the output to a more standardized and computable
 object. We can use the <code><a href="../reference/output_as.html">output_as()</a></code> function to structure
 our analysis results:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Return the correlation as a single number</span></span>
 <span><span class="va">equipped_agent</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="../reference/output_as.html">output_as</a></span><span class="op">(</span><span class="fu">S7</span><span class="fu">::</span><span class="va"><a href="https://rconsortium.github.io/S7/reference/base_classes.html" class="external-link">class_numeric</a></span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -508,7 +487,7 @@ our analysis results:</p>
 <span>    <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="st">"Average mpg and hp by number of cylinders."</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   cyl avg_mpg avg_hp</span></span>
 <span><span class="co">#&gt; 1   4    24.1   91.5</span></span>
-<span><span class="co">#&gt; 2   6    18.9  123.5</span></span>
+<span><span class="co">#&gt; 2   6    18.9  130.5</span></span>
 <span><span class="co">#&gt; 3   8    15.1  209.5</span></span>
 <span></span>
 <span><span class="co"># Using class_data.frame for more general output</span></span>
@@ -537,7 +516,7 @@ of agent outputs into any R object structure defined using S7.</p>
 <p>Since the agent is already behaving like a function, it is relatively
 straightforward to convert it into an actual R function using the
 <code>convert()</code> generic from S7:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Convert the filtered agent to a function</span></span>
 <span><span class="va">filter_cars</span> <span class="op">&lt;-</span> <span class="fu">S7</span><span class="fu">::</span><span class="fu"><a href="https://rconsortium.github.io/S7/reference/convert.html" class="external-link">convert</a></span><span class="op">(</span><span class="va">filtered_agent</span>, <span class="fu">S7</span><span class="fu">::</span><span class="va"><a href="https://rconsortium.github.io/S7/reference/base_classes.html" class="external-link">class_function</a></span><span class="op">)</span></span>
 <span><span class="fu">filter_cars</span><span class="op">(</span><span class="st">"Cars with mpg &gt; 30"</span><span class="op">)</span></span>
@@ -559,7 +538,7 @@ straightforward to convert it into an actual R function using the
 including tools, prompts, and resources.</p>
 <p>Here’s an example of using MCP to interact with a data analysis
 server:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Start the data analysis server</span></span>
 <span><span class="va">mcp_args</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fastmcp"</span>, <span class="st">"run"</span>,</span>
 <span>              <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"mcp"</span>, <span class="st">"data_server.py"</span>, package <span class="op">=</span> <span class="st">"wizrd"</span><span class="op">)</span><span class="op">)</span></span>
@@ -607,7 +586,7 @@ to the query. Finally, it sends the query for an example of the
 formats, including markdown derivatives, HTML and PDF.</p>
 <p>Since the output is markdown, we embed it directly in this
 document.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">chunks</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/chunk.html">chunk</a></span><span class="op">(</span><span class="fu">tools</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/tools/Rdutils.html" class="external-link">Rd_db</a></span><span class="op">(</span><span class="st">"S7"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">store</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/text_store.html">text_store</a></span><span class="op">(</span><span class="fu"><a href="../reference/convenience-models.html">nomic</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">chunks</span><span class="op">)</span></span>
 <span><span class="va">agent</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/convenience-models.html">llama</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/prompt_as.html">prompt_as</a></span><span class="op">(</span><span class="fu"><a href="../reference/rag_with.html">rag_with</a></span><span class="op">(</span><span class="va">store</span><span class="op">)</span><span class="op">)</span></span>
@@ -669,7 +648,7 @@ document.</p>
 <h4 id="querying-a-data-frame">Querying a data.frame<a class="anchor" aria-label="anchor" href="#querying-a-data-frame"></a>
 </h4>
 <p>And here is an example of querying a data.frame using RAG:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">chunks</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/chunk.html">chunk</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">)</span></span>
 <span><span class="va">store</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/text_store.html">text_store</a></span><span class="op">(</span><span class="fu"><a href="../reference/convenience-models.html">nomic</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">chunks</span><span class="op">)</span></span>
 <span><span class="va">agent</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/convenience-models.html">llama</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/prompt_as.html">prompt_as</a></span><span class="op">(</span><span class="fu"><a href="../reference/rag_with.html">rag_with</a></span><span class="op">(</span><span class="va">store</span><span class="op">)</span><span class="op">)</span></span>
