@@ -4,7 +4,7 @@ Title: An R Interface to Large Language Models
 Version: 0.1.0
 Authors@R: c(
 		person(given = "Michael", family = "Lawrence",
-		       role = c("aut", "cre"), email = "michafla@gene.com")
+		       role = c("aut", "cre"), email = "lawremi@gmail.com")
 	   )
 Description: Enables embedding Large Language Models (LLMs) in R programs by
 	     treating them as functions with structured inputs and
