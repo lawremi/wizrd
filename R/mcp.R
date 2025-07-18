@@ -467,15 +467,16 @@ start_mcp <- function(command, args = list()) {
     try_uv_pipex(command, args) %||% pipex(command, args)
 }
 
-start_test_mcp <- function(transport = c("stdio", "sse"), port) {
+start_test_mcp <- function(transport = c("stdio", "http", "sse"), port) {
     transport <- match.arg(transport)
     args <- c("fastmcp", "run",
               system.file("mcp", "server.py", package = "wizrd"),
               "--transport", transport)
-    if (transport == "sse")
+    remote <- transport %in% c("http", "sse")
+    if (remote)
         args <- c(args, "--port", port)
     server <- start_mcp("uvx", args)
-    if (transport == "sse")
+    if (remote)
         wait_until_port_open(port)
     server
 }

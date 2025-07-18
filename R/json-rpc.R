@@ -49,21 +49,23 @@ JSONRPCResponse := new_class(
     )
 )
 
-PostSSEEndpoint := new_class(
+HTTPEndpoint := new_class(
     properties = list(
-        post_req = S3_httr2_request,
-        sse_resp = S3_httr2_response,
-        auth = nullable(OAuth),
-        base_url = scalar(class_character, getter = function(self) {
-            self@post_req$url |> httr2::url_modify(path = NULL)
-        })
-    )
+        req = S3_httr2_request,
+        resp = nullable(S3_httr2_response),
+        auth = nullable(OAuth)
+    ),
+    abstract = TRUE
 )
 
-ws_endpoint <- function(url) {
-    require_ns("websocket", "connect to websocket-based MCP servers")
-    BufferedWebSocket(webSocket = WebSocket$new(url))
-}
+PostSSEEndpoint := new_class(HTTPEndpoint)
+
+StreamableHTTPEndpoint := new_class(
+    HTTPEndpoint,
+    properties = list(
+        session_id = nullable(scalar(class_character))
+    )
+)
 
 post_sse_endpoint <- function(url) {
     sse_resp <- httr2::request(url) |>
@@ -75,17 +77,23 @@ post_sse_endpoint <- function(url) {
             httr2::url_build() |>
             httr2::request()
     else stop("expected 'endpoint' event from ", url)
-    PostSSEEndpoint(post_req = post_req, sse_resp = sse_resp)
+    PostSSEEndpoint(req = post_req, resp = sse_resp)
+}
+
+streamable_http_endpoint <- function(url) {
+    StreamableHTTPEndpoint(req = url |> httr2::request())
 }
 
 json_rpc_endpoint <- function(server) {
     if (is.character(server)) {
-        if (resembles_url(server, "ws") || resembles_url(server, "wss"))
-            ws_endpoint(server)
-        else if (resembles_url(server, "http") ||
-                     resembles_url(server, "https"))
-            post_sse_endpoint(server)
-        else server
+        if (resembles_url(server, "http") ||
+                resembles_url(server, "https")) {
+            if (url_path_ends_with(server, "sse"))
+                post_sse_endpoint(server)
+            else streamable_http_endpoint(server)
+        } else {
+            server
+        }
     } else {
         server
     }
@@ -129,73 +137,54 @@ method(send, list(class_character | class_json, union_connection)) <-
         to
     }
 
-WebSocket <- new_S3_class("WebSocket") # R6 class from the websocket package
-
-BufferedWebSocket := new_class(
-    properties = list(
-        buffer = new_property(
-            S3_connection,
-            setter = function(self, value) {
-                if (is.null(self@buffer))
-                    self@buffer <- value
-                else stop("@buffer is read only after construction")
-                self
-            },
-            default = quote(file())
-        ),
-        webSocket = new_property(
-            WebSocket,
-            setter = function(self, value) {
-                value$onMessage(function(event) {
-                    writeLines(event$data, self@buffer)
-                })
-                self@webSocket <- value
-                self
-            }
-        )
-    )
-)
-
-method(close, BufferedWebSocket) <- function(con, ...) {
-    con@webSocket$close()
-    close(con@buffer, ...)
-}
-
 method(close, Pipe) <- function(con, ...) {
     con@process$kill()
 }
 
 method(close, PostSSEEndpoint) <- function(con, ...) {
-    close(con@sse_resp)
+    close(con@resp)
 }
 
-method(send, list(class_character | class_json, WebSocket)) <- function(x, to) {
-    to$send(x)
-    to
+method(close, StreamableHTTPEndpoint) <- function(con, ...) {
+    con@req |>
+        httr2::req_method("DELETE") |>
+        httr2::req_headers("Mcp-Session-Id" = con@session_id) |>
+        httr2::req_perform()
 }
 
-method(send, list(class_any, BufferedWebSocket)) <- function(x, to) {
-    send(x, to@webSocket)
-    to
-}
+method(send, list(S3_httr2_request, PostSSEEndpoint)) <-
+    function(x, to) {
+        httr2::req_perform(x)
+        to
+    }
 
-method(send, list(class_character | class_json, PostSSEEndpoint)) <-
+method(send, list(S3_httr2_request, StreamableHTTPEndpoint)) <-
+    function(x, to) {
+        to@resp <- x |> httr2::req_headers(
+            "Mcp-Session-Id" = to@session_id,
+            "Accept" = "application/json, text/event-stream"
+        ) |> httr2::req_perform_connection(blocking = FALSE)
+        to@session_id <- httr2::resp_header(to@resp, "Mcp-Session-Id") %||%
+            to@session_id
+        to
+    }
+
+method(send, list(class_character | class_json, HTTPEndpoint)) <-
     function(x, to) {
         verbose_message("SEND: ", x)
-        req <- to@post_req |> httr2::req_body_raw(x)
+        req <- to@req |> httr2::req_body_raw(x, "application/json")
         if (!is.null(to@auth))
             req <- req |> req_oauth_with(to@auth)
-        tryCatch(
-            req |> httr2::req_perform(),
-            httr2_http_403 = function(cnd) {
+        to <- tryCatch(
+            req |> send(to),
+            httr2_http_401 = function(cnd) {
                 if (is.null(to@auth)) {
-                    to@auth <- oauth_auth_code(to@base_url)
+                    to@auth <- oauth_auth_code_for_response(cnd)
                     send(x, to)
                 } else {
                     stop(cnd)
                 }
-            }
-        )
+            })
         to
     }
 
@@ -210,8 +199,18 @@ method(read_json_rpc_response, union_connection) <- function(x) {
 }
 
 method(read_json_rpc_response, S3_httr2_response) <- function(x) {
-    event <- x |> httr2::resp_stream_sse()
-    event$data
+    ctype <- httr2::resp_content_type(x)
+    if (ctype == "application/json") {
+        lines <- character()
+        while(!httr2::resp_stream_is_complete(x))
+            lines <- c(lines, httr2::resp_stream_lines(x))
+        paste0(lines, collapse = "\n")
+    } else if (ctype == "text/event-stream") {
+        event <- httr2::resp_stream_sse(x)
+        event$data
+    } else {
+        stop("unsupported content type: ", ctype)
+    }
 }
 
 method(receive, list(union_connection | S3_httr2_response, JSONRPCResponse)) <-
@@ -237,11 +236,6 @@ method(receive, list(union_connection | S3_httr2_response, JSONRPCResponse)) <-
         on.exit(add = FALSE)
         receive(response, as)
     }
-
-method(receive, list(BufferedWebSocket, JSONRPCResponse)) <- function(from, as,
-                                                                      ...) {
-    receive(from@buffer, as, ...)
-}
 
 method(receive, list(class_character, JSONRPCResponse)) <- function(from, as,
                                                                     ...) {
@@ -276,8 +270,8 @@ method(receive, list(class_list, JSONRPCResponse)) <- function(from, as) {
     response
 }
 
-method(receive, list(PostSSEEndpoint, class_any)) <- function(from, as, ...) {
-    receive(from@sse_resp, as, ...)
+method(receive, list(HTTPEndpoint, class_any)) <- function(from, as, ...) {
+    receive(from@resp, as, ...)
 }
 
 method(response_class, JSONRPCRequest) <- function(x) JSONRPCResponse

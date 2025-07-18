@@ -62,6 +62,17 @@ test_that("the SSE transport layer works", {
     expect_identical(result, "Hello, R!")
 })
 
+test_that("the Streamable HTTP transport layer works", {
+    port <- wizrd:::find_available_port()
+    mcp_server <- wizrd:::start_test_mcp("http", port)
+    url <- paste0("http://127.0.0.1:", port, "/mcp")
+
+    session <- connect_mcp(url)
+    r <- resources(session)
+    result <- r$get_greeting("R")
+    expect_identical(result, "Hello, R!")
+})
+
 test_that("MCP errors work", {
     session <- connect_mcp(wizrd:::start_test_mcp())
     pf <- prompts(session)

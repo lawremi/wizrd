@@ -691,6 +691,11 @@ resembles_url <- function(x, scheme) {
     else TRUE
 }
 
+url_path_ends_with <- function(x, suffix) {
+    path <- httr2::url_parse(x)$path
+    endsWith(sub("/$", "", path), suffix)
+}
+
 read_as_string <- function(x) paste(readLines(x), collapse = "\n")
 
 s3_super <- function(from, to) {
