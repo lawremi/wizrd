@@ -1,0 +1,47 @@
+{
+    "id": "chatcmpl-BvRVN1EgSxr3WwkYxekPUEr5r3JG7",
+    "object": "chat.completion",
+    "created": 1753030125,
+    "model": "o4-mini-2025-04-16",
+    "choices": [
+        {
+            "index": 0,
+            "message": {
+                "role": "assistant",
+                "content": null,
+                "tool_calls": [
+                    {
+                        "id": "call_AF2Xxm3mAGU9WSQqWfeRctS3",
+                        "type": "function",
+                        "function": {
+                            "name": "get_data",
+                            "arguments": "{\"mart\":\"ENSEMBL_MART_ENSEMBL\",\"dataset\":\"hsapiens_gene_ensembl\",\"attributes\":[\"external_gene_name\",\"chromosome_name\",\"start_position\",\"end_position\",\"strand\"],\"filters\":{\"link_ensembl_gene_id\":\"ENSG00000141510,ENSG00000139618\"}}"
+                        }
+                    }
+                ],
+                "refusal": null,
+                "annotations": [
+
+                ]
+            },
+            "finish_reason": "tool_calls"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 3250,
+        "completion_tokens": 1045,
+        "total_tokens": 4295,
+        "prompt_tokens_details": {
+            "cached_tokens": 2816,
+            "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+            "reasoning_tokens": 960,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+        }
+    },
+    "service_tier": "default",
+    "system_fingerprint": null
+}

@@ -1,0 +1,47 @@
+{
+    "id": "chatcmpl-BvRWGX0G9MfbHeGEzMqz8Cdir34Dg",
+    "object": "chat.completion",
+    "created": 1753030180,
+    "model": "o4-mini-2025-04-16",
+    "choices": [
+        {
+            "index": 0,
+            "message": {
+                "role": "assistant",
+                "content": null,
+                "tool_calls": [
+                    {
+                        "id": "call_ep9qBgNsz3GAsY3UmE7qZat3",
+                        "type": "function",
+                        "function": {
+                            "name": "list_filters",
+                            "arguments": "{\"mart\":\"ENSEMBL_MART_ENSEMBL\",\"dataset\":\"hsapiens_gene_ensembl\"}"
+                        }
+                    }
+                ],
+                "refusal": null,
+                "annotations": [
+
+                ]
+            },
+            "finish_reason": "tool_calls"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 2129,
+        "completion_tokens": 426,
+        "total_tokens": 2555,
+        "prompt_tokens_details": {
+            "cached_tokens": 2048,
+            "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+            "reasoning_tokens": 384,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+        }
+    },
+    "service_tier": "default",
+    "system_fingerprint": null
+}

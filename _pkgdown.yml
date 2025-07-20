@@ -5,7 +5,9 @@ template:
     bs_version: 5
 articles:
 - title: Vignettes
-  contents: wizrd
+  contents:
+    - wizrd
+    - biomart-mcp
 navbar:
   structure:
     left:

@@ -1,0 +1,136 @@
+---
+title: "Natural Language BioMart Queries"
+author: "Michael Lawrence"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+    %\VignetteIndexEntry{Natural Language BioMart Queries}
+    %\VignetteEngine{knitr::rmarkdown}
+    %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>"
+)
+httptest2::start_vignette("bm-http")
+```
+
+# Overview
+
+This vignette demonstrates how to use the wizrd agent interface with the
+BioMart MCP server to perform natural language queries against Ensembl and
+other BioMart resources. Unlike traditional biomaRt workflows, you do not
+need to know the exact dataset, attribute, or filter names—just ask your
+question in plain English and get a data.frame result.
+
+## Important Note: pybiomart Limitations
+
+The BioMart MCP server uses the `pybiomart` Python package, which relies on an 
+older XML-based approach to BioMart. This limits its functionality compared to 
+the `biomaRt` R package, which uses direct API access. Some queries that work 
+with biomaRt may not be possible vwith the current MCP server.
+
+# Starting the BioMart MCP Server
+
+We begin by downloading the BioMart MCP server script to a temporary
+directory and launching it with all dependencies using `uvx` and
+`start_mcp()`.
+
+```{r biomart-mcp-server, message=FALSE}
+library(wizrd)
+library(GenomicRanges)
+
+biomart_mcp_path <- file.path(tempdir(), "biomart-mcp.py")
+download.file(
+    "https://raw.githubusercontent.com/jzinno/biomart-mcp/main/biomart-mcp.py",
+    biomart_mcp_path
+)
+
+server <- start_mcp(
+    "uvx",
+    c(
+        "--with", "pybiomart",
+        "fastmcp", "run", biomart_mcp_path
+    )
+)
+```
+
+Connect to the BioMart MCP server.
+
+```{r biomart-mcp-server-connect}
+session <- connect_mcp(server)
+```
+
+# Creating a Natural Language BioMart Agent
+
+We create an agent, equip it with the BioMart MCP tools, and instruct it to
+answer user queries using BioMart. All outputs are returned as data.frames
+for easy downstream analysis.
+
+```{r biomart-agent}
+biomart_tools <- tools(session)
+agent <- openai_agent("o4-mini") |>
+    equip(biomart_tools) |>
+    instruct(
+        "You are an expert in Ensembl gene annotation.",
+        "Answer user queries using BioMart,",
+        "using only strings for filter values, with lists comma-separated.",
+        "Return results as a data.frame."
+    ) |>
+    output_as(S7::class_data.frame)
+```
+
+# Example 1: Gene Coordinates (cf. biomaRt Section 3.1)
+
+In biomaRt, you must specify the dataset, attributes, and filters. With
+wizrd, just ask:
+
+```{r gene-coordinates}
+coords <- agent |>
+    output_as(as.data.frame(GRanges())) |>
+    predict(
+        "What are the chromosomal coordinates for TP53 and BRCA2?"
+    )
+coords |> makeGRangesFromDataFrame()
+```
+
+# Example 2: GO Term Query (cf. biomaRt Section 3.6)
+
+Retrieve all EntrezGene IDs and gene symbols for genes with MAP kinase
+activity (GO:0004707):
+
+```{r go-query}
+go_genes <- agent |>
+    predict(
+        "List all EntrezGene IDs and gene symbols with MAP kinase activity"
+    )
+go_genes
+```
+
+# Example 3: Genes on Specific Chromosomes (cf. biomaRt Section 3.3)
+
+Retrieve all HUGO gene symbols of genes located on chromosome 20
+and associated with a specific GO term:
+
+```{r chr-go-query}
+chr_go_genes <- agent |>
+    predict(paste(
+        "Retrieve all HUGO gene symbols of genes on chromosome 20",
+        "associated with GO:0005515 (protein binding)"
+    ))
+head(chr_go_genes)
+```
+
+# Conclusion
+
+With wizrd and the BioMart MCP server, you can perform complex biological
+queries using natural language, without needing to know the technical
+details of BioMart datasets, attributes, or filters. All results are
+returned as data.frames, making downstream analysis in R seamless and
+efficient. 
+
+```{r end, include=FALSE}
+httptest2::end_vignette()
+```
