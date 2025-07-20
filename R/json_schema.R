@@ -103,6 +103,29 @@ method(default_description, S7_S3_class) <- function(from) {
         "R formula"
 }
 
+method(as_json_schema, getClass("classGeneratorFunction")) <- function(from,
+                                                                       ...) {
+    getClass(x@className) |> as_json_schema(...)
+}
+
+method(as_json_schema, getClass("classRepresentation")) <- function(from, ...) {
+    infinitely_recurses <- function(slot) {
+        (is(slot, "classRepresentation") &&
+             extends(slot, from)) ||
+            (inherits(slot, S7_union) &&
+                 any(vapply(slot$classes, infinitely_recurses, logical(1L))))
+    }
+    new_class(from@className,
+              package = attr(from@className, "package"),
+              properties = lapply(from@slots, \(x) {
+                  s7_class <- getClass(x) |> as_class()
+                  if (infinitely_recurses(s7_class))
+                      class_any
+                  else s7_class
+              })) |>
+        as_json_schema(...)
+}
+
 base_json_schema <- function(from, description = NULL, scalar = FALSE,
                              named = FALSE)
 {
