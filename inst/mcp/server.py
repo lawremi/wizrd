@@ -5,7 +5,7 @@ from fastmcp.prompts.prompt import Message
 import anyio
 
 # Create an MCP server
-mcp = FastMCP("Demo", log_level="WARNING") # change to DEBUG for debugging
+mcp = FastMCP("Demo")
 
 
 # Add an addition tool
@@ -45,4 +45,4 @@ def debug_session_start(error_message: str) -> list[Message]:
     ]
 
 if __name__ == "__main__":
-    mcp.run()
+    mcp.run(log_level="WARNING") # or DEBUG for debugging
