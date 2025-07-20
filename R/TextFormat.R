@@ -241,6 +241,8 @@ class_jsonic <- new_S3_class("jsonic")
 
 dejsonify <- new_generic("dejsonify", c("x", "spec"))
 
+method(dejsonify, list(NULL, class_any)) <- function(x, spec) NULL
+
 method(dejsonify,
        list(class_list | class_jsonic | class_data.frame, S7_class)) <-
     function(x, spec) {

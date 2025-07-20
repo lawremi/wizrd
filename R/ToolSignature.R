@@ -50,6 +50,6 @@ method(print, Parameters) <- function(x, ...) {
 }
 
 method(convert, list(class_jsonic, ToolSignature)) <- function(from, to) {
-    ToolSignature(parameters = schema_S7_class(from, parent = Parameters),
+    ToolSignature(parameters = schema_class_object(from, parent = Parameters),
                   value = new_property(class_any))
 }
