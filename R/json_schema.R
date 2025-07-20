@@ -38,7 +38,8 @@ base_ancestor_class <- function(class) {
 method(as_json_schema, S7_class) <- function(from, description = NULL, ...) {
     if (identical(from, S7_object))
         return(s7_schema)
-    Rd <- get_Rd(from@name)
+    Rd <- if (!is.null(from@package) && from@package != getPackageName(topenv()))
+              get_Rd(from@name)
     arg_descriptions <- if (!is.null(Rd)) Rd_args(Rd) else list()
     props <- Filter(Negate(prop_read_only), from@properties)
     prop_schema <- Map(as_json_schema, props, arg_descriptions[names(props)]) |>
