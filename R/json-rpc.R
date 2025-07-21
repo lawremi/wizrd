@@ -24,7 +24,7 @@ JSONRPCRequest := new_class(
 JSONRPCNotification := new_class(
     JSONRPCRequest,
     properties = list(
-        id = NULL
+        id = optional(NULL)
     ), # See S7 PR#473 for why this is necessary
     constructor = function(.data = JSONRPCRequest(method = method, id = NULL,
                                                   ...),
