@@ -1,7 +1,7 @@
 {
-    "id": "chatcmpl-BvRUePrNrwM2sPGTcT2WPF1zKCEGZ",
+    "id": "chatcmpl-BvsOprFxVeCErTUcMxkIUmm89SdbR",
     "object": "chat.completion",
-    "created": 1753030080,
+    "created": 1753133507,
     "model": "o4-mini-2025-04-16",
     "choices": [
         {
@@ -11,10 +11,10 @@
                 "content": null,
                 "tool_calls": [
                     {
-                        "id": "call_5oCV7JtUVfMmwxTVbCz3xdnv",
+                        "id": "call_HCExuyzAdZ6785CThnp3WABH",
                         "type": "function",
                         "function": {
-                            "name": "list_common_attributes",
+                            "name": "list_filters",
                             "arguments": "{\"mart\":\"ENSEMBL_MART_ENSEMBL\",\"dataset\":\"hsapiens_gene_ensembl\"}"
                         }
                     }
@@ -28,15 +28,15 @@
         }
     ],
     "usage": {
-        "prompt_tokens": 2615,
-        "completion_tokens": 171,
-        "total_tokens": 2786,
+        "prompt_tokens": 2122,
+        "completion_tokens": 554,
+        "total_tokens": 2676,
         "prompt_tokens_details": {
-            "cached_tokens": 0,
+            "cached_tokens": 2048,
             "audio_tokens": 0
         },
         "completion_tokens_details": {
-            "reasoning_tokens": 128,
+            "reasoning_tokens": 512,
             "audio_tokens": 0,
             "accepted_prediction_tokens": 0,
             "rejected_prediction_tokens": 0

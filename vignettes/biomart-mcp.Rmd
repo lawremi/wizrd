@@ -100,12 +100,39 @@ coords <- agent |>
     predict(
         "What are the chromosomal coordinates for TP53 and BRCA2?"
     )
-coords |> makeGRangesFromDataFrame()
+coords |> makeGRangesFromDataFrame(keep.extra.columns = TRUE)
 ```
 
 The above relies on the GenomicRanges package in order to return a
 useful R data structure for further computations, but every query can
-return a simple data.frame, as demonstrated by the following.
+return a simple data.frame, as demonstrated in later examples.
+
+## biomaRt equivalent
+
+The biomaRt equivalent requires the user to learn how to use the
+biomaRt package, to determine many different identifiers, and to exert
+extra effort to convert the output to a GRanges.
+
+```{r biomart-equivalent-coords}
+library(biomaRt)
+mart <- useMart("ensembl", dataset = "hsapiens_gene_ensembl")
+getBM(
+    attributes = c(
+        "external_gene_name", "chromosome_name", "start_position",
+        "end_position", "strand"
+    ),
+    filters = "external_gene_name",
+    values = c("TP53", "BRCA2"),
+    mart = mart
+) |>
+    transform(strand = ifelse(strand > 0, "+", "-")) |>
+    makeGRangesFromDataFrame(
+        seqnames.field = "chromosome_name",
+        start.field = "start_position",
+        end.field = "end_position",
+        keep.extra.columns = TRUE
+    )
+```
 
 # Example 2: GO Term Query (cf. biomaRt Section 3.6)
 

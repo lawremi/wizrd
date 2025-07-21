@@ -39,7 +39,8 @@ Suggests:
     testthat (>= 3.0.0),
     httptest2,
     reticulate (>= 1.41.0),
-    GenomicRanges
+    GenomicRanges,
+    biomaRt
 Depends: 
     R (>= 4.3.0)
 Encoding: UTF-8

@@ -1,7 +1,7 @@
 {
-    "id": "chatcmpl-BvRUclLnBOoxcn9NADhguDDQG1Vbc",
+    "id": "chatcmpl-BvsPasNvTNbyw7hDXRB3Jf4IR6wOF",
     "object": "chat.completion",
-    "created": 1753030078,
+    "created": 1753133554,
     "model": "o4-mini-2025-04-16",
     "choices": [
         {
@@ -11,11 +11,11 @@
                 "content": null,
                 "tool_calls": [
                     {
-                        "id": "call_zeNczVnIFWyeAv4NmSiSvAQd",
+                        "id": "call_19jycQmfizVCgpMmR0tGUgmx",
                         "type": "function",
                         "function": {
-                            "name": "list_filters",
-                            "arguments": "{\"mart\":\"ENSEMBL_MART_ENSEMBL\",\"dataset\":\"hsapiens_gene_ensembl\"}"
+                            "name": "get_data",
+                            "arguments": "{\"mart\":\"ENSEMBL_MART_ENSEMBL\",\"dataset\":\"hsapiens_gene_ensembl\",\"attributes\":[\"entrezgene_id\",\"hgnc_symbol\"],\"filters\":{\"link_go_closure\":\"GO:0004707\"}}"
                         }
                     }
                 ],
@@ -28,15 +28,15 @@
         }
     ],
     "usage": {
-        "prompt_tokens": 2261,
-        "completion_tokens": 106,
-        "total_tokens": 2367,
+        "prompt_tokens": 7148,
+        "completion_tokens": 836,
+        "total_tokens": 7984,
         "prompt_tokens_details": {
-            "cached_tokens": 2048,
+            "cached_tokens": 0,
             "audio_tokens": 0
         },
         "completion_tokens_details": {
-            "reasoning_tokens": 64,
+            "reasoning_tokens": 768,
             "audio_tokens": 0,
             "accepted_prediction_tokens": 0,
             "rejected_prediction_tokens": 0
