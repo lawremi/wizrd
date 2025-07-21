@@ -127,7 +127,7 @@ method(as_json_schema, getClass("classRepresentation")) <- function(from, ...) {
 }
 
 base_json_schema <- function(from, description = NULL, scalar = FALSE,
-                             named = FALSE)
+                             named = FALSE, levels = NULL)
 {
     schema <- named_list()
     type <- if (named && "list" %in% from$class)
@@ -150,6 +150,7 @@ base_json_schema <- function(from, description = NULL, scalar = FALSE,
             "date-time"
         else if ("raw" %in% from$class)
             "byte"
+        schema$enum <- levels
     }
     
     schema
@@ -171,13 +172,13 @@ method(as_json_schema, S7_any) <- function(from, description = NULL) {
 }
 
 method(as_json_schema, S7_S3_class) <- function(from, description = NULL,
-                                                scalar = NULL)
+                                                scalar = NULL, levels = NULL)
 {
     known_vector_classes <- c("Date", "POSIXt", "factor", "data.frame",
                               "matrix", "array")
     if (is.null(scalar))
         scalar <- !any(from$class %in% known_vector_classes)
-    base_json_schema(from, description, scalar)
+    base_json_schema(from, description, scalar, levels = levels)
 }
 
 method(as_json_schema, S7_property) <- function(from, description = NULL, ...) {
@@ -225,7 +226,15 @@ method(as_json_schema, numeric_S7_property) <- function(from,
     c(schema, minimum = from$min, maximum = from$max)
 }
 
-json_schema_for_object <- function(x, ...) as_json_schema(class_object(x), ...)
+json_schema_for_object := new_generic("x")
+
+method(json_schema_for_object, class_any) <- function(x, ...) {
+    as_json_schema(class_object(x), ...)
+}
+
+method(json_schema_for_object, class_factor) <- function(x, ...) {
+    as_json_schema(class_factor, levels = levels(x), ...)
+}
 
 method(as_json_schema, class_data.frame) <- function(from, description = NULL) {
     schema <- list(title = "data_frame",
