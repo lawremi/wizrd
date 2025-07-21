@@ -320,7 +320,9 @@ vectorize_property <- function(x) {
 
 schema_class_array <- function(x) {
     item_class <- schema_class(x)
-    if (inherits(item_class, S7_class)) {
+    if (inherits(item_class, scalar_S7_property))
+        item_class$class
+    else if (inherits(item_class, S7_class)) {
         vector_props <- lapply(item_class@properties, vectorize_property)
         vector_class <- new_class(item_class@name, properties = vector_props)
         prototype <- as.data.frame(as.list(formals(vector_class)))
