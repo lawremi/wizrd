@@ -40,7 +40,6 @@ directory and launching it with all dependencies using `uvx` and
 
 ```{r biomart-mcp-server, message=FALSE}
 library(wizrd)
-library(GenomicRanges)
 
 biomart_mcp_path <- file.path(tempdir(), "biomart-mcp.py")
 download.file(
@@ -62,6 +61,13 @@ Connect to the BioMart MCP server.
 ```{r biomart-mcp-server-connect}
 session <- connect_mcp(server)
 ```
+
+Alternatively, you can connect to a hosted BioMart MCP server using:
+```{r eval=FALSE}
+session <- connect_mcp("https://server.smithery.ai/@jzinno/biomart-mcp/mcp")
+```
+This option requires a free account on smithery.ai and uses interactive
+authorization, so this vignette will use the local server.
 
 # Creating a Natural Language BioMart Agent
 
@@ -88,6 +94,7 @@ In biomaRt, you must specify the dataset, attributes, and filters. With
 wizrd, just ask:
 
 ```{r gene-coordinates}
+library(GenomicRanges)
 coords <- agent |>
     output_as(as.data.frame(GRanges())) |>
     predict(
@@ -95,6 +102,10 @@ coords <- agent |>
     )
 coords |> makeGRangesFromDataFrame()
 ```
+
+The above relies on the GenomicRanges package in order to return a
+useful R data structure for further computations, but every query can
+return a simple data.frame, as demonstrated by the following.
 
 # Example 2: GO Term Query (cf. biomaRt Section 3.6)
 
