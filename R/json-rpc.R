@@ -175,16 +175,17 @@ method(send, list(class_character | class_json, HTTPEndpoint)) <-
         req <- to@req |> httr2::req_body_raw(x, "application/json")
         if (!is.null(to@auth))
             req <- req |> req_oauth_with(to@auth)
-        to <- tryCatch(
-            req |> send(to),
-            httr2_http_401 = function(cnd) {
-                if (is.null(to@auth)) {
-                    to@auth <- oauth_auth_code_for_response(cnd)
-                    send(x, to)
-                } else {
-                    stop(cnd)
-                }
-            })
+        result <- tryCatch(req |> send(to), httr2_http_401 = identity)
+        if (inherits(result, "httr2_http_401")) {
+            if (is.null(to@auth)) {
+                to@auth <- oauth_auth_code_for_response(result$resp)
+                to <- send(x, to)
+            } else {
+                stop(cnd)
+            }
+        } else {
+            to <- result
+        }
         to
     }
 
