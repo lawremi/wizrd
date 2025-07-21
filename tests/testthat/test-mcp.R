@@ -93,3 +93,8 @@ test_that("MCP requests can be cancelled", {
     on.exit(options(opt))
     result <- mcp_tools$sleep()
 })
+
+test_that("dynamic oauth works", {
+    skip_if_not(interactive())
+    mcp_connect("https://server.smithery.ai/@jzinno/biomart-mcp/mcp")
+})
