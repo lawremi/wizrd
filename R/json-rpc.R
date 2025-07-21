@@ -201,12 +201,12 @@ method(read_json_rpc_response, union_connection) <- function(x) {
 
 method(read_json_rpc_response, S3_httr2_response) <- function(x) {
     ctype <- httr2::resp_content_type(x)
-    if (ctype == "application/json") {
+    if (identical(ctype, "application/json")) {
         lines <- character()
         while(!httr2::resp_stream_is_complete(x))
             lines <- c(lines, httr2::resp_stream_lines(x))
         paste0(lines, collapse = "\n")
-    } else if (ctype == "text/event-stream") {
+    } else if (identical(ctype, "text/event-stream")) {
         event <- httr2::resp_stream_sse(x)
         event$data
     } else {
