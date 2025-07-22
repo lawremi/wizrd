@@ -232,10 +232,6 @@ method(json_schema_for_object, class_any) <- function(x, ...) {
     as_json_schema(class_object(x), ...)
 }
 
-method(json_schema_for_object, class_factor) <- function(x, ...) {
-    as_json_schema(class_factor, levels = levels(x), ...)
-}
-
 method(as_json_schema, class_data.frame) <- function(from, description = NULL) {
     schema <- list(title = "data_frame",
                    type = "array",

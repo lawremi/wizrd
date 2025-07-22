@@ -1,14 +1,14 @@
 {
-    "id": "chatcmpl-BwFSG60knPgdx3k8U4fFy9qhj2J6m",
+    "id": "chatcmpl-BwH3nYNDwIxphSL5ZJD3LJMlykYdI",
     "object": "chat.completion",
-    "created": 1753222132,
+    "created": 1753228303,
     "model": "o4-mini-2025-04-16",
     "choices": [
         {
             "index": 0,
             "message": {
                 "role": "assistant",
-                "content": "{\"__boxed\":[\n \t\t\t\n\t\t]}",
+                "content": "{\"__boxed\":[{\"seqnames\":\"13\",\"start\":32315086,\"end\":32400268,\"width\":85183,\"strand\":\"+\"},{\"seqnames\":\"17\",\"start\":7661779,\"end\":7687546,\"width\":25767,\"strand\":\"-\"}]}",
                 "refusal": null,
                 "annotations": [
 
@@ -18,15 +18,15 @@
         }
     ],
     "usage": {
-        "prompt_tokens": 3406,
-        "completion_tokens": 674,
-        "total_tokens": 4080,
+        "prompt_tokens": 3302,
+        "completion_tokens": 73,
+        "total_tokens": 3375,
         "prompt_tokens_details": {
-            "cached_tokens": 2560,
+            "cached_tokens": 2176,
             "audio_tokens": 0
         },
         "completion_tokens_details": {
-            "reasoning_tokens": 640,
+            "reasoning_tokens": 0,
             "audio_tokens": 0,
             "accepted_prediction_tokens": 0,
             "rejected_prediction_tokens": 0

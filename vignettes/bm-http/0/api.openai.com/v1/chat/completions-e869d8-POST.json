@@ -1,7 +1,7 @@
 {
-    "id": "chatcmpl-BwFRUqs9FFwrH1cQtImDSOc36dzr9",
+    "id": "chatcmpl-BwH47IvvsRMqy26bIg7NhQzRBt1DO",
     "object": "chat.completion",
-    "created": 1753222084,
+    "created": 1753228323,
     "model": "o4-mini-2025-04-16",
     "choices": [
         {
@@ -11,11 +11,11 @@
                 "content": null,
                 "tool_calls": [
                     {
-                        "id": "call_uiebnlCCDG2N4pMBKGEwn295",
+                        "id": "call_MX3EZRVqT3J0NWfQ2Tmhptix",
                         "type": "function",
                         "function": {
-                            "name": "get_data",
-                            "arguments": "{\"mart\":\"ENSEMBL_MART_ENSEMBL\",\"dataset\":\"hsapiens_gene_ensembl\",\"attributes\":[\"external_gene_name\",\"chromosome_name\",\"start_position\",\"end_position\",\"strand\"],\"filters\":{\"hgnc_symbol\":\"TP53,BRCA2\"}}"
+                            "name": "list_all_attributes",
+                            "arguments": "{\"mart\":\"ENSEMBL_MART_ENSEMBL\",\"dataset\":\"hsapiens_gene_ensembl\"}"
                         }
                     }
                 ],
@@ -28,11 +28,11 @@
         }
     ],
     "usage": {
-        "prompt_tokens": 2924,
-        "completion_tokens": 523,
-        "total_tokens": 3447,
+        "prompt_tokens": 2771,
+        "completion_tokens": 491,
+        "total_tokens": 3262,
         "prompt_tokens_details": {
-            "cached_tokens": 0,
+            "cached_tokens": 2048,
             "audio_tokens": 0
         },
         "completion_tokens_details": {

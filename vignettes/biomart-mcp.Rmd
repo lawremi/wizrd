@@ -83,7 +83,7 @@ In biomaRt, you must specify the dataset, attributes, and filters. With
 wizrd, just ask:
 
 ```{r gene-coordinates}
-library(GenomicRanges)
+suppressPackageStartupMessages(library(GenomicRanges))
 coords <- agent |>
     output_as(as.data.frame(GRanges())) |>
     predict(
