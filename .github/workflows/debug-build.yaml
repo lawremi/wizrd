@@ -21,10 +21,9 @@ jobs:
           
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::pkgdown, local::.
-          needs: website
-          
-      - name: R CMD build
+          extra-packages: local::.
+
+      - name: Debugging window
         run: |
-          echo "=== Running R CMD build ==="
-          R CMD build . 
+          echo "=== Ready for Debugging ==="
+          sleep 3600
