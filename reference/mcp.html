@@ -78,11 +78,9 @@
     URL, typically just a hostname.</p></dd>
 
   <dt id="arg-command">command<a class="anchor" aria-label="anchor" href="#arg-command"></a></dt>
-<dd><p>Name of command to execute. If this is “uvx”,
-    and <code class="command">uvx</code> is not found on the path, <span class="pkg">reticulate</span> is used to
-    install <code class="command">uvx</code> and run the command (<code class="command">uvx</code> is a
-    popular Python package manager, so this ensures that a registered
-    Python MCP server can be automatically installed anywhere).</p></dd>
+<dd><p>Name of command to execute. If this is a Python script (with
+    extension .py), it is run via <span class="pkg">reticulate</span> and <code class="command">uv</code> to
+    ensure proper dependency resolution.</p></dd>
 
   <dt id="arg-args">args<a class="anchor" aria-label="anchor" href="#arg-args"></a></dt>
 <dd><p>List of string arguments to pass to <code>command</code></p></dd>
