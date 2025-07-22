@@ -811,3 +811,6 @@ wait_until_port_open <- function(port) {
     }
     invisible(port)
 }
+
+RFC_5424_SEVERITY_LEVELS <- c("emergency", "alert", "critical", "error", "warning",
+                              "notice", "info", "debug")

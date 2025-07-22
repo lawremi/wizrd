@@ -61,6 +61,11 @@ MCPSession <- setRefClass("MCPSession",
             result <- invoke(request, .self)
             lapply(result@messages, convert, ChatMessage)
         },
+        setLogLevel = function(.self, level) {
+            request <- MCPSetLevelRequest(level = level)
+            invoke(request, .self)
+            invisible(NULL)
+        },
         show = function(.self) {
             cat("<MCPSession>")
             cat("\n@endpoint: "); print(.self$endpoint)
@@ -348,13 +353,26 @@ MCPGetPromptResult := new_class(
     )
 )
 
+logging_level <- scalar(class_character, choices = RFC_5424_SEVERITY_LEVELS)
+
 MCPLoggingMessageNotification := new_class(
     MCPNotification,
     properties = list(
-        level = scalar(class_character),
+        level = logging_level,
         logger = optional(scalar(class_character)),
         data = class_any
     )
+)
+
+MCPSetLevelRequest := new_class(
+    MCPRequest,
+    properties = list(
+        level = logging_level
+    )
+)
+
+MCPEmptyResult := new_class(
+    MCPResult
 )
 
 MCPCancelledNotification := new_class(
@@ -387,6 +405,8 @@ method(json_rpc_method, MCPListPromptsRequest) <- function(x) "prompts/list"
 
 method(json_rpc_method, MCPGetPromptRequest) <- function(x) "prompts/get"
 
+method(json_rpc_method, MCPSetLevelRequest) <- function(x) "logging/setLevel"
+
 method(json_rpc_method, MCPNotification) <- function(x) {
     name <- tolower(sub(".*MCP(.*)Notification", "\\1", class(x)[1L]))
     paste0("notifications/", name)
@@ -397,6 +417,8 @@ method(json_rpc_params, MCPRequest) <- function(x) jsonify(x)
 method(response_class, MCPRequest) <- function(x) {
     match.fun(sub("wizrd::", "", sub("Request", "Result", class(x)[1L])))
 }
+
+method(response_class, MCPSetLevelRequest) <- function(x) MCPEmptyResult
 
 method(invoke, MCPRequest) <- function(x, endpoint) {
     mcp_canceller <- function() {
@@ -603,4 +625,10 @@ method(handle_notification, MCPLoggingMessageNotification) <- function(x) {
                     alert = , emergency = "warning")
     condition(x@data, level = x@level, class = c(class, "mcp_condition")) |>
         emit()
+}
+
+mcp_set_log_level <- function(x, level = RFC_5424_SEVERITY_LEVELS) {
+    level <- match.arg(level)
+    x$setLogLevel(level)
+    x
 }
