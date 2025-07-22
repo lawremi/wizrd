@@ -112,7 +112,8 @@ getBM(
     ),
     filters = "external_gene_name",
     values = c("TP53", "BRCA2"),
-    mart = mart
+    mart = mart,
+    useCache = FALSE # would interfere with vignette-level caching
 ) |>
     transform(strand = ifelse(strand > 0, "+", "-")) |>
     makeGRangesFromDataFrame(

@@ -1,7 +1,7 @@
 {
-    "id": "chatcmpl-BwD3GfVGSN22XVqbJgfaHcokcDz7i",
+    "id": "chatcmpl-BwF5KRqCovtMwbFT5sXnqeV4tQsK4",
     "object": "chat.completion",
-    "created": 1753212894,
+    "created": 1753220710,
     "model": "o4-mini-2025-04-16",
     "choices": [
         {
@@ -11,7 +11,7 @@
                 "content": null,
                 "tool_calls": [
                     {
-                        "id": "call_hp07KzxzPcx81lelYBIwQdO1",
+                        "id": "call_gkHrFmsJhtYsAJ64EvzikhZT",
                         "type": "function",
                         "function": {
                             "name": "get_data",
@@ -28,11 +28,11 @@
         }
     ],
     "usage": {
-        "prompt_tokens": 2574,
+        "prompt_tokens": 6049,
         "completion_tokens": 452,
-        "total_tokens": 3026,
+        "total_tokens": 6501,
         "prompt_tokens_details": {
-            "cached_tokens": 0,
+            "cached_tokens": 2048,
             "audio_tokens": 0
         },
         "completion_tokens_details": {
