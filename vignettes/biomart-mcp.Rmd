@@ -41,19 +41,8 @@ directory and launching it with all dependencies using `uvx` and
 ```{r biomart-mcp-server, message=FALSE}
 library(wizrd)
 
-biomart_mcp_path <- file.path(tempdir(), "biomart-mcp.py")
-download.file(
-    "https://raw.githubusercontent.com/jzinno/biomart-mcp/main/biomart-mcp.py",
-    biomart_mcp_path
-)
-
-server <- start_mcp(
-    "uvx",
-    c(
-        "--with", "pybiomart",
-        "fastmcp", "run", biomart_mcp_path
-    )
-)
+biomart_mcp_path <- system.file("mcp", "biomart-mcp.py", package = "wizrd")
+server <- start_mcp(biomart_mcp_path)
 ```
 
 Connect to the BioMart MCP server.
