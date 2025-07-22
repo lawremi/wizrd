@@ -1,10 +1,14 @@
-# data_server.py
+# /// script
+# dependencies = [
+#   "mcp[cli]",
+# ]
+# ///
 
-from fastmcp import FastMCP, Context
+from mcp.server.fastmcp import FastMCP, Context
 from typing import List
 
 # Create an MCP server
-mcp = FastMCP("Data Analysis Server", log_level="WARNING")
+mcp = FastMCP("Data Analysis Server")
 
 @mcp.tool()
 def get_mean(data: List[float]) -> float:
