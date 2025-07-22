@@ -31,11 +31,9 @@ prompts(x, ...)
     URL, typically just a hostname.
   }
   \item{command}{
-    Name of command to execute. If this is \dQuote{uvx},
-    and \command{uvx} is not found on the path, \pkg{reticulate} is used to
-    install \command{uvx} and run the command (\command{uvx} is a
-    popular Python package manager, so this ensures that a registered
-    Python MCP server can be automatically installed anywhere).
+    Name of command to execute. If this is a Python script (with
+    extension .py), it is run via \pkg{reticulate} and \command{uv} to
+    ensure proper dependency resolution. 
   }
   \item{args}{
     List of string arguments to pass to \code{command}

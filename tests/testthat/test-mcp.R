@@ -1,5 +1,6 @@
 test_that("we can call MCP tools", {
-    session <- connect_mcp(wizrd:::start_test_mcp())
+    session <- connect_mcp(wizrd:::start_test_mcp()) |>
+        wizrd:::mcp_set_log_level("debug")
     mcp_tools <- tools(session)
     result <- mcp_tools$add(1L, 2L)
     expect_match(result, "3")

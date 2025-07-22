@@ -443,39 +443,32 @@ need_builtin_uvx <- function(command, args) {
     command == "uvx" && !file.exists(command) && Sys.which(command) == ""
 }
 
-uv_pipex <- function(command, args) {
-    require_ns("reticulate", "find/install builtin uv")
-    uv_pipe_tool <- reticulate::uv_run_tool
-    environment(uv_pipe_tool) <- list2env(list(system2 = pipex),
-                                          parent = environment(uv_pipe_tool))
-    uv_pipe_tool(command, args)
+uv_pipex <- function(pyfile, args, ...) {
+    require_ns("reticulate", "run FastMCP-based servers conveniently")
+    my_uv_exec <- reticulate:::uv_exec
+    environment(my_uv_exec) <- list2env(list(system2 = pipex),
+                                        parent = environment(my_uv_exec))
+    my_uv_exec(c("run", pyfile, args), ...)
 }
 
-try_uv_pipex <- function(command, args) {
-    if (command == "uv" && identical(head(args, 2L), c("tool", "run"))) {
-        command <- "uvx"
-        args <- tail(args, -2L)
-    }
-    if (need_builtin_uvx(command, args))
-        uv_pipex(args[1L], args[-1L])
-}
-
-start_mcp <- function(command, args = list()) {
+start_mcp <- function(command, args = character()) {
     assert_string(command)
     assert_character(args, any.missing = FALSE)
     require_ns("processx", "connect to stdio-based MCP servers")
-    try_uv_pipex(command, args) %||% pipex(command, args)
+
+    if (tools::file_ext(command) == "py")
+        uv_pipex(command, args)
+    else pipex(command, args)
 }
 
 start_test_mcp <- function(transport = c("stdio", "http", "sse"), port) {
     transport <- match.arg(transport)
-    args <- c("fastmcp", "run",
-              system.file("mcp", "server.py", package = "wizrd"),
-              "--transport", transport)
+    test_file <- system.file("mcp", "server.py", package = "wizrd")
+    args <- c("--transport", transport)
     remote <- transport %in% c("http", "sse")
     if (remote)
         args <- c(args, "--port", port)
-    server <- start_mcp("uvx", args)
+    server <- start_mcp(test_file, args)
     if (remote)
         wait_until_port_open(port)
     server
