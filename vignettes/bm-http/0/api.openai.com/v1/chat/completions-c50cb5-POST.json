@@ -1,7 +1,7 @@
 {
-    "id": "chatcmpl-BwF4NYpZRUkPXAXn8OdnQGxe2jm6J",
+    "id": "chatcmpl-BwFS2mNx3pbST39pa1UKYCCcwZNt9",
     "object": "chat.completion",
-    "created": 1753220651,
+    "created": 1753222118,
     "model": "o4-mini-2025-04-16",
     "choices": [
         {
@@ -11,11 +11,11 @@
                 "content": null,
                 "tool_calls": [
                     {
-                        "id": "call_eXs8gtcU02mHl9nQSLx5Hw5b",
+                        "id": "call_pIuqSl5TwsnnG73VG8IGSexw",
                         "type": "function",
                         "function": {
                             "name": "get_data",
-                            "arguments": "{\"mart\":\"ENSEMBL_MART_ENSEMBL\",\"dataset\":\"hsapiens_gene_ensembl\",\"attributes\":[\"entrezgene_id\",\"hgnc_symbol\"],\"filters\":{\"go_name\":\"mitogen-activated protein kinase activity\"}}"
+                            "arguments": "{\"mart\":\"ENSEMBL_MART_ENSEMBL\",\"dataset\":\"hsapiens_gene_ensembl\",\"attributes\":[\"external_gene_name\",\"chromosome_name\",\"start_position\",\"end_position\",\"strand\"],\"filters\":{\"gene_id\":\"ENSG00000141510,ENSG00000139618\"}}"
                         }
                     }
                 ],
@@ -28,15 +28,15 @@
         }
     ],
     "usage": {
-        "prompt_tokens": 7061,
-        "completion_tokens": 1220,
-        "total_tokens": 8281,
+        "prompt_tokens": 3156,
+        "completion_tokens": 592,
+        "total_tokens": 3748,
         "prompt_tokens_details": {
-            "cached_tokens": 2688,
+            "cached_tokens": 2176,
             "audio_tokens": 0
         },
         "completion_tokens_details": {
-            "reasoning_tokens": 1152,
+            "reasoning_tokens": 512,
             "audio_tokens": 0,
             "accepted_prediction_tokens": 0,
             "rejected_prediction_tokens": 0

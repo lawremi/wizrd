@@ -1,0 +1,37 @@
+{
+    "id": "chatcmpl-BwFSyLTXeWlIjgDYTFS7UcyIVpML6",
+    "object": "chat.completion",
+    "created": 1753222176,
+    "model": "o4-mini-2025-04-16",
+    "choices": [
+        {
+            "index": 0,
+            "message": {
+                "role": "assistant",
+                "content": "{\"__boxed\":[{\"entrezgene_id\":\"5596\",\"external_gene_name\":\"MAPK4\"},{\"entrezgene_id\":\"5594\",\"external_gene_name\":\"MAPK1\"},{\"entrezgene_id\":\"6300\",\"external_gene_name\":\"MAPK12\"},{\"entrezgene_id\":\"5600\",\"external_gene_name\":\"MAPK11\"},{\"entrezgene_id\":\"5595\",\"external_gene_name\":\"MAPK3\"},{\"entrezgene_id\":\"225689\",\"external_gene_name\":\"MAPK15\"},{\"entrezgene_id\":\"5598\",\"external_gene_name\":\"MAPK7\"},{\"entrezgene_id\":\"5602\",\"external_gene_name\":\"MAPK10\"},{\"entrezgene_id\":\"5603\",\"external_gene_name\":\"MAPK13\"},{\"entrezgene_id\":\"5609\",\"external_gene_name\":\"MAP2K7\"},{\"entrezgene_id\":\"5601\",\"external_gene_name\":\"MAPK9\"},{\"entrezgene_id\":\"5599\",\"external_gene_name\":\"MAPK8\"},{\"entrezgene_id\":\"5597\",\"external_gene_name\":\"MAPK6\"},{\"entrezgene_id\":\"6885\",\"external_gene_name\":\"MAP3K7\"},{\"entrezgene_id\":\"51701\",\"external_gene_name\":\"NLK\"},{\"entrezgene_id\":\"1432\",\"external_gene_name\":\"MAPK14\"}]}",
+                "refusal": null,
+                "annotations": [
+
+                ]
+            },
+            "finish_reason": "stop"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 7260,
+        "completion_tokens": 278,
+        "total_tokens": 7538,
+        "prompt_tokens_details": {
+            "cached_tokens": 2048,
+            "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+            "reasoning_tokens": 0,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+        }
+    },
+    "service_tier": "default",
+    "system_fingerprint": null
+}

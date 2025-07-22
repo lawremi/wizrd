@@ -1,7 +1,7 @@
 {
-    "id": "chatcmpl-BwF5PAas4JoofXJ5YP6OxqhpTtYc5",
+    "id": "chatcmpl-BwFTJbkSxyrJqs2JC8w12tHAkYzMP",
     "object": "chat.completion",
-    "created": 1753220715,
+    "created": 1753222197,
     "model": "o4-mini-2025-04-16",
     "choices": [
         {
@@ -18,15 +18,15 @@
         }
     ],
     "usage": {
-        "prompt_tokens": 7830,
-        "completion_tokens": 4089,
-        "total_tokens": 11919,
+        "prompt_tokens": 4353,
+        "completion_tokens": 3315,
+        "total_tokens": 7668,
         "prompt_tokens_details": {
-            "cached_tokens": 2432,
+            "cached_tokens": 2048,
             "audio_tokens": 0
         },
         "completion_tokens_details": {
-            "reasoning_tokens": 768,
+            "reasoning_tokens": 0,
             "audio_tokens": 0,
             "accepted_prediction_tokens": 0,
             "rejected_prediction_tokens": 0
