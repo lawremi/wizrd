@@ -1,11 +1,17 @@
-# server.py
+# /// script
+# dependencies = [
+#   "mcp[cli]",
+# ]
+# ///
 
-from fastmcp import FastMCP, Context
-from fastmcp.prompts.prompt import Message
+from mcp.server.fastmcp.utilities.logging import configure_logging
+from mcp.server.fastmcp import FastMCP, Context
+from mcp.server.fastmcp.prompts.base import Message
 import anyio
 
 # Create an MCP server
 mcp = FastMCP("Demo")
+configure_logging(level="WARNING")
 
 
 # Add an addition tool
@@ -44,5 +50,9 @@ def debug_session_start(error_message: str) -> list[Message]:
         Message(role="assistant", content="Okay, I can help with that. Can you provide the full traceback and tell me what you were trying to do?")
     ]
 
+@mcp._mcp_server.set_logging_level()
+async def set_logging_level(level: str) -> None:
+    pass
+
 if __name__ == "__main__":
-    mcp.run(log_level="WARNING") # or DEBUG for debugging
+    mcp.run()
