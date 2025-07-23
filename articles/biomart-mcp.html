@@ -72,7 +72,7 @@
                         <h4 data-toc-skip class="author">Michael
 Lawrence</h4>
             
-            <h4 data-toc-skip class="date">2025-07-22</h4>
+            <h4 data-toc-skip class="date">2025-07-23</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/lawremi/wizrd/blob/main/vignettes/biomart-mcp.Rmd" class="external-link"><code>vignettes/biomart-mcp.Rmd</code></a></small>
       <div class="hidden name"><code>biomart-mcp.Rmd</code></div>
@@ -97,7 +97,7 @@ data.frame result.</p>
 package, which relies on an older XML-based approach to BioMart. This
 limits its functionality compared to the <code>biomaRt</code> R package,
 which uses direct API access. Some queries that work with biomaRt may
-not be possible vwith the current MCP server.</p>
+not be possible with the current MCP server.</p>
 </div>
 </div>
 <div class="section level2">
@@ -146,51 +146,20 @@ data.frames for easy downstream analysis.</p>
 <p>In biomaRt, you must specify the dataset, attributes, and filters.
 With wizrd, just ask:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bioconductor.org/packages/GenomicRanges" class="external-link">GenomicRanges</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Loading required package: stats4</span></span>
-<span><span class="co">#&gt; Loading required package: BiocGenerics</span></span>
-<span><span class="co">#&gt; Loading required package: generics</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'generics'</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     as.difftime, as.factor, as.ordered, intersect, is.element, setdiff,</span></span>
-<span><span class="co">#&gt;     setequal, union</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'BiocGenerics'</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     IQR, mad, sd, var, xtabs</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     anyDuplicated, aperm, append, as.data.frame, basename, cbind,</span></span>
-<span><span class="co">#&gt;     colnames, dirname, do.call, duplicated, eval, evalq, Filter, Find,</span></span>
-<span><span class="co">#&gt;     get, grep, grepl, is.unsorted, lapply, Map, mapply, match, mget,</span></span>
-<span><span class="co">#&gt;     order, paste, pmax, pmax.int, pmin, pmin.int, Position, rank,</span></span>
-<span><span class="co">#&gt;     rbind, Reduce, rownames, sapply, saveRDS, table, tapply, unique,</span></span>
-<span><span class="co">#&gt;     unsplit, which.max, which.min</span></span>
-<span><span class="co">#&gt; Loading required package: S4Vectors</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'S4Vectors'</span></span>
-<span><span class="co">#&gt; The following object is masked from 'package:utils':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     findMatches</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     expand.grid, I, unname</span></span>
-<span><span class="co">#&gt; Loading required package: IRanges</span></span>
-<span><span class="co">#&gt; Loading required package: GenomeInfoDb</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bioconductor.org/packages/GenomicRanges" class="external-link">GenomicRanges</a></span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">coords</span> <span class="op">&lt;-</span> <span class="va">agent</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="../reference/output_as.html">output_as</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/GenomicRanges/man/GRanges-class.html" class="external-link">GRanges</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
 <span>        <span class="st">"What are the chromosomal coordinates for TP53 and BRCA2?"</span></span>
 <span>    <span class="op">)</span></span>
 <span><span class="va">coords</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/pkg/GenomicRanges/man/makeGRangesFromDataFrame.html" class="external-link">makeGRangesFromDataFrame</a></span><span class="op">(</span>keep.extra.columns <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; GRanges object with 0 ranges and 0 metadata columns:</span></span>
-<span><span class="co">#&gt;    seqnames    ranges strand</span></span>
-<span><span class="co">#&gt;       &lt;Rle&gt; &lt;IRanges&gt;  &lt;Rle&gt;</span></span>
+<span><span class="co">#&gt; GRanges object with 2 ranges and 0 metadata columns:</span></span>
+<span><span class="co">#&gt;       seqnames            ranges strand</span></span>
+<span><span class="co">#&gt;          &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt;</span></span>
+<span><span class="co">#&gt;   [1]       17   7661779-7687546      -</span></span>
+<span><span class="co">#&gt;   [2]       13 32315086-32400268      +</span></span>
 <span><span class="co">#&gt;   -------</span></span>
-<span><span class="co">#&gt;   seqinfo: no sequences</span></span></code></pre></div>
+<span><span class="co">#&gt;   seqinfo: 2 sequences from an unspecified genome; no seqlengths</span></span></code></pre></div>
 <p>The above relies on the GenomicRanges package in order to return a
 useful R data structure for further computations, but every query can
 return a simple data.frame, as demonstrated in later examples.</p>
@@ -210,8 +179,7 @@ extra effort to convert the output to a GRanges.</p>
 <span>    <span class="op">)</span>,</span>
 <span>    filters <span class="op">=</span> <span class="st">"external_gene_name"</span>,</span>
 <span>    values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"TP53"</span>, <span class="st">"BRCA2"</span><span class="op">)</span>,</span>
-<span>    mart <span class="op">=</span> <span class="va">mart</span>,</span>
-<span>    useCache <span class="op">=</span> <span class="cn">FALSE</span> <span class="co"># would interfere with vignette-level caching</span></span>
+<span>    mart <span class="op">=</span> <span class="va">mart</span></span>
 <span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/transform.html" class="external-link">transform</a></span><span class="op">(</span>strand <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">strand</span> <span class="op">&gt;</span> <span class="fl">0</span>, <span class="st">"+"</span>, <span class="st">"-"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/pkg/GenomicRanges/man/makeGRangesFromDataFrame.html" class="external-link">makeGRangesFromDataFrame</a></span><span class="op">(</span></span>
@@ -219,14 +187,7 @@ extra effort to convert the output to a GRanges.</p>
 <span>        start.field <span class="op">=</span> <span class="st">"start_position"</span>,</span>
 <span>        end.field <span class="op">=</span> <span class="st">"end_position"</span>,</span>
 <span>        keep.extra.columns <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span>    <span class="op">)</span></span>
-<span><span class="co">#&gt; GRanges object with 2 ranges and 1 metadata column:</span></span>
-<span><span class="co">#&gt;       seqnames            ranges strand | external_gene_name</span></span>
-<span><span class="co">#&gt;          &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; |        &lt;character&gt;</span></span>
-<span><span class="co">#&gt;   [1]       13 32315086-32400268      + |              BRCA2</span></span>
-<span><span class="co">#&gt;   [2]       17   7661779-7687546      - |               TP53</span></span>
-<span><span class="co">#&gt;   -------</span></span>
-<span><span class="co">#&gt;   seqinfo: 2 sequences from an unspecified genome; no seqlengths</span></span></code></pre></div>
+<span>    <span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -240,23 +201,23 @@ kinase activity (<a href="GO:0004707" class="uri">GO:0004707</a>):</p>
 <span>        <span class="st">"List all EntrezGene IDs and gene symbols with MAP kinase activity"</span></span>
 <span>    <span class="op">)</span></span>
 <span><span class="va">go_genes</span></span>
-<span><span class="co">#&gt;    entrezgene_id external_gene_name</span></span>
-<span><span class="co">#&gt; 1           5596              MAPK4</span></span>
-<span><span class="co">#&gt; 2           5594              MAPK1</span></span>
-<span><span class="co">#&gt; 3           6300             MAPK12</span></span>
-<span><span class="co">#&gt; 4           5600             MAPK11</span></span>
-<span><span class="co">#&gt; 5           5595              MAPK3</span></span>
-<span><span class="co">#&gt; 6         225689             MAPK15</span></span>
-<span><span class="co">#&gt; 7           5598              MAPK7</span></span>
-<span><span class="co">#&gt; 8           5602             MAPK10</span></span>
-<span><span class="co">#&gt; 9           5603             MAPK13</span></span>
-<span><span class="co">#&gt; 10          5609             MAP2K7</span></span>
-<span><span class="co">#&gt; 11          5601              MAPK9</span></span>
-<span><span class="co">#&gt; 12          5599              MAPK8</span></span>
-<span><span class="co">#&gt; 13          5597              MAPK6</span></span>
-<span><span class="co">#&gt; 14          6885             MAP3K7</span></span>
-<span><span class="co">#&gt; 15         51701                NLK</span></span>
-<span><span class="co">#&gt; 16          1432             MAPK14</span></span></code></pre></div>
+<span><span class="co">#&gt;    entrezgene_id hgnc_symbol</span></span>
+<span><span class="co">#&gt; 1           5596       MAPK4</span></span>
+<span><span class="co">#&gt; 2           5594       MAPK1</span></span>
+<span><span class="co">#&gt; 3           6300      MAPK12</span></span>
+<span><span class="co">#&gt; 4           5600      MAPK11</span></span>
+<span><span class="co">#&gt; 5           5595       MAPK3</span></span>
+<span><span class="co">#&gt; 6         225689      MAPK15</span></span>
+<span><span class="co">#&gt; 7           5598       MAPK7</span></span>
+<span><span class="co">#&gt; 8           5602      MAPK10</span></span>
+<span><span class="co">#&gt; 9           5603      MAPK13</span></span>
+<span><span class="co">#&gt; 10          5609      MAP2K7</span></span>
+<span><span class="co">#&gt; 11          5601       MAPK9</span></span>
+<span><span class="co">#&gt; 12          5599       MAPK8</span></span>
+<span><span class="co">#&gt; 13          5597       MAPK6</span></span>
+<span><span class="co">#&gt; 14          6885      MAP3K7</span></span>
+<span><span class="co">#&gt; 15         51701         NLK</span></span>
+<span><span class="co">#&gt; 16          1432      MAPK14</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="example-3-genes-on-specific-chromosomes-cf--biomart-section-3-3">Example 3: Genes on Specific Chromosomes (cf. biomaRt Section
