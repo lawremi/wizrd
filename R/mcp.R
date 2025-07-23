@@ -483,11 +483,12 @@ start_mcp <- function(command, args = character()) {
     else pipex(command, args)
 }
 
-start_test_mcp <- function(transport = c("stdio", "http", "sse"), port) {
+start_test_mcp <- function(transport = c("stdio", "streamable-http", "sse"),
+                           port) {
     transport <- match.arg(transport)
     test_file <- system.file("mcp", "server.py", package = "wizrd")
     args <- c("--transport", transport)
-    remote <- transport %in% c("http", "sse")
+    remote <- transport %in% c("streamable-http", "sse")
     if (remote)
         args <- c(args, "--port", port)
     server <- start_mcp(test_file, args)

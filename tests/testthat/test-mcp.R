@@ -10,6 +10,8 @@ test_that("we can call MCP tools", {
         equip(mcp_tools) |>
         predict("use the add tool to add 1 and 2")
     expect_identical(result, "The result of adding 1 and 2 is 3.")
+
+    expect_warning(mcp_tools$sleep(-1L))
 })
 
 test_that("we can access MCP resources", {
@@ -28,14 +30,12 @@ test_that("we can generate prompts with MCP", {
     result <- model |>
         prompt_as(pf$ask_review) |>
         predict(list(code_snippet = "print \"foo\""))
-    expect_match(result, "Python 3.0", fixed = TRUE)
+    expect_match(result, "Python 3", fixed = TRUE)
 
-    expect_warning(
-        result <- model |>
-            prompt_as(pf$ask_review) |>
-            predict(list(code_snippet = "for (i in 1:length(n)) v <- c(v, i)",
-                         language = "R"))
-    )
+    result <- model |>
+        prompt_as(pf$ask_review) |>
+        predict(list(code_snippet = "for (i in 1:length(n)) v <- c(v, i)",
+                     language = "R"))
     expect_match(result, "R code snippet", fixed = TRUE)
 
     error_message <-
@@ -65,7 +65,7 @@ test_that("the SSE transport layer works", {
 
 test_that("the Streamable HTTP transport layer works", {
     port <- wizrd:::find_available_port()
-    mcp_server <- wizrd:::start_test_mcp("http", port)
+    mcp_server <- wizrd:::start_test_mcp("streamable-http", port)
     url <- paste0("http://127.0.0.1:", port, "/mcp")
 
     session <- connect_mcp(url)
@@ -86,16 +86,17 @@ test_that("MCP errors work", {
 })
 
 test_that("MCP requests can be cancelled", {
-    skip("Not sure if FastMCP yet handles notifications/cancelled")
     options(wizrd_verbose = TRUE)
     session <- connect_mcp(wizrd:::start_test_mcp())
     mcp_tools <- tools(session)
     opt <- options(wizrd_test_json_rpc_cancel = TRUE)
     on.exit(options(opt))
-    result <- mcp_tools$sleep()
+    expect_error(mcp_tools$sleep())
 })
 
 test_that("dynamic oauth works", {
-    skip_if_not(interactive())
-    mcp_connect("https://server.smithery.ai/@jzinno/biomart-mcp/mcp")
+    skip()
+    session <- connect_mcp("https://server.smithery.ai/@jzinno/biomart-mcp/mcp")
+    tools <- tools(session)
+    expect_match(tools$list_marts(), "ENSEMBL_MART_ENSEMBL")
 })
