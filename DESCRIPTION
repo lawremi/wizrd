@@ -7,14 +7,14 @@ Authors@R: c(
 		       role = c("aut", "cre"), email = "lawremi@gmail.com")
 	   )
 Description: Enables embedding Large Language Models (LLMs) in R programs by
-	     treating them as functions with structured inputs and
-	     outputs. Features include tool calling, prompt templating,
-	     convenient encoding of examples and interconversion of JSON and S7
-	     objects. Supports local and remote LLMs, including Ollama,
-	     llama.cpp, OpenAI and Azure, via an abstraction that is extensible
-	     to other providers. Includes a Model Context Protocol (MCP) client.
-	     There is experimental support for text embedding, vector stores and
-	     Results Augmented Generation (RAG).
+	     treating them as functions with structured inputs and outputs.
+	     Features include tool calling, prompt templating, convenient
+	     encoding of examples and interconversion of JSON and S7 objects.
+	     Supports local and remote LLMs, including Ollama, llama.cpp,
+	     OpenAI and Azure, via an abstraction that is extensible to other
+	     providers. Includes a Model Context Protocol (MCP) client.
+	     There is experimental support for text embedding, vector stores
+	     and Retrieval Augmented Generation (RAG).
 License: MIT + file LICENSE
 Imports:
     tools,

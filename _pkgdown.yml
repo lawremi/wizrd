@@ -3,11 +3,76 @@ template:
   params:
     bootswatch: cosmo
     bs_version: 5
+    toc: true
+    toc_float: true
+    highlight: tango
+
 articles:
-- title: Vignettes
+- title: Getting Started
   contents:
     - wizrd
+- title: Advanced Topics
+  contents:
     - biomart-mcp
+
+reference:
+  - title: "Model Constructors"
+    desc: "Create agents for different LLM providers"
+    contents:
+      - ollama_agent
+      - llama_cpp_agent
+      - openai_agent
+      - azure_openai_agent
+      - llama
+      - llamafile_llama
+      - llama_vision
+      - nomic
+  - title: "Core Functions"
+    desc: "Main functions for working with LLMs"
+    contents:
+      - chat
+      - last_output
+      - last_message
+  - title: "Agent Configuration"
+    desc: "Functions to configure and customize agents"
+    contents:
+      - instruct
+      - prompt_as
+      - output_as
+      - equip
+      - unequip
+      - demonstrate
+      - demonstrate_all
+      - system_prompt_as
+  - title: "Tools and Extensions"
+    desc: "Tool calling and external integrations"
+    contents:
+      - tool
+      - connect_mcp
+      - start_mcp
+      - describe_with_Rd
+      - tools
+      - resources
+  - title: "Text Processing"
+    desc: "Text embedding and RAG functionality"
+    contents:
+      - embed_text
+      - text_store
+      - retrieve
+      - chunk
+      - default_chunking
+      - rag_with
+  - title: "Utilities"
+    desc: "Helper functions and utilities"
+    contents:
+      - persist
+      - restore
+      - LanguageModelParams
+      - ollama_server
+      - prompts
+      - can_accept_as
+      - pipelines
+
 navbar:
   structure:
     left:
