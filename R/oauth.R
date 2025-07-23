@@ -85,7 +85,7 @@ oauth_client_for_server_metadata <- function(meta, redirect_uri) {
     if (!is.null(meta$registration_endpoint))
         oauth_register_client(meta$registration_endpoint, redirect_uri) |>
             oauth_client_from_dcr(meta$token_endpoint)
-    else httr2::oauth_client(getPackageName(topenv()), meta$token_endpoint)
+    else httr2::oauth_client(getNamespaceName(topenv()), meta$token_endpoint)
 }
 
 oauth_auth_code_for_server_metadata <- function(meta, ...) {
