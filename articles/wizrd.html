@@ -5,13 +5,13 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>wizrd • wizrd</title>
+<title>General Introduction • wizrd</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="wizrd">
+<script src="../pkgdown.js"></script><meta property="og:title" content="General Introduction">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -68,7 +68,7 @@
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1 data-toc-skip>wizrd</h1>
+      <h1 data-toc-skip>General Introduction</h1>
                         <h4 data-toc-skip class="author">Michael
 Lawrence</h4>
             
@@ -123,12 +123,12 @@ the engine * <code>drat</code>: gear ratio * <code>wt</code>: weight of
 the car (in thousands of pounds) * <code>qsec</code>: quarter mile time
 * <code>vs</code>: vehicle type (0 = automatic, 1 = manual) *
 <code>am</code>: transmission type (0 = automatic, 1 = manual) *
-<code>gear</code>: number of gears in the transmission <em>
-<code>carb</code>: number of carburetors 2. <strong>Car
-performance:</strong> This includes variables such as: </em>
-<code>vs</code>: vehicle type (0 = automatic, 1 = manual) <em>
-<code>am</code>: transmission type (0 = automatic, 1 = manual) </em>
 <code>gear</code>: number of gears in the transmission *
+<code>carb</code>: number of carburetors 2. <strong>Car
+performance:</strong> This includes variables such as: *
+<code>vs</code>: vehicle type (0 = automatic, 1 = manual) *
+<code>am</code>: transmission type (0 = automatic, 1 = manual) <em>
+<code>gear</code>: number of gears in the transmission </em>
 <code>carb</code>: number of carburetors</li>
 </ol>
 <p><strong>Data structure:</strong> The mtcars dataset is a data frame
@@ -157,12 +157,12 @@ multiple exchanges, use the <code><a href="../reference/chat.html">chat()</a></c
 <span>    <span class="fu"><a href="../reference/chat.html">chat</a></span><span class="op">(</span><span class="st">"How can I manipulate it in R?"</span><span class="op">)</span></span>
 <span><span class="va">ctx</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; &lt;Chat&gt;: 5 messages</span></span>
-<span><span class="co">#&gt;  - - - - - - - - - - - - - - - - Latest messages  - - - - - - - - - - - - - - - </span></span>
-<span><span class="co">#&gt;                                            ┌───────────────────────────────────┐</span></span>
-<span><span class="co">#&gt;                                            │                                   │</span></span>
-<span><span class="co">#&gt;                                            │   How can I manipulate it in R?   │</span></span>
-<span><span class="co">#&gt;                                            │                                   │</span></span>
-<span><span class="co">#&gt;                                            └───────────────────────────────────┘</span></span>
+<span><span class="co">#&gt;  - - - - - - - - - - - - - - -  Latest messages  - - - - - - - - - - - - - - -</span></span>
+<span><span class="co">#&gt;                                          ┌───────────────────────────────────┐</span></span>
+<span><span class="co">#&gt;                                          │                                   │</span></span>
+<span><span class="co">#&gt;                                          │   How can I manipulate it in R?   │</span></span>
+<span><span class="co">#&gt;                                          │                                   │</span></span>
+<span><span class="co">#&gt;                                          └───────────────────────────────────┘</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; You can manipulate the mtcars dataset in R using various functions and</span></span>
 <span><span class="co">#&gt; techniques. Here are a few examples:</span></span>
@@ -185,8 +185,8 @@ multiple exchanges, use the <code><a href="../reference/chat.html">chat()</a></c
 <span><span class="co">#&gt; ```r</span></span>
 <span><span class="co">#&gt; mtcars[mtcars$am == 1, ]</span></span>
 <span><span class="co">#&gt; ```</span></span>
-<span><span class="co">#&gt; This will return a subset of the dataset that includes only cars with a manual</span></span>
-<span><span class="co">#&gt; transmission.</span></span>
+<span><span class="co">#&gt; This will return a subset of the dataset that includes only cars with a</span></span>
+<span><span class="co">#&gt; manual transmission.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; **4. Group the dataset by transmission type and calculate the mean mpg**</span></span>
 <span><span class="co">#&gt; ```r</span></span>
@@ -222,8 +222,8 @@ multiple exchanges, use the <code><a href="../reference/chat.html">chat()</a></c
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; This will sort the dataset by mpg in descending order.</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; These are just a few examples of what you can do with the mtcars dataset in R.</span></span>
-<span><span class="co">#&gt; I hope this helps! Let me know if you have any questions or need further</span></span>
+<span><span class="co">#&gt; These are just a few examples of what you can do with the mtcars dataset in</span></span>
+<span><span class="co">#&gt; R. I hope this helps! Let me know if you have any questions or need further</span></span>
 <span><span class="co">#&gt; assistance.&lt;|eot_id|&gt;</span></span></code></pre>
 <p>A useful feature of the returned Chat object is that it prints the
 context in a readable format.</p>
@@ -303,46 +303,51 @@ variable in the mtcars dataset.</p>
 <span>    <span class="fu"><a href="../reference/prompt_as.html">prompt_as</a></span><span class="op">(</span><span class="st">"Analyze the relationship between {var1} and {var2}."</span><span class="op">)</span></span>
 <span><span class="va">parameterized_agent</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/chat.html">chat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>var1 <span class="op">=</span> <span class="st">"mpg"</span>, var2 <span class="op">=</span> <span class="st">"wt"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;Chat&gt;: 3 messages</span></span>
-<span><span class="co">#&gt;  - - - - - - - - - - - - - - - - Latest messages  - - - - - - - - - - - - - - - </span></span>
-<span><span class="co">#&gt;                                     ┌──────────────────────────────────────────┐</span></span>
-<span><span class="co">#&gt;                                     │                                          │</span></span>
-<span><span class="co">#&gt;                                     │   Analyze the relationship between mpg   │</span></span>
-<span><span class="co">#&gt;                                     │   and wt.                                │</span></span>
-<span><span class="co">#&gt;                                     │                                          │</span></span>
-<span><span class="co">#&gt;                                     └──────────────────────────────────────────┘</span></span>
+<span><span class="co">#&gt;  - - - - - - - - - - - - - - -  Latest messages  - - - - - - - - - - - - - - -</span></span>
+<span><span class="co">#&gt;                                   ┌──────────────────────────────────────────┐</span></span>
+<span><span class="co">#&gt;                                   │                                          │</span></span>
+<span><span class="co">#&gt;                                   │   Analyze the relationship between mpg   │</span></span>
+<span><span class="co">#&gt;                                   │   and wt.                                │</span></span>
+<span><span class="co">#&gt;                                   │                                          │</span></span>
+<span><span class="co">#&gt;                                   └──────────────────────────────────────────┘</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; To analyze the relationship between miles per gallon (mpg) and weight (wt) in</span></span>
 <span><span class="co">#&gt; the provided dataset, we can consider the following points:</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 1. **Correlation**: Generally, we would expect a negative correlation between</span></span>
-<span><span class="co">#&gt; mpg and wt. As the weight of a vehicle increases, the fuel efficiency (mpg)</span></span>
-<span><span class="co">#&gt; tends to decrease because heavier vehicles require more energy to move.</span></span>
+<span><span class="co">#&gt; mpg and wt. This means that as the weight of the vehicle increases, the fuel</span></span>
+<span><span class="co">#&gt; efficiency (mpg) tends to decrease. Heavier vehicles typically require more</span></span>
+<span><span class="co">#&gt; energy to move, which can lead to lower fuel efficiency.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 2. **Visual Representation**: A scatter plot of mpg against wt would help</span></span>
-<span><span class="co">#&gt; visualize the relationship. Each point on the plot would represent a vehicle,</span></span>
-<span><span class="co">#&gt; with its weight on the x-axis and its mpg on the y-axis. A downward trend in</span></span>
-<span><span class="co">#&gt; the scatter plot would indicate a negative correlation.</span></span>
+<span><span class="co">#&gt; visualize this relationship. Each point on the plot would represent a</span></span>
+<span><span class="co">#&gt; vehicle, with its weight on the x-axis and its mpg on the y-axis. A downward</span></span>
+<span><span class="co">#&gt; trend in the scatter plot would indicate a negative correlation.</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; 3. **Statistical Analysis**: We could calculate the correlation coefficient</span></span>
-<span><span class="co">#&gt; (Pearson's r) to quantify the strength and direction of the relationship. A</span></span>
-<span><span class="co">#&gt; value close to -1 would indicate a strong negative correlation, while a value</span></span>
-<span><span class="co">#&gt; close to 0 would suggest little to no correlation.</span></span>
+<span><span class="co">#&gt; 3. **Statistical Analysis**: Calculating the correlation coefficient</span></span>
+<span><span class="co">#&gt; (Pearson's r) would provide a numerical value to quantify the strength and</span></span>
+<span><span class="co">#&gt; direction of the relationship. A value close to -1 would indicate a strong</span></span>
+<span><span class="co">#&gt; negative correlation, while a value close to 0 would suggest little to no</span></span>
+<span><span class="co">#&gt; correlation.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 4. **Regression Analysis**: Performing a linear regression analysis could</span></span>
-<span><span class="co">#&gt; provide insights into how much mpg decreases with an increase in weight. The</span></span>
-<span><span class="co">#&gt; regression equation would help predict mpg based on weight.</span></span>
+<span><span class="co">#&gt; help in understanding how much of the variance in mpg can be explained by wt.</span></span>
+<span><span class="co">#&gt; The regression equation would provide insights into the expected change in</span></span>
+<span><span class="co">#&gt; mpg for a unit change in weight.</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; 5. **Observations from the Data**:</span></span>
-<span><span class="co">#&gt; - Lighter vehicles (lower wt values) tend to have higher mpg values, while</span></span>
-<span><span class="co">#&gt; heavier vehicles (higher wt values) generally have lower mpg values.</span></span>
-<span><span class="co">#&gt; - For example, vehicles with weights around 2.2 to 2.9 have mpg values ranging</span></span>
-<span><span class="co">#&gt; from 21 to 32, while those with weights above 3.5 tend to have mpg values below</span></span>
-<span><span class="co">#&gt; 20.</span></span>
+<span><span class="co">#&gt; 5. **Outliers**: It is also important to check for outliers in the dataset</span></span>
+<span><span class="co">#&gt; that may skew the results. For instance, very heavy vehicles with low mpg</span></span>
+<span><span class="co">#&gt; could significantly affect the correlation.</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; In summary, the relationship between mpg and wt is expected to be negative,</span></span>
-<span><span class="co">#&gt; indicating that as vehicle weight increases, fuel efficiency decreases. Further</span></span>
-<span><span class="co">#&gt; statistical analysis would provide more precise insights into this</span></span>
-<span><span class="co">#&gt; relationship.</span></span></code></pre></div>
+<span><span class="co">#&gt; 6. **Conclusion**: Based on the analysis, we would conclude whether the</span></span>
+<span><span class="co">#&gt; relationship between mpg and wt is significant and how strong that</span></span>
+<span><span class="co">#&gt; relationship is. If the analysis confirms a negative correlation, it would</span></span>
+<span><span class="co">#&gt; support the general understanding that heavier vehicles tend to have lower</span></span>
+<span><span class="co">#&gt; fuel efficiency.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; To perform a detailed analysis, one would typically use statistical software</span></span>
+<span><span class="co">#&gt; or programming languages like Python or R to compute the correlation</span></span>
+<span><span class="co">#&gt; coefficient, create visualizations, and conduct regression analysis.</span></span></code></pre></div>
 <p>By calling <code><a href="../reference/prompt_as.html">prompt_as()</a></code>, we parameterized the agent using
 a glue template to accept parameters named <code>var1</code> and
 <code>var2</code>. By passing <code>"mpg"</code> and <code>"wt"</code>
@@ -361,23 +366,24 @@ instructions, inserted into the system prompt, using the
 <span>             <span class="st">"When comparing variables, calculate their correlation."</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/chat.html">chat</a></span><span class="op">(</span><span class="va">instructed_agent</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>var1 <span class="op">=</span> <span class="st">"mpg"</span>, var2 <span class="op">=</span> <span class="st">"wt"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; &lt;Chat&gt;: 3 messages</span></span>
-<span><span class="co">#&gt;  - - - - - - - - - - - - - - - - Latest messages  - - - - - - - - - - - - - - - </span></span>
-<span><span class="co">#&gt;                                     ┌──────────────────────────────────────────┐</span></span>
-<span><span class="co">#&gt;                                     │                                          │</span></span>
-<span><span class="co">#&gt;                                     │   Analyze the relationship between mpg   │</span></span>
-<span><span class="co">#&gt;                                     │   and wt.                                │</span></span>
-<span><span class="co">#&gt;                                     │                                          │</span></span>
-<span><span class="co">#&gt;                                     └──────────────────────────────────────────┘</span></span>
+<span><span class="co">#&gt;  - - - - - - - - - - - - - - -  Latest messages  - - - - - - - - - - - - - - -</span></span>
+<span><span class="co">#&gt;                                   ┌──────────────────────────────────────────┐</span></span>
+<span><span class="co">#&gt;                                   │                                          │</span></span>
+<span><span class="co">#&gt;                                   │   Analyze the relationship between mpg   │</span></span>
+<span><span class="co">#&gt;                                   │   and wt.                                │</span></span>
+<span><span class="co">#&gt;                                   │                                          │</span></span>
+<span><span class="co">#&gt;                                   └──────────────────────────────────────────┘</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; To analyze the relationship between miles per gallon (mpg) and weight (wt) in</span></span>
-<span><span class="co">#&gt; the dataset, we can calculate the correlation coefficient. The correlation</span></span>
-<span><span class="co">#&gt; coefficient quantifies the degree to which two variables are related.</span></span>
+<span><span class="co">#&gt; To analyze the relationship between miles per gallon (mpg) and weight (wt),</span></span>
+<span><span class="co">#&gt; we can calculate the correlation coefficient. The correlation coefficient</span></span>
+<span><span class="co">#&gt; (often denoted as "r") measures the strength and direction of a linear</span></span>
+<span><span class="co">#&gt; relationship between two variables.</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; 1. **Data Preparation**: We will extract the mpg and wt values from the</span></span>
+<span><span class="co">#&gt; 1. **Data Extraction**: We will extract the mpg and wt values from the</span></span>
 <span><span class="co">#&gt; dataset.</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; 2. **Calculation of Correlation**: The correlation coefficient (Pearson's r)</span></span>
-<span><span class="co">#&gt; can be calculated using the formula:</span></span>
+<span><span class="co">#&gt; 2. **Calculation of Correlation**: We can use the Pearson correlation</span></span>
+<span><span class="co">#&gt; coefficient formula, which is given by:</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; \[</span></span>
 <span><span class="co">#&gt; r = \frac{n(\sum xy) - (\sum x)(\sum y)}{\sqrt{[n\sum x^2 - (\sum x)^2][n\sum</span></span>
@@ -395,17 +401,45 @@ instructions, inserted into the system prompt, using the
 <span><span class="co">#&gt; - r = 0 indicates no correlation.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Let's calculate the correlation coefficient for mpg and wt using the provided</span></span>
-<span><span class="co">#&gt; data.</span></span>
+<span><span class="co">#&gt; dataset.</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### Data Extraction</span></span>
-<span><span class="co">#&gt; Here are the mpg and wt values from the dataset:</span></span>
+<span><span class="co">#&gt; ### Data Points</span></span>
+<span><span class="co">#&gt; Here are the mpg and wt values extracted from the dataset:</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; - mpg: [21, 21, 22.8, 21.4, 18.7, 18.1, 14.3, 24.4, 22.8, 19.2, 17.8, 16.4,</span></span>
-<span><span class="co">#&gt; 17.3, 15.2, 10.4, 10.4, 14.7, 32.4, 30.4, 33.9, 21.5, 15.5, 15.2, 13.3, 19.2,</span></span>
-<span><span class="co">#&gt; 27.3, 26, 30.4, 15.8, 19.7, 15, 21.4]</span></span>
-<span><span class="co">#&gt; - wt: [2.62, 2.875, 2.32, 3.215, 3.44, 3.46, 3.57, 3.19, 3.15, 3.44, 3.44,</span></span>
-<span><span class="co">#&gt; 4.07, 3.73, 3.78, 5.25, 5.424, 5.345, 2.2, 1.615, 1.835, 2.465, 3.52, 3.435,</span></span>
-<span><span class="co">#&gt; 3.84, 3.845, 1.935, 2.14, 1.513, 3.17, 2.77, 3.57, 2.78]</span></span>
+<span><span class="co">#&gt; | mpg | wt |</span></span>
+<span><span class="co">#&gt; |------|------|</span></span>
+<span><span class="co">#&gt; | 21 | 2.62 |</span></span>
+<span><span class="co">#&gt; | 21 | 2.875|</span></span>
+<span><span class="co">#&gt; | 22.8 | 2.32 |</span></span>
+<span><span class="co">#&gt; | 21.4 | 3.215|</span></span>
+<span><span class="co">#&gt; | 18.7 | 3.44 |</span></span>
+<span><span class="co">#&gt; | 18.1 | 3.46 |</span></span>
+<span><span class="co">#&gt; | 14.3 | 3.57 |</span></span>
+<span><span class="co">#&gt; | 24.4 | 3.19 |</span></span>
+<span><span class="co">#&gt; | 22.8 | 3.15 |</span></span>
+<span><span class="co">#&gt; | 19.2 | 3.44 |</span></span>
+<span><span class="co">#&gt; | 17.8 | 3.44 |</span></span>
+<span><span class="co">#&gt; | 16.4 | 4.07 |</span></span>
+<span><span class="co">#&gt; | 17.3 | 3.73 |</span></span>
+<span><span class="co">#&gt; | 15.2 | 3.78 |</span></span>
+<span><span class="co">#&gt; | 10.4 | 5.25 |</span></span>
+<span><span class="co">#&gt; | 10.4 | 5.424|</span></span>
+<span><span class="co">#&gt; | 14.7 | 5.345|</span></span>
+<span><span class="co">#&gt; | 32.4 | 2.2 |</span></span>
+<span><span class="co">#&gt; | 30.4 | 1.615|</span></span>
+<span><span class="co">#&gt; | 33.9 | 1.835|</span></span>
+<span><span class="co">#&gt; | 21.5 | 2.465|</span></span>
+<span><span class="co">#&gt; | 15.5 | 3.52 |</span></span>
+<span><span class="co">#&gt; | 15.2 | 3.435|</span></span>
+<span><span class="co">#&gt; | 13.3 | 3.84 |</span></span>
+<span><span class="co">#&gt; | 19.2 | 3.845|</span></span>
+<span><span class="co">#&gt; | 27.3 | 1.935|</span></span>
+<span><span class="co">#&gt; | 26 | 2.14 |</span></span>
+<span><span class="co">#&gt; | 30.4 | 1.513|</span></span>
+<span><span class="co">#&gt; | 15.8 | 3.17 |</span></span>
+<span><span class="co">#&gt; | 19.7 | 2.77 |</span></span>
+<span><span class="co">#&gt; | 15 | 3.57 |</span></span>
+<span><span class="co">#&gt; | 21.4 | 2.78 |</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ### Calculation</span></span>
 <span><span class="co">#&gt; Using statistical software or a programming language like Python or R, we can</span></span>
@@ -414,30 +448,30 @@ instructions, inserted into the system prompt, using the
 <span><span class="co">#&gt; For example, in Python, you could use:</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ```python</span></span>
-<span><span class="co">#&gt; import numpy as np</span></span>
+<span><span class="co">#&gt; import pandas as pd</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; mpg = np.array([21, 21, 22.8, 21.4, 18.7, 18.1, 14.3, 24.4, 22.8, 19.2, 17.8,</span></span>
-<span><span class="co">#&gt; 16.4, 17.3, 15.2, 10.4, 10.4, 14.7, 32.4, 30.4, 33.9, 21.5, 15.5, 15.2, 13.3,</span></span>
-<span><span class="co">#&gt; 19.2, 27.3, 26, 30.4, 15.8, 19.7, 15, 21.4])</span></span>
-<span><span class="co">#&gt; wt = np.array([2.62, 2.875, 2.32, 3.215, 3.44, 3.46, 3.57, 3.19, 3.15, 3.44,</span></span>
-<span><span class="co">#&gt; 3.44, 4.07, 3.73, 3.78, 5.25, 5.424, 5.345, 2.2, 1.615, 1.835, 2.465, 3.52,</span></span>
-<span><span class="co">#&gt; 3.435, 3.84, 3.845, 1.935, 2.14, 1.513, 3.17, 2.77, 3.57, 2.78])</span></span>
+<span><span class="co">#&gt; data = {</span></span>
+<span><span class="co">#&gt; 'mpg': [21, 21, 22.8, 21.4, 18.7, 18.1, 14.3, 24.4, 22.8, 19.2, 17.8, 16.4,</span></span>
+<span><span class="co">#&gt; 17.3, 15.2, 10.4, 10.4, 14.7, 32.4, 30.4, 33.9, 21.5, 15.5, 15.2, 13.3, 19.2,</span></span>
+<span><span class="co">#&gt; 27.3, 26, 30.4, 15.8, 19.7, 15, 21.4],</span></span>
+<span><span class="co">#&gt; 'wt': [2.62, 2.875, 2.32, 3.215, 3.44, 3.46, 3.57, 3.19, 3.15, 3.44, 3.44,</span></span>
+<span><span class="co">#&gt; 4.07, 3.73, 3.78, 5.25, 5.424, 5.345, 2.2, 1.615, 1.835, 2.465, 3.52, 3.435,</span></span>
+<span><span class="co">#&gt; 3.84, 3.845, 1.935, 2.14, 1.513, 3.17, 2.77, 3.57, 2.78]</span></span>
+<span><span class="co">#&gt; }</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; correlation = np.corrcoef(mpg, wt)[0, 1]</span></span>
+<span><span class="co">#&gt; df = pd.DataFrame(data)</span></span>
+<span><span class="co">#&gt; correlation = df['mpg'].corr(df['wt'])</span></span>
 <span><span class="co">#&gt; print(correlation)</span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ### Result</span></span>
 <span><span class="co">#&gt; After performing the calculation, you would find that the correlation</span></span>
-<span><span class="co">#&gt; coefficient between mpg and wt is typically negative, indicating that as the</span></span>
-<span><span class="co">#&gt; weight of the vehicle increases, the miles per gallon tends to decrease. This</span></span>
-<span><span class="co">#&gt; is a common relationship in automotive data, as heavier vehicles generally</span></span>
-<span><span class="co">#&gt; consume more fuel.</span></span>
+<span><span class="co">#&gt; coefficient between mpg and wt is approximately -0.87.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ### Conclusion</span></span>
-<span><span class="co">#&gt; In summary, the analysis of the relationship between mpg and wt shows a</span></span>
-<span><span class="co">#&gt; negative correlation, suggesting that increased vehicle weight is associated</span></span>
-<span><span class="co">#&gt; with lower fuel efficiency (mpg).</span></span></code></pre>
+<span><span class="co">#&gt; This indicates a strong negative correlation between mpg and weight (wt). As</span></span>
+<span><span class="co">#&gt; the weight of the vehicle increases, the miles per gallon (mpg) tends to</span></span>
+<span><span class="co">#&gt; decrease, suggesting that heavier vehicles are generally less fuel-efficient.</span></span></code></pre>
 <p>The agent will now provide a more structured analysis including
 correlation, interpretation, and visualization suggestions. However, it
 is not able to carry out the correlation calculation.</p>
@@ -450,16 +484,17 @@ correlation calculation:</p>
 <span><span class="va">equipped_agent</span> <span class="op">&lt;-</span> <span class="va">instructed_agent</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/equip.html">equip</a></span><span class="op">(</span><span class="va">calculate_correlation</span><span class="op">)</span></span>
 <span><span class="va">equipped_agent</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/chat.html">chat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>var1 <span class="op">=</span> <span class="st">"mpg"</span>, var2 <span class="op">=</span> <span class="st">"wt"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;Chat&gt;: 5 messages</span></span>
-<span><span class="co">#&gt;  - - - - - - - - - - - - - - - - Latest messages  - - - - - - - - - - - - - - - </span></span>
-<span><span class="co">#&gt;                               + call_USeVbbBfzQLW… +</span></span>
-<span><span class="co">#&gt;                               |                    |</span></span>
-<span><span class="co">#&gt;                               |   [1] -0.8676594   |</span></span>
-<span><span class="co">#&gt;                               |                    |</span></span>
-<span><span class="co">#&gt;                               +--------------------+</span></span>
+<span><span class="co">#&gt;  - - - - - - - - - - - - - - -  Latest messages  - - - - - - - - - - - - - - -</span></span>
+<span><span class="co">#&gt;                              + call_unIM709jlIx6… +</span></span>
+<span><span class="co">#&gt;                              |                    |</span></span>
+<span><span class="co">#&gt;                              |   [1] -0.8676594   |</span></span>
+<span><span class="co">#&gt;                              |                    |</span></span>
+<span><span class="co">#&gt;                              +--------------------+</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; The correlation coefficient between miles per gallon (mpg) and weight (wt) is</span></span>
-<span><span class="co">#&gt; approximately -0.87. This indicates a strong negative correlation, meaning that</span></span>
-<span><span class="co">#&gt; as the weight of the vehicle increases, the miles per gallon tends to decrease.</span></span></code></pre></div>
+<span><span class="co">#&gt; approximately -0.87. This indicates a strong negative correlation, meaning</span></span>
+<span><span class="co">#&gt; that as the weight of the vehicle increases, the miles per gallon tends to</span></span>
+<span><span class="co">#&gt; decrease.</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="constraining-output">Constraining output<a class="anchor" aria-label="anchor" href="#constraining-output"></a>
@@ -486,15 +521,11 @@ our analysis results:</p>
 <span><span class="co">#&gt; 3  22.8   4 108.0  93 3.85 2.320 18.61  1  1    4    1</span></span>
 <span><span class="co">#&gt; 4  24.4   4 146.7  62 3.69 3.190 20.00  1  0    4    2</span></span>
 <span><span class="co">#&gt; 5  22.8   4 140.8  95 3.92 3.150 22.90  1  0    4    2</span></span>
-<span><span class="co">#&gt; 6  19.2   6 167.6 123 3.92 3.440 18.30  1  0    4    4</span></span>
-<span><span class="co">#&gt; 7  17.8   6 167.6 123 3.92 3.440 18.90  1  0    4    4</span></span>
-<span><span class="co">#&gt; 8  32.4   4  78.7  66 4.08 2.200 19.47  1  1    4    1</span></span>
-<span><span class="co">#&gt; 9  30.4   4  75.7  52 4.93 1.615 18.52  1  1    4    2</span></span>
-<span><span class="co">#&gt; 10 33.9   4  71.1  65 4.22 1.835 19.90  1  1    4    1</span></span>
-<span><span class="co">#&gt; 11 21.5   4 120.1  97 3.70 2.465 20.01  1  0    3    1</span></span>
-<span><span class="co">#&gt; 12 27.3   4  79.0  66 4.08 1.935 18.90  1  1    4    1</span></span>
-<span><span class="co">#&gt; 13 30.4   4  95.1 113 3.77 1.513 16.90  1  1    5    2</span></span>
-<span><span class="co">#&gt; 14 21.4   4 121.0 109 4.11 2.780 18.60  1  1    4    2</span></span>
+<span><span class="co">#&gt; 6  21.5   4 120.1  97 3.70 2.465 20.01  1  0    3    1</span></span>
+<span><span class="co">#&gt; 7  27.3   4  79.0  66 4.08 1.935 18.90  1  1    4    1</span></span>
+<span><span class="co">#&gt; 8  30.4   4  75.7  52 4.93 1.615 18.52  1  1    4    2</span></span>
+<span><span class="co">#&gt; 9  32.4   4  78.7  66 4.08 2.200 19.47  1  1    4    1</span></span>
+<span><span class="co">#&gt; 10 30.4   4  95.1 113 3.77 1.513 16.90  1  1    5    2</span></span>
 <span></span>
 <span><span class="co"># Return a summary data.frame</span></span>
 <span><span class="va">summary_agent</span> <span class="op">&lt;-</span> <span class="va">agent</span> <span class="op">|&gt;</span></span>
@@ -660,9 +691,9 @@ document.</p>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; In this example, we define two classes: `Person` with properties `name` and</span></span>
-<span><span class="co">#&gt; `age`, and `Clock` with a dynamic property `now`. We create instances of these</span></span>
-<span><span class="co">#&gt; classes with default values or custom values for the properties. We also</span></span>
-<span><span class="co">#&gt; demonstrate how to use dynamic properties to compute on demand.</span></span></code></pre>
+<span><span class="co">#&gt; `age`, and `Clock` with a dynamic property `now`. We create instances of</span></span>
+<span><span class="co">#&gt; these classes with default values or custom values for the properties. We</span></span>
+<span><span class="co">#&gt; also demonstrate how to use dynamic properties to compute on demand.</span></span></code></pre>
 </div>
 <div class="section level4">
 <h4 id="querying-a-data-frame">Querying a data.frame<a class="anchor" aria-label="anchor" href="#querying-a-data-frame"></a>

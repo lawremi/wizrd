@@ -68,7 +68,47 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-Enables embedding Large Language Models (LLMs) in R programs by treating them as functions with structured inputs and outputs. Features include tool calling, prompt templating, convenient encoding of examples and interconversion of JSON and S7 objects. Supports local and remote LLMs, including Ollama, llama.cpp, OpenAI and Azure, via an abstraction that is extensible to other providers. Includes a Model Context Protocol (MCP) client. There is experimental support for text embedding, vector stores and Retrieval Augmented Generation (RAG).
+<div class="section level1">
+<div class="page-header"><h1 id="wizrd-an-r-interface-to-large-language-models">wizrd: An R Interface to Large Language Models<a class="anchor" aria-label="anchor" href="#wizrd-an-r-interface-to-large-language-models"></a>
+</h1></div>
+<div class="section level2">
+<h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
+</h2>
+<p>The wizrd package enables embedding Large Language Models (LLMs) in R programs by treating them as functions with structured inputs and outputs. It supports local and remote LLMs, including Ollama, llama.cpp, OpenAI, and Azure, via an extensible abstraction. Features include prompt templating, tool calling, and experimental support for text embedding, vector stores, and Results Augmented Generation (RAG).</p>
+</div>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"lawremi/wizrd"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="quick-start">Quick Start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
+</h2>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/lawremi/wizrd" class="external-link">wizrd</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Use a local LLM (requires Ollama)</span></span>
+<span><span class="va">agent</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/convenience-models.html">llama</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">agent</span>, <span class="st">"Describe the mtcars dataset"</span><span class="op">)</span></span></code></pre></div>
+<p>For advanced usage, including parameterized prompts, tool calling, structured output, and retrieval-augmented generation (RAG), see the package vignette:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/vignette.html" class="external-link">vignette</a></span><span class="op">(</span><span class="st">"wizrd"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="documentation-and-support">Documentation and Support<a class="anchor" aria-label="anchor" href="#documentation-and-support"></a>
+</h2>
+<ul>
+<li>Reference: <code><a href="https://lawremi.github.io/wizrd/reference">help(package = "wizrd")</a></code>
+</li>
+<li>Website: <a href="https://lawremi.github.io/wizrd/">https://lawremi.github.io/wizrd/</a>
+</li>
+<li>GitHub Issues: <a href="https://github.com/lawremi/wizrd/issues" class="external-link">https://github.com/lawremi/wizrd/issues</a>
+</li>
+</ul>
+</div>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
