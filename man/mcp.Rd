@@ -16,7 +16,7 @@
 \usage{
 connect_mcp(server)
 
-start_mcp(command, args = list())
+start_mcp(command, args = character())
 
 tools(x, ...)
 
