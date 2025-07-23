@@ -50,97 +50,121 @@
     </div>
 
     <table class="ref-index"><colgroup><col class="alias"><col class="title"></colgroup><tbody><tr><th colspan="2">
-          <h2 id="all-functions">All functions <a href="#all-functions" class="anchor" aria-hidden="true"></a></h2>
-          <p class="section-desc"></p>
+          <h2 id="model-constructors">Model Constructors <a href="#model-constructors" class="anchor" aria-hidden="true"></a></h2>
+          <p class="section-desc"></p><p>Create agents for different LLM providers</p>
         </th>
       </tr></tbody><tbody><tr><td>
-          <p><code><a href="LanguageModelParams.html">LanguageModelParams()</a></code> </p>
-        </td>
-        <td><p>Language Model Parameters</p></td>
-      </tr><tr><td>
-          <p><code><a href="can_accept_as.html">can_accept_as()</a></code> </p>
-        </td>
-        <td><p>Declaring Tool Parameters</p></td>
-      </tr><tr><td>
-          <p><code><a href="chat.html">chat()</a></code> </p>
-        </td>
-        <td><p>Chat with an Agent</p></td>
-      </tr><tr><td>
-          <p><code><a href="chunk.html">chunk()</a></code> <code><a href="chunk.html">default_chunking()</a></code> </p>
-        </td>
-        <td><p>Text Chunking</p></td>
-      </tr><tr><td>
-          <p><code><a href="convenience-models.html">llama()</a></code> <code><a href="convenience-models.html">llamafile_llama()</a></code> <code><a href="convenience-models.html">llama_vision()</a></code> <code><a href="convenience-models.html">nomic()</a></code> </p>
-        </td>
-        <td><p>Convenience Functions for Common Models</p></td>
-      </tr><tr><td>
-          <p><code><a href="demonstrate.html">demonstrate()</a></code> <code><a href="demonstrate.html">demonstrate_all()</a></code> </p>
-        </td>
-        <td><p>Demonstrating with Examples</p></td>
-      </tr><tr><td>
-          <p><code><a href="describe_with_Rd.html">describe_with_Rd()</a></code> </p>
-        </td>
-        <td><p>Describing Tools with Rd</p></td>
-      </tr><tr><td>
-          <p><code><a href="embed_text.html">embed_text()</a></code> </p>
-        </td>
-        <td><p>Text Embedding</p></td>
-      </tr><tr><td>
-          <p><code><a href="equip.html">equip()</a></code> <code><a href="equip.html">unequip()</a></code> </p>
-        </td>
-        <td><p>Equipping Tools</p></td>
-      </tr><tr><td>
-          <p><code><a href="instruct.html">instruct()</a></code> </p>
-        </td>
-        <td><p>Instructing Models</p></td>
-      </tr><tr><td>
-          <p><code><a href="last_output.html">last_output()</a></code> <code><a href="last_output.html">last_message()</a></code> </p>
-        </td>
-        <td><p>Getting the Last Model Output</p></td>
-      </tr><tr><td>
-          <p><code><a href="mcp.html">connect_mcp()</a></code> <code><a href="mcp.html">start_mcp()</a></code> <code><a href="mcp.html">tools()</a></code> <code><a href="mcp.html">resources()</a></code> <code><a href="mcp.html">prompts()</a></code> </p>
-        </td>
-        <td><p>Model Context Protocol (MCP)</p></td>
-      </tr><tr><td>
           <p><code><a href="model-constructors.html">ollama_agent()</a></code> <code><a href="model-constructors.html">llama_cpp_agent()</a></code> <code><a href="model-constructors.html">openai_agent()</a></code> <code><a href="model-constructors.html">azure_openai_agent()</a></code> </p>
         </td>
         <td><p>Agent Constructors</p></td>
       </tr><tr><td>
-          <p><code><a href="ollama_server.html">ollama_server()</a></code> </p>
+          <p><code><a href="convenience-models.html">llama()</a></code> <code><a href="convenience-models.html">llamafile_llama()</a></code> <code><a href="convenience-models.html">llama_vision()</a></code> <code><a href="convenience-models.html">nomic()</a></code> </p>
         </td>
-        <td><p>Construct an Ollama Server Object</p></td>
+        <td><p>Convenience Functions for Common Models</p></td>
+      </tr></tbody><tbody><tr><th colspan="2">
+          <h2 id="core-functions">Core Functions <a href="#core-functions" class="anchor" aria-hidden="true"></a></h2>
+          <p class="section-desc"></p><p>Main functions for working with LLMs</p>
+        </th>
+      </tr></tbody><tbody><tr><td>
+          <p><code><a href="chat.html">chat()</a></code> </p>
+        </td>
+        <td><p>Chat with an Agent</p></td>
       </tr><tr><td>
-          <p><code><a href="output_as.html">output_as()</a></code> </p>
+          <p><code><a href="last_output.html">last_output()</a></code> <code><a href="last_output.html">last_message()</a></code> </p>
         </td>
-        <td><p>Output Constraints</p></td>
-      </tr><tr><td>
-          <p><code><a href="persist.html">persist()</a></code> <code><a href="persist.html">restore()</a></code> </p>
+        <td><p>Getting the Last Model Output</p></td>
+      </tr></tbody><tbody><tr><th colspan="2">
+          <h2 id="agent-configuration">Agent Configuration <a href="#agent-configuration" class="anchor" aria-hidden="true"></a></h2>
+          <p class="section-desc"></p><p>Functions to configure and customize agents</p>
+        </th>
+      </tr></tbody><tbody><tr><td>
+          <p><code><a href="instruct.html">instruct()</a></code> </p>
         </td>
-        <td><p>Object Persistence</p></td>
-      </tr><tr><td>
-          <p><code><a href="pipelines.html">c(<i>&lt;Agent&gt;</i>)</a></code> <code><a href="pipelines.html">c(<i>&lt;Chat&gt;</i>)</a></code> <code><a href="pipelines.html">c(<i>&lt;ChatPipeline&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>Chat Pipelines</p></td>
+        <td><p>Instructing Models</p></td>
       </tr><tr><td>
           <p><code><a href="prompt_as.html">prompt_as()</a></code> <code><a href="prompt_as.html">system_prompt_as()</a></code> </p>
         </td>
         <td><p>Prompt Construction</p></td>
       </tr><tr><td>
-          <p><code><a href="rag_with.html">rag_with()</a></code> </p>
+          <p><code><a href="output_as.html">output_as()</a></code> </p>
         </td>
-        <td><p>Retrieval Augmented Generation (RAG)</p></td>
+        <td><p>Output Constraints</p></td>
       </tr><tr><td>
-          <p><code><a href="retrieve.html">retrieve()</a></code> </p>
+          <p><code><a href="equip.html">equip()</a></code> <code><a href="equip.html">unequip()</a></code> </p>
         </td>
-        <td><p>Retrieve Documents</p></td>
+        <td><p>Equipping Tools</p></td>
+      </tr><tr><td>
+          <p><code><a href="demonstrate.html">demonstrate()</a></code> <code><a href="demonstrate.html">demonstrate_all()</a></code> </p>
+        </td>
+        <td><p>Demonstrating with Examples</p></td>
+      </tr></tbody><tbody><tr><th colspan="2">
+          <h2 id="tools-and-extensions">Tools and Extensions <a href="#tools-and-extensions" class="anchor" aria-hidden="true"></a></h2>
+          <p class="section-desc"></p><p>Tool calling and external integrations</p>
+        </th>
+      </tr></tbody><tbody><tr><td>
+          <p><code><a href="tool.html">tool()</a></code> </p>
+        </td>
+        <td><p>Agent Tools</p></td>
+      </tr><tr><td>
+          <p><code><a href="mcp.html">connect_mcp()</a></code> <code><a href="mcp.html">start_mcp()</a></code> <code><a href="mcp.html">tools()</a></code> <code><a href="mcp.html">resources()</a></code> <code><a href="mcp.html">prompts()</a></code> </p>
+        </td>
+        <td><p>Model Context Protocol (MCP)</p></td>
+      </tr><tr><td>
+          <p><code><a href="describe_with_Rd.html">describe_with_Rd()</a></code> </p>
+        </td>
+        <td><p>Describing Tools with Rd</p></td>
+      </tr></tbody><tbody><tr><th colspan="2">
+          <h2 id="text-processing">Text Processing <a href="#text-processing" class="anchor" aria-hidden="true"></a></h2>
+          <p class="section-desc"></p><p>Text embedding and RAG functionality</p>
+        </th>
+      </tr></tbody><tbody><tr><td>
+          <p><code><a href="embed_text.html">embed_text()</a></code> </p>
+        </td>
+        <td><p>Text Embedding</p></td>
       </tr><tr><td>
           <p><code><a href="text_store.html">text_store()</a></code> </p>
         </td>
         <td><p>Text Stores</p></td>
       </tr><tr><td>
-          <p><code><a href="tool.html">tool()</a></code> </p>
+          <p><code><a href="retrieve.html">retrieve()</a></code> </p>
         </td>
-        <td><p>Agent Tools</p></td>
+        <td><p>Retrieve Documents</p></td>
+      </tr><tr><td>
+          <p><code><a href="chunk.html">chunk()</a></code> <code><a href="chunk.html">default_chunking()</a></code> </p>
+        </td>
+        <td><p>Text Chunking</p></td>
+      </tr><tr><td>
+          <p><code><a href="rag_with.html">rag_with()</a></code> </p>
+        </td>
+        <td><p>Retrieval Augmented Generation (RAG)</p></td>
+      </tr></tbody><tbody><tr><th colspan="2">
+          <h2 id="utilities">Utilities <a href="#utilities" class="anchor" aria-hidden="true"></a></h2>
+          <p class="section-desc"></p><p>Helper functions and utilities</p>
+        </th>
+      </tr></tbody><tbody><tr><td>
+          <p><code><a href="persist.html">persist()</a></code> <code><a href="persist.html">restore()</a></code> </p>
+        </td>
+        <td><p>Object Persistence</p></td>
+      </tr><tr><td>
+          <p><code><a href="LanguageModelParams.html">LanguageModelParams()</a></code> </p>
+        </td>
+        <td><p>Language Model Parameters</p></td>
+      </tr><tr><td>
+          <p><code><a href="ollama_server.html">ollama_server()</a></code> </p>
+        </td>
+        <td><p>Construct an Ollama Server Object</p></td>
+      </tr><tr><td>
+          <p><code><a href="mcp.html">connect_mcp()</a></code> <code><a href="mcp.html">start_mcp()</a></code> <code><a href="mcp.html">tools()</a></code> <code><a href="mcp.html">resources()</a></code> <code><a href="mcp.html">prompts()</a></code> </p>
+        </td>
+        <td><p>Model Context Protocol (MCP)</p></td>
+      </tr><tr><td>
+          <p><code><a href="can_accept_as.html">can_accept_as()</a></code> </p>
+        </td>
+        <td><p>Declaring Tool Parameters</p></td>
+      </tr><tr><td>
+          <p><code><a href="pipelines.html">c(<i>&lt;Agent&gt;</i>)</a></code> <code><a href="pipelines.html">c(<i>&lt;Chat&gt;</i>)</a></code> <code><a href="pipelines.html">c(<i>&lt;ChatPipeline&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Chat Pipelines</p></td>
       </tr></tbody></table></div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
