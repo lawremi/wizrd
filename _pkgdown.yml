@@ -27,13 +27,16 @@ reference:
       - llamafile_llama
       - llama_vision
       - nomic
+      - ollama_server
   - title: "Core Functions"
     desc: "Main functions for working with LLMs"
     contents:
       - chat
+      - predict.Agent
       - last_output
       - last_message
-  - title: "Agent Configuration"
+      - LanguageModelParams
+  - title: "Agent Grammar"
     desc: "Functions to configure and customize agents"
     contents:
       - instruct
@@ -44,15 +47,12 @@ reference:
       - demonstrate
       - demonstrate_all
       - system_prompt_as
-  - title: "Tools and Extensions"
+  - title: "Tools"
     desc: "Tool calling and external integrations"
     contents:
       - tool
-      - connect_mcp
-      - start_mcp
       - describe_with_Rd
-      - tools
-      - resources
+      - can_accept_as
   - title: "Text Processing"
     desc: "Text embedding and RAG functionality"
     contents:
@@ -62,15 +62,19 @@ reference:
       - chunk
       - default_chunking
       - rag_with
-  - title: "Utilities"
-    desc: "Helper functions and utilities"
-    contents:
       - persist
       - restore
-      - LanguageModelParams
-      - ollama_server
+  - title: "Model Context Protocol (MCP) Client"
+    desc: "Access tools, resources and prompts from an MCP server"
+    contents:
+      - connect_mcp
+      - start_mcp
+      - tools      
       - prompts
-      - can_accept_as
+      - resources
+  - title: "Experimental"
+    desc: "Features that might change without notice"
+    contents:
       - pipelines
 
 navbar:
