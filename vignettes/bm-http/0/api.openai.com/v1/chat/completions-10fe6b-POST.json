@@ -1,7 +1,7 @@
 {
-    "id": "chatcmpl-BwH4Puv1IK9c8xCUbcidy4zy6vNP4",
+    "id": "chatcmpl-BwHbjwf1PgoOmKTjdDO0WXYmJSDch",
     "object": "chat.completion",
-    "created": 1753228341,
+    "created": 1753230407,
     "model": "o4-mini-2025-04-16",
     "choices": [
         {
@@ -11,11 +11,11 @@
                 "content": null,
                 "tool_calls": [
                     {
-                        "id": "call_Hz0O2bYwKC54Ti2MqnEI4di2",
+                        "id": "call_fZgrqV2RFaxdh2N7vaoIWWEO",
                         "type": "function",
                         "function": {
                             "name": "get_data",
-                            "arguments": "{\"mart\":\"ENSEMBL_MART_ENSEMBL\",\"dataset\":\"hsapiens_gene_ensembl\",\"attributes\":[\"entrezgene_id\",\"hgnc_symbol\"],\"filters\":{\"link_go_closure\":\"GO:0004707\"}}"
+                            "arguments": "{\"mart\":\"ENSEMBL_MART_ENSEMBL\",\"dataset\":\"hsapiens_gene_ensembl\",\"attributes\":[\"entrezgene_id\",\"hgnc_symbol\"],\"filters\":{\"go_name\":\"MAP kinase activity\"}}"
                         }
                     }
                 ],
@@ -28,15 +28,15 @@
         }
     ],
     "usage": {
-        "prompt_tokens": 7148,
-        "completion_tokens": 1348,
-        "total_tokens": 8496,
+        "prompt_tokens": 7061,
+        "completion_tokens": 896,
+        "total_tokens": 7957,
         "prompt_tokens_details": {
-            "cached_tokens": 2432,
+            "cached_tokens": 2048,
             "audio_tokens": 0
         },
         "completion_tokens_details": {
-            "reasoning_tokens": 1280,
+            "reasoning_tokens": 832,
             "audio_tokens": 0,
             "accepted_prediction_tokens": 0,
             "rejected_prediction_tokens": 0

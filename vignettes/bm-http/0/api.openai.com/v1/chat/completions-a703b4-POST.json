@@ -1,7 +1,7 @@
 {
-    "id": "chatcmpl-BwH3tAPc864fHA4R7rteTELBtYLmc",
+    "id": "chatcmpl-BwHbXZkgedAPB0QnDjgO3X4MQ32Im",
     "object": "chat.completion",
-    "created": 1753228309,
+    "created": 1753230395,
     "model": "o4-mini-2025-04-16",
     "choices": [
         {
@@ -11,7 +11,7 @@
                 "content": null,
                 "tool_calls": [
                     {
-                        "id": "call_iyMLRURrBmKev0Wf4A5t0b20",
+                        "id": "call_ccmnleCcjFysEbENoTIvn5z2",
                         "type": "function",
                         "function": {
                             "name": "list_filters",
@@ -29,14 +29,14 @@
     ],
     "usage": {
         "prompt_tokens": 2122,
-        "completion_tokens": 1002,
-        "total_tokens": 3124,
+        "completion_tokens": 426,
+        "total_tokens": 2548,
         "prompt_tokens_details": {
-            "cached_tokens": 2048,
+            "cached_tokens": 0,
             "audio_tokens": 0
         },
         "completion_tokens_details": {
-            "reasoning_tokens": 960,
+            "reasoning_tokens": 384,
             "audio_tokens": 0,
             "accepted_prediction_tokens": 0,
             "rejected_prediction_tokens": 0

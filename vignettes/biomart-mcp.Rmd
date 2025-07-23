@@ -30,7 +30,7 @@ question in plain English and get a data.frame result.
 The BioMart MCP server uses the `pybiomart` Python package, which relies on an 
 older XML-based approach to BioMart. This limits its functionality compared to 
 the `biomaRt` R package, which uses direct API access. Some queries that work 
-with biomaRt may not be possible vwith the current MCP server.
+with biomaRt may not be possible with the current MCP server.
 
 # Starting the BioMart MCP Server
 
@@ -102,7 +102,7 @@ The biomaRt equivalent requires the user to learn how to use the
 biomaRt package, to determine many different identifiers, and to exert
 extra effort to convert the output to a GRanges.
 
-```{r biomart-equivalent-coords}
+```{r biomart-equivalent-coords, eval = FALSE}
 library(biomaRt)
 mart <- useMart("ensembl", dataset = "hsapiens_gene_ensembl")
 getBM(
@@ -112,8 +112,7 @@ getBM(
     ),
     filters = "external_gene_name",
     values = c("TP53", "BRCA2"),
-    mart = mart,
-    useCache = FALSE # would interfere with vignette-level caching
+    mart = mart
 ) |>
     transform(strand = ifelse(strand > 0, "+", "-")) |>
     makeGRangesFromDataFrame(
