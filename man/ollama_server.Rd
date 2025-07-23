@@ -7,7 +7,9 @@
 \description{
   Constructs a reference to an Ollama server, optionally starting one if
   one is not running at the specified (local) URL. If the server is
-  started, it will be killed when the returned object goes out of scope.
+  started, it will be killed when the returned object goes out of scope
+  (such as when the agents using it go out of scope and there is no
+  independent reference).
 
   This function requires Ollama to be installed on your system. You can
   install Ollama from \url{https://ollama.ai} and follow their
@@ -33,7 +35,7 @@ ollama_server(url = ollama_url(), start = TRUE, ...)
 \author{Michael Lawrence}
 \examples{
 \dontrun{
-    server <- ollama_server() # keep a reference to this object
+    server <- ollama_server()
     agent <- llama(server)
     agent |>
         instruct("Answer questions about this dataset:", mtcars) |>

@@ -6,24 +6,17 @@
 \alias{chat.Chat}
 
 \title{
-  Chat with an Agent
+  Interact with an Agent
 }
 \description{
-  Chat with a model, either by a single exchange or by maintaining context over multiple exchanges.
+  Interact with an agent, either by a single exchange (\code{predict})
+  or by maintaining context over multiple exchanges (\code{chat}).
 }
-\usage{
-# generic, see methods below
-chat(x, ...)
-}
-\arguments{
-  \item{x}{
-    A Chat or Agent object.
-  }
-  \item{\dots}{
-    Additional arguments passed to the backend.
-  }
-}
+
 \section{Methods}{
+  There are methods for both \code{predict} and \code{chat} on Chat and Agent
+  objects.
+  
   \subsection{Usage}{
     \describe{
       \item{Agent}{
@@ -78,9 +71,9 @@ chat(x, ...)
       }
     }
   }
-}
-\value{
-  For \code{predict}, the model response. For \code{chat}, a Chat object.
+  \subsection{Value}{
+    For \code{predict}, the model response. For \code{chat}, a Chat object.
+  }
 }
 \author{Michael Lawrence}
 \examples{

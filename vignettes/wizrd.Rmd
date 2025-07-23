@@ -1,10 +1,10 @@
 ---
-title: "wizrd"
+title: "General Introduction"
 author: "Michael Lawrence"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{wizrd}
+  %\VignetteIndexEntry{General Introduction}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -15,6 +15,7 @@ knitr::opts_chunk$set(
     comment = "#>"
 )
 httptest2::start_vignette("http")
+options(width=78)
 ```
 
 # Overview
