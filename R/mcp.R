@@ -466,7 +466,7 @@ need_builtin_uvx <- function(command, args) {
 }
 
 uv_pipex <- function(pyfile, args, ...) {
-    require_ns("reticulate", "run FastMCP-based servers conveniently")
+    require_ns("reticulate", "run FastMCP-based servers conveniently", "1.41.0")
     my_uv_exec <- reticulate:::uv_exec
     environment(my_uv_exec) <- list2env(list(system2 = pipex),
                                         parent = environment(my_uv_exec))

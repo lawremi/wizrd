@@ -349,7 +349,7 @@ find_name <- function(what, env) {
     assign(nm, eval(call, parent.frame()), parent.frame())
 }
 
-require_ns <- function(x, to) {
+require_ns <- function(x, to, version = NULL) {
     assert_character(x)
     assert_string(to)
 
@@ -359,6 +359,15 @@ require_ns <- function(x, to) {
              paste0("'", x[!loaded], "'", collapse = " and "), " to ", to, ".",
              call. = FALSE)
 
+    if (!is.null(version)) {
+        outdated <- mapply(compareVersion, version,
+                           lapply(x, getNamespaceVersion)) > 0L
+        if (any(outdated))
+            stop("Update package", if (sum(loaded) > 1L) "s" else "", " ",
+                 paste0("'", x[outdated], "'", collapse = " and "),
+                 " to ", to, ".", call. = FALSE)
+    }
+    
     invisible(TRUE)
 }
 
