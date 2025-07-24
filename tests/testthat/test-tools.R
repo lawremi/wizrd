@@ -16,7 +16,9 @@ test_that("models can call R functions as tools", {
     output <- predict(model, "What is the mean of var? Respond in pure JSON.")
     expect_equal(jsonlite::fromJSON(output)$mean, mean(var))
 
-    model <- equip(model, tool(mean) |> describe_with_Rd())
+    mean_tool <- tool(mean) |> describe_with_Rd()
+    mean_tool@param_descriptions["x"] <- "The name of the variable"
+    model <- equip(model, mean_tool)
     output <- predict(model, "What is the mean of `var`? Return the mean in a JSON object.")
     expect_equal(jsonlite::fromJSON(output)$mean, mean(var))
 

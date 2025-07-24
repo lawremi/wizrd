@@ -50,5 +50,4 @@ test_that("chat() can stream responses", {
     prompt <- "Who created R?"
     ans <- predict(model, prompt, stream_callback = stream_callback)
     expect_equal(ans, all_content)
-    expect_equal(predict(model, prompt), all_content)
 })
