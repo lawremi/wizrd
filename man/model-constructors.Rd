@@ -18,7 +18,7 @@
 \usage{
 ollama_agent(name, pull = NA, server = ollama_server(), ...)
 llama_cpp_agent(path, mode = c("chat", "embedding"), alias = NULL,
-                server_path = NULL, ...)
+                server_path = NULL, port = 0L, ...)
 openai_agent(name = "gpt-4o-mini", ...)
 azure_openai_agent(name = "gpt-4o", url = getOption("wizrd_azure_openai_url"),
                    ...)
@@ -68,6 +68,10 @@ azure_openai_agent(name = "gpt-4o", url = getOption("wizrd_azure_openai_url"),
     (self-contained) llamafile. Otherwise, defaults to the automatic,
     user-local installation of the llamafile utility, downloading and
     installing it if necessary and (when interactive) the user approves.
+  }
+  \item{port}{
+    The listening port for the llama.cpp HTTP server. By default,
+    automatically finds an open port.
   }
   \item{url}{The URL of the Azure endpoint, typically ending with the hostname.}
   \item{\dots}{

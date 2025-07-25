@@ -30,7 +30,7 @@ llama_cpp_agent_from_ollama <- function(name, ...) {
 }
 
 llama_cpp_agent <- function(path, mode = c("chat", "embedding"), alias = NULL,
-                            server_path = NULL, ...) {
+                            server_path = NULL, port = 0L, ...) {
     mode <- match.arg(mode)
 
     if (resembles_url(path))
@@ -45,7 +45,7 @@ llama_cpp_agent <- function(path, mode = c("chat", "embedding"), alias = NULL,
     }
 
     run_server <- if (mode == "chat") run_llama_cpp_server else run_llamafile_v2
-    server <- run_server(model, alias = alias, path = server_path)
+    server <- run_server(model, alias = alias, path = server_path, port = port)
     language_agent(server, ...)
 }
 
