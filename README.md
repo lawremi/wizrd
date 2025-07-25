@@ -18,11 +18,15 @@ remotes::install_github("lawremi/wizrd")
 
 ## Quick Start
 
+The following example runs out of the box using Mozilla's 
+[llamafile framework](https://github.com/Mozilla-Ocho/llamafile) 
+(no system dependencies):
+
 ```r
 library(wizrd)
 
-# Use a local LLM (requires Ollama)
-agent <- llama()
+# Use a local Llama 3.2 3B model via llamafile (auto-downloads if needed)
+agent <- llamafile_llama()
 predict(agent, "Describe the mtcars dataset")
 ```
 
