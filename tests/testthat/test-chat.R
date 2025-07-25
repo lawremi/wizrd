@@ -10,7 +10,8 @@ test_that("chat() and predict() work for text messages", {
     expect_length(chat2@messages, 5L)
     expect_match(last_output(chat2), "1993")
 
-    expect_match(predict(model, "Who created R?"), "Robert.*Ross|Ross.*Robert")
+    expect_match(predict(model, "Who created the R language?"),
+                 "Robert.*Ross|Ross.*Robert")
     expect_match(predict(chat, "When did they do it?"), "1993")
 })
 
@@ -37,6 +38,13 @@ test_that("chat() and predict() work for images", {
 })
 
 test_that("chat() can stream responses", {
+    skip_on_cran() # avoid ollama dependency since we cannot cache
+    is_mocking <- !is.null(getOption("httr2_mock"))
+    if (is_mocking) { # cannot cache req_perform_connection()
+        httptest2::stop_mocking()
+        on.exit(httptest2::use_mock_api())
+    }
+
     model <- llama(server)
 
     model@instructions <- "Respond with a single sentence"

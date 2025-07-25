@@ -64,6 +64,11 @@ test_that("the SSE transport layer works", {
 })
 
 test_that("the Streamable HTTP transport layer works", {
+    is_mocking <- !is.null(getOption("httr2_mock"))
+    if (is_mocking) { # cannot cache req_perform_connection()
+        httptest2::stop_mocking()
+        on.exit(httptest2::use_mock_api())
+    }
     port <- wizrd:::find_available_port()
     mcp_server <- wizrd:::start_test_mcp("streamable-http", port)
     url <- paste0("http://127.0.0.1:", port, "/mcp")
