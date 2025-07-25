@@ -86,11 +86,12 @@
 <div class="section level2">
 <h2 id="quick-start">Quick Start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
 </h2>
+<p>The following example runs out of the box using Mozilla’s <a href="https://github.com/Mozilla-Ocho/llamafile" class="external-link">llamafile framework</a> (no system dependencies):</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/lawremi/wizrd" class="external-link">wizrd</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Use a local LLM (requires Ollama)</span></span>
-<span><span class="va">agent</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/convenience-models.html">llama</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co"># Use a local Llama 3.2 3B model via llamafile (auto-downloads if needed)</span></span>
+<span><span class="va">agent</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/convenience-models.html">llamafile_llama</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">agent</span>, <span class="st">"Describe the mtcars dataset"</span><span class="op">)</span></span></code></pre></div>
 <p>For advanced usage, including parameterized prompts, tool calling, structured output, and retrieval-augmented generation (RAG), see the package vignette:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
