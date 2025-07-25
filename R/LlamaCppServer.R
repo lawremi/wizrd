@@ -57,7 +57,8 @@ cache_llama_cpp_agent <- function(url) {
 }
 
 llamafile_llama <- function(temperature = 0, ...) {
-    llama_cpp_agent("https://huggingface.co/Mozilla/Llama-3.2-3B-Instruct-llamafile/resolve/main/Llama-3.2-3B-Instruct.Q6_K.llamafile")
+    llama_cpp_agent("https://huggingface.co/Mozilla/Llama-3.2-3B-Instruct-llamafile/resolve/main/Llama-3.2-3B-Instruct.Q6_K.llamafile",
+                    temperature = temperature, ...)
 }
 
 llamafile_url <- function() {
