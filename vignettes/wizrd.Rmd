@@ -35,7 +35,7 @@ pretty_rmd <- function(x) {
 
 # Quick start
 
-To start analyzing data with an agentl:
+To start analyzing data with an agent:
 ```{r quickstart, results='asis'}
 library(wizrd)
 agent <- llamafile_llama()
