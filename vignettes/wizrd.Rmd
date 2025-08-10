@@ -189,11 +189,10 @@ outputs into any R object structure defined using S7.
 ## Converting an agent to an actual R function
 
 Since the agent is already behaving like a function, it is relatively
-straightforward to convert it into an actual R function using the
-`convert()` generic from S7:
+straightforward to convert it into an actual R function using `as.function`:
 ```{r function}
 # Convert the filtered agent to a function
-filter_cars <- S7::convert(filtered_agent, S7::class_function)
+filter_cars <- as.function(filtered_agent)
 filter_cars("Cars with mpg > 30")
 ```
 
