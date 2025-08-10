@@ -143,8 +143,8 @@ equipped_agent |> chat(list(var1 = "mpg", var2 = "wt"))
 
 In order to incorporate the output into a larger program, it is often
 necessary to convert the output to a more standardized and computable
-object. We can use the `output_as()` function to structure our
-analysis results:
+object. We can use the `output_as()` function to structure the outputs
+(*but do not trust these actual results!*):
 
 ```{r output_as}
 # Return the correlation as a single number
