@@ -821,5 +821,19 @@ wait_until_port_open <- function(port) {
     invisible(port)
 }
 
-RFC_5424_SEVERITY_LEVELS <- c("emergency", "alert", "critical", "error", "warning",
-                              "notice", "info", "debug")
+RFC_5424_SEVERITY_LEVELS <- c("emergency", "alert", "critical", "error",
+                              "warning", "notice", "info", "debug")
+
+# API key cache management for httptest2
+api_key_cache_dir <- function(base_dir, env_var) {
+    api_key <- Sys.getenv(env_var)
+    if (api_key == "") {
+        return(base_dir)
+    }
+    key_hash <- substr(digest::digest(api_key, algo = "sha256"), 1, 8)
+    file.path(base_dir, key_hash)
+}
+
+start_vignette_with_api_key <- function(base_dir, env_var) {
+    httptest2::start_vignette(api_key_cache_dir(base_dir, env_var))
+}

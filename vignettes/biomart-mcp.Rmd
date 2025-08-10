@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
     collapse = TRUE,
     comment = "#>"
 )
-httptest2::start_vignette("bm-http")
+wizrd:::start_vignette_with_api_key("bm-cache", "OPENAI_API_KEY")
 ```
 
 # Overview

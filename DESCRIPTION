@@ -25,7 +25,8 @@ Imports:
     glue,
     cli,
     curl,
-    methods
+    methods,
+    digest
 Suggests:
     processx,
     base64enc,
