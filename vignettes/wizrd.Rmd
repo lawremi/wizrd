@@ -143,8 +143,7 @@ equipped_agent |> chat(list(var1 = "mpg", var2 = "wt"))
 
 In order to incorporate the output into a larger program, it is often
 necessary to convert the output to a more standardized and computable
-object. We can use the `output_as()` function to structure the outputs
-(*but do not trust these actual results!*):
+object. We can use the `output_as()` function to structure the outputs:
 
 ```{r output_as}
 # Return the correlation as a single number
@@ -156,22 +155,22 @@ equipped_agent |>
 filtered_agent <- agent |>
     output_as(mtcars)
 filtered_agent |>
-    predict("Cars with mpg > 20")
+    predict("First five cars")
 
-# Return a summary data.frame
+# Return a data.frame with specific, renamed columns
 summary_agent <- agent |>
     output_as(data.frame(
-        cyl = integer(),
-        avg_mpg = numeric(),
-        avg_hp = numeric()
+        mpg = numeric(),
+        horsepower = integer(),
+        weight = numeric()
     ))
 summary_agent |>
-    predict("Average mpg and hp by number of cylinders.")
+    predict("First five cars.")
 
 # Using class_data.frame for more general output
 agent |>
     output_as(S7::class_data.frame) |>
-    predict("Top 5 most fuel efficient cars including mpg, hp, and wt.")
+    predict("First five cars cars including mpg, hp, and wt.")
 ```
 
 In the above examples, we demonstrate different ways to structure the output:
