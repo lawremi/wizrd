@@ -38,18 +38,17 @@ pretty_rmd <- function(x) {
 To start analyzing data with an agent:
 ```{r quickstart, results='asis'}
 library(wizrd)
-agent <- llamafile_llama()
+agent <- quick_start_model()
 predict(agent, "Describe the mtcars dataset") |> pretty_rmd()
 ```
 
-The call to `llamafile_llama()` will download, cache and run the
-self-contained, cross-platform llamafile binary for the llama 3.2 3B
-model. Behind the scenes, it starts up a local HTTP server (based on
+The call to `quick_start_model()` will download, cache and run a
+self-contained, cross-platform llamafile model. Behind the scenes, it
+starts up a local HTTP server (based on
 llama.cpp) through which it communicates with the R process. For more
 general use of local LLMs, it is recommended to install Ollama and use
-`ollama_agent()` to pull (if necessary) and run agents with
-Ollama. The `llama()` function is a convenience to run llama 3.2 3B
-with Ollama. Convenience functions exist for some other common models.
+`test_model()` for test and demonstration chat workflows, `vision_model()`
+for image-capable chat, and `embedding_model()` for text embeddings.
 
 The `predict()` function is the most convenient way to execute single
 exchanges with an agent. To maintain a context over multiple exchanges,
@@ -81,11 +80,10 @@ There are three requirements for LLMs to act as functions:
 1. Return an R object of a specified type and structure.
 
 We will demonstrate how the wizrd package meets each of these
-requirements in turn. We will use gpt-4o-mini for this example, in
-order to support constrained output. Set the `OPENAI_API_KEY`
-environment variable to your OpenAI key before running this.
-```{r openai_agent}
-agent <- openai_agent("gpt-4o-mini", temperature = 0) |>
+requirements in turn. We will use a local model through Ollama for this
+example, so it can run locally without an API key.
+```{r ollama_agent}
+agent <- test_model() |>
     instruct("Answer questions about this dataset:", mtcars)
 ```
 For reproducibility reasons, it is best to explicitly specify the
@@ -246,7 +244,7 @@ application is in the querying of R manual pages.
 
 The code below uses the `chunk()` generic to generate text chunks from
 the S7 man pages. Next, it creates a TextStore that indexes those
-chunks using the nomic text embedding model. It then configures the
+chunks using the default text embedding model. It then configures the
 prompt generator to query the text store for chunks that are similar
 to the query. Finally, it sends the query for an example of the
 `S7::new_property()` function. 
@@ -259,8 +257,8 @@ directly in this document.
 
 ```{r rag}
 chunks <- chunk(tools::Rd_db("S7"))
-store <- text_store(nomic(), chunks)
-agent <- llama() |> prompt_as(rag_with(store))
+store <- text_store(embedding_model(), chunks)
+agent <- test_model() |> prompt_as(rag_with(store))
 cat("#### new_property example\n")
 last_message(chat(agent, "new_property example"))
 ```
@@ -270,8 +268,8 @@ last_message(chat(agent, "new_property example"))
 And here is an example of querying a data.frame using RAG:
 ```{r rag-df}
 chunks <- chunk(mtcars)
-store <- text_store(nomic(), chunks)
-agent <- llama() |> prompt_as(rag_with(store))
+store <- text_store(embedding_model(), chunks)
+agent <- test_model() |> prompt_as(rag_with(store))
 predict(agent, "MPG of Datsun 710")
 ```
 

@@ -26,7 +26,7 @@ The following example runs out of the box using Mozilla's
 library(wizrd)
 
 # Use a local Llama 3.2 3B model via llamafile (auto-downloads if needed)
-agent <- llamafile_llama()
+agent <- quick_start_model()
 predict(agent, "Describe the mtcars dataset")
 ```
 

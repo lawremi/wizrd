@@ -51,7 +51,7 @@ can_accept_as(`_x`, ..., `_parameters` = list(...))
 \examples{
 \dontrun{
     var <- 1:10
-    agent <- llama() |>
+    agent <- test_model() |>
         equip(tool(mean) |> describe_with_Rd() |> can_accept_as(class_name)) |>
         predict("What is the mean of var?")
 }

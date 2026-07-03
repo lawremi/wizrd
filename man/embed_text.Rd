@@ -13,7 +13,7 @@ embed_text(x, text, ndim, ...)
 \arguments{
   \item{x}{
     The Agent object, whose underlying model should be
-    specialized for generating embeddings, like \code{\link{nomic}}.
+    specialized for generating embeddings, like \code{\link{embedding_model}}.
   }
   \item{text}{
     A data.frame, typically generated via \code{\link{chunk}}, with
@@ -40,7 +40,7 @@ embed_text(x, text, ndim, ...)
 \examples{
 \dontrun{
     chunks <- chunk(tools::Rd_db("S7"))
-    embed_text(nomic(), chunks)
+    embed_text(embedding_model(), chunks)
 }
 }
 \keyword{ utilities }

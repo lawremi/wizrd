@@ -54,11 +54,11 @@ system_prompt_as(x, format, ...)
 \author{Michael Lawrence}
 \examples{
 \dontrun{
-    llama() |>
+    test_model() |>
         prompt_as("Output a {nchar}-letter word starting with '{initial}'.") |>
         predict(list(nchar = 4L, initial = "a"))
 
-    llama() |>
+    test_model() |>
         system_prompt_as("Answer questions about {language}") |>
         chat(system_params = list(language = "R")) |>
         predict("Who created the language?")

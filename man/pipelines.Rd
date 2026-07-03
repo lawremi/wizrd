@@ -57,8 +57,10 @@
 \examples{
 \dontrun{
     pipeline <- c(
-        adder = llama(server) |> instruct("Return a single number"),
-        namer = llama(server) |> instruct("Return only the name of the number")
+        adder = test_model(server) |>
+            instruct("Return only the number as digits. No words."),
+        namer = test_model(server) |>
+            instruct("Return only the English name of the number, title case. No punctuation.")
     )
     predict(pipeline, "1 + 1") # "Two"
 

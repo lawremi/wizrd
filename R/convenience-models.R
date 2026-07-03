@@ -4,10 +4,24 @@ llama <- function(server = ollama_server(), temperature = 0, ...) {
     ollama_llama(server, temperature, ...)
 }
 
-llama_vision <- function(server = ollama_server(), temperature = 0, ...) {
-    ollama_llama_vision(server, temperature, ...)
+vision_model <- function(server = ollama_server(), temperature = 0, ...) {
+    ollama_gemma(server, temperature, ...)
 }
 
-nomic <- function(server = ollama_server(), temperature = 0, ...) {
+llama_vision <- vision_model
+
+embedding_model <- function(server = ollama_server(), temperature = 0, ...) {
     ollama_nomic(server, temperature, ...)
 }
+
+nomic <- embedding_model
+
+quick_start_model <- function(temperature = 0, ...) {
+    llamafile_ministral(temperature, ...)
+}
+
+gemma <- function(server = ollama_server(), temperature = 0, ...) {
+    ollama_gemma(server, temperature, ...)
+}
+
+test_model <- gemma

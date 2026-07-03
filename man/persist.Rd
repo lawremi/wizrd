@@ -32,11 +32,11 @@ restore(file)
 \examples{
 \dontrun{
     chunks <- chunk(tools::Rd_db("S7"))
-    store <- text_store(nomic(), chunks)
+    store <- text_store(embedding_model(), chunks)
     file <- tempfile("text", fileext = ".rds")
     persist(store, file)
     store <- restore(file)
-    agent <- llama() |> prompt_as(rag_with(store))
+    agent <- test_model() |> prompt_as(rag_with(store))
     predict(agent, "new_property example")
 }
 }

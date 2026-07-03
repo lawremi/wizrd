@@ -44,10 +44,16 @@ ollama_is_running <- function(server = ollama_server(start = FALSE)) {
 ollama_list <- function(server = ollama_server()) {
     stopifnot(inherits(server, OllamaServer))
     to_df <- function(x) {
-        do.call(rbind, lapply(x$models, \(m) {
+        rows <- lapply(x$models, \(m) {
             m$details$families <- I(list(unlist(m$details$families)))
             as.data.frame(m)
-        }))
+        })
+        cols <- unique(unlist(lapply(rows, names)))
+        rows <- lapply(rows, \(row) {
+            row[setdiff(cols, names(row))] <- NA
+            row[cols]
+        })
+        do.call(rbind, rows)
     }
     httr2::request(server@url) |>
         httr2::req_url_path_append("api", "tags") |>
@@ -137,11 +143,16 @@ ollama_llama <- function(server, temperature = 0, ...) {
     ans <- try(ollama_agent("llama3.2:3b-instruct-q4_K_M",
                             server = server, temperature = temperature, ...))
     if (inherits(ans, "try-error"))
-        stop("Try using llamafile_llama() as a quickstart.")
+        stop("Try using quick_start_model() as a quickstart.")
     ans
 }
 
 ollama_nomic <- function(server, temperature = 0, ...) {
     ollama_agent("nomic-embed-text:v1.5", temperature = temperature,
+                 server = server, ...)
+}
+
+ollama_gemma <- function(server, temperature = 0, ...) {
+    ollama_agent("gemma4:e4b", temperature = temperature,
                  server = server, ...)
 }

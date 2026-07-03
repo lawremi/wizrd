@@ -30,7 +30,7 @@ instruct(x, ...)
 }
 \examples{
 \dontrun{
-    llama() |> instruct("Return only first names") |> predict("Creators of R")
+    test_model() |> instruct("Return only first names") |> predict("Creators of R")
 }
 }
 \keyword{ utilities }

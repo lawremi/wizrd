@@ -39,7 +39,7 @@ output_as(x, format, ...)
 }
 \examples{
 \dontrun{
-    agent <- openai_agent("gpt-4o-mini", temperature = 0) |>
+    agent <- test_model() |>
         instruct("Answer questions about this dataset:", mtcars)
 
     # Return a filtered subset of mtcars, which serves as the prototype
@@ -68,9 +68,10 @@ output_as(x, format, ...)
         first_name = S7::class_character,
         last_name = S7::class_character
     ))
-    openai_agent(temperature = 0) |>
+    test_model() |>
+        instruct("Extract person names from the user text.") |>
         output_as(Person) |>
-        predict("Creators of R")
+        predict("Text: R was created by Robert Gentleman.")
 }
 }
 \keyword{ utilities }

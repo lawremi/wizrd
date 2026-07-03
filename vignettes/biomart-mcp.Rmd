@@ -66,7 +66,7 @@ for easy downstream analysis.
 
 ```{r biomart-agent}
 biomart_tools <- tools(session)
-agent <- openai_agent("o4-mini") |>
+agent <- test_model() |>
     equip(biomart_tools) |>
     instruct(
         "You are an expert in Ensembl gene annotation.",

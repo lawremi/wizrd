@@ -1,4 +1,4 @@
-llamafile_version <- "0.9.0"
+llamafile_version <- "0.10.3"
 
 LlamaCppServer <- new_class("LlamaCppServer", OpenAIAPIServer,
                             properties = list(
@@ -56,9 +56,11 @@ cache_llama_cpp_agent <- function(url) {
     path
 }
 
-llamafile_llama <- function(temperature = 0, ...) {
-    llama_cpp_agent("https://huggingface.co/Mozilla/Llama-3.2-3B-Instruct-llamafile/resolve/main/Llama-3.2-3B-Instruct.Q6_K.llamafile",
-                    temperature = temperature, ...)
+llamafile_ministral <- function(temperature = 0, ...) {
+    llama_cpp_agent(
+        "https://huggingface.co/mozilla-ai/llamafile_0.10/resolve/main/Ministral-3-3B-Instruct-2512-Q4_K_M.llamafile",
+        temperature = temperature, ...
+    )
 }
 
 llamafile_url <- function() {

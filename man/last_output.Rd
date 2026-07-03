@@ -35,7 +35,7 @@ last_message(x, role = NULL)
 \author{Michael Lawrence}
 \examples{
 \dontrun{
-    last_output(chat(llama(), "Creators of R"))
+    last_output(chat(test_model(), "Creators of R"))
 }
 }
 \keyword{ utilities }

@@ -62,7 +62,7 @@ tool(x, name = deparse(substitute(x)), ...)
 \examples{
 \dontrun{
     var <- 1:10
-    equip(llama(), tool(mean) |> describe_with_Rd()) |>
+    equip(test_model(), tool(mean) |> describe_with_Rd()) |>
         predict("What is the mean of `var`?")
 }
 }

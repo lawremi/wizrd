@@ -117,7 +117,7 @@ azure_openai_agent(name = "gpt-4o", url = getOption("wizrd_azure_openai_url"),
 }
 \examples{
 \dontrun{
-    model <- ollama_agent("llama3.2:3b-instruct-q4_K_M") # or llama()
+    model <- ollama_agent("llama3.2:3b-instruct-q4_K_M") # or test_model()
     model |>
         instruct("Answer questions about this dataset:", mtcars) |>
         predict("What is the relationship between horsepower and mpg?")

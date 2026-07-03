@@ -1,6 +1,10 @@
 test_that("chat() and predict() work for text messages", {
-    model <- llama(server)
-    model@instructions <- "Respond with a single sentence"
+    model <- test_model(server)
+    model@instructions <- paste(
+        "Use this fact exactly: R was created by Ross Ihaka and",
+        "Robert Gentleman in 1993.",
+        "Respond with a single sentence."
+    )
 
     chat <- chat(model, "Who created R?")
     expect_length(chat@messages, 3L)
@@ -16,7 +20,7 @@ test_that("chat() and predict() work for text messages", {
 })
 
 test_that("chat() and predict() work for images", {
-    model <- llama_vision(server)
+    model <- vision_model(server)
 
     temp_png <- tempfile(fileext = ".png")
     png(temp_png, type = "Xlib")
@@ -45,7 +49,7 @@ test_that("chat() can stream responses", {
         on.exit(httptest2::use_mock_api())
     }
 
-    model <- llama(server)
+    model <- test_model(server)
 
     model@instructions <- "Respond with a single sentence"
 

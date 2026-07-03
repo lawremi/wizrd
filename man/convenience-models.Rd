@@ -1,20 +1,20 @@
 \name{convenience-models}
-\alias{llama}
-\alias{llamafile_llama}
-\alias{llama_vision}
-\alias{nomic}
+\alias{test_model}
+\alias{quick_start_model}
+\alias{vision_model}
+\alias{embedding_model}
 
 \title{
   Convenience Functions for Common Models
 }
 \description{
-  These functions provide convenient access to common local models.
+  These functions provide convenient access to local models for specific purposes.
 }
 \usage{
-llama(server = ollama_server(), temperature = 0, ...)
-llamafile_llama(temperature = 0, ...)
-llama_vision(server = ollama_server(), temperature = 0, ...)
-nomic(server = ollama_server(), temperature = 0, ...)
+test_model(server = ollama_server(), temperature = 0, ...)
+quick_start_model(temperature = 0, ...)
+vision_model(server = ollama_server(), temperature = 0, ...)
+embedding_model(server = ollama_server(), temperature = 0, ...)
 }
 \arguments{
   \item{server}{
@@ -34,16 +34,16 @@ nomic(server = ollama_server(), temperature = 0, ...)
   }
 }
 \details{
-  \code{llama}, \code{llama_vision} and \code{nomic} are all pulled from
+  \code{test_model}, \code{vision_model} and \code{embedding_model} are
+  all pulled from
   Ollama, so Ollama must be installed.
 
-  \code{llamafile_llama} is meant as a quick start. It will download and
-  cache a self-contained, cross-platform llamafile binary using the same
-  weights as \code{llama}. No Ollama required.
+  \code{quick_start_model} is meant as a quick start. It will download and
+  cache a self-contained, cross-platform llamafile binary. No Ollama required.
 }
 \section{Issues with llamafile}{
   See \code{\link{llama_cpp_agent}} for resolving OS-specific issues
-  with \code{llamafile_llama}.
+  with \code{quick_start_model}.
 }
 \value{
   An Agent
@@ -51,7 +51,7 @@ nomic(server = ollama_server(), temperature = 0, ...)
 \author{Michael Lawrence}
 \examples{
 \dontrun{
-    llamafile_llama() |>
+    quick_start_model() |>
         instruct("Answer questions about the mtcars dataset:", mtcars) |> 
         predict("Relationship between hp and fuel efficiency")
 }

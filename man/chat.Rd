@@ -78,7 +78,7 @@
 \author{Michael Lawrence}
 \examples{
 \dontrun{
-    agent <- llama() |>
+    agent <- test_model() |>
         instruct("Answer questions about the mtcars dataset:", mtcars)
     predict(agent, "What is the relationship between hp and fuel efficiency?")
     chat <- chat(agent,

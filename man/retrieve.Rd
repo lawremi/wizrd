@@ -41,7 +41,7 @@ retrieve(x, from, ...)
 \examples{
 \dontrun{
     chunks <- chunk(tools::Rd_db("S7"))
-    store <- text_store(nomic(), chunks)
+    store <- text_store(embedding_model(), chunks)
     retrieve("new_property example", store)
 }
 }

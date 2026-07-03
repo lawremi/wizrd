@@ -4,8 +4,6 @@ library(wizrd)
 
 `:=` <- wizrd:::`:=`
 
-server <- ollama_server()
-
 if (interactive())
     setwd("tests")
 

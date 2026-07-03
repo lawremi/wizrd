@@ -1,0 +1,1 @@
+server <- ollama_server()

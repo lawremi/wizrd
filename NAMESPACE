@@ -30,7 +30,7 @@ export(chunk, default_chunking)
 # querying
 export(retrieve)
 # convenience models
-export(llama, llamafile_llama, llama_vision, nomic)
+export(test_model, quick_start_model, vision_model, embedding_model)
 # persistence
 export(persist, restore)
 # MCP

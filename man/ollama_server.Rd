@@ -36,7 +36,7 @@ ollama_server(url = ollama_url(), start = TRUE, ...)
 \examples{
 \dontrun{
     server <- ollama_server()
-    agent <- llama(server)
+    agent <- test_model(server)
     agent |>
         instruct("Answer questions about this dataset:", mtcars) |>
         predict("What is the relationship between horsepower and mpg?")

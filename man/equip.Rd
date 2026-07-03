@@ -41,7 +41,7 @@ unequip(x, name)
 }
 \examples{
 \dontrun{
-    model <- equip(llama(), tool(mean) |> describe_with_Rd())
+    model <- equip(test_model(), tool(mean) |> describe_with_Rd())
 }
 }
 \keyword{ utilities }

@@ -1,4 +1,5 @@
 test_that("calling predict() generates correct responses", {
+    skip_on_cran()
     model <- openai_agent("gpt-4o-mini", temperature = 0)
     model@instructions <- "Respond with a single sentence"
 

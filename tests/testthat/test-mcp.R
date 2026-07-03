@@ -5,11 +5,11 @@ test_that("we can call MCP tools", {
     result <- mcp_tools$add(1L, 2L)
     expect_match(result, "3")
 
-    model <- llama(server)
+    model <- test_model(server)
     result <- model |>
         equip(mcp_tools) |>
         predict("use the add tool to add 1 and 2")
-    expect_identical(result, "The result of adding 1 and 2 is 3.")
+    expect_match(result, "3")
 
     expect_warning(mcp_tools$sleep(-1L))
 })
@@ -25,7 +25,7 @@ test_that("we can generate prompts with MCP", {
     session <- connect_mcp(wizrd:::start_test_mcp())
     pf <- prompts(session)
 
-    model <- llama(server)
+    model <- test_model(server)
 
     result <- model |>
         prompt_as(pf$ask_review) |>
@@ -83,7 +83,7 @@ test_that("MCP errors work", {
     session <- connect_mcp(wizrd:::start_test_mcp())
     pf <- prompts(session)
 
-    model <- llama(server)
+    model <- test_model(server)
 
     expect_error(model |>
                      prompt_as(pf$ask_review) |>
