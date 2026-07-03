@@ -1,4 +1,10 @@
 import(S7)
+importFrom(eleven, as_json_schema, box_json, box_json_schema,
+           class_json, class_jsonic, class_S7_any, class_S7_base_class,
+           class_S7_class, class_S7_property, class_S7_S3_class,
+           class_S7_union, data_frame_of, dejsonify, jsonify, list_of,
+           literal, named, nullable, optional, prop_read_only, scalar,
+           schema_class, unbox_json, with_default)
 import(checkmate)
 importFrom(jsonlite, toJSON, fromJSON)
 importFrom(stats, predict, setNames, aggregate)
@@ -31,6 +37,3 @@ export(persist, restore)
 export(connect_mcp, start_mcp)
 # c() methods; exported to gratiate R CMD check, since they are in \usage{}
 export(c.Chat, c.Agent, c.ChatPipeline)
-
-# S3 methods
-S3method(nameOfClass, S7_S3_class)

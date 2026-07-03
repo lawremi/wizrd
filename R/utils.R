@@ -1,211 +1,3 @@
-assert_scalar <- function(scalar, class, arg = deparse(substitute(scalar))) {
-    if (length(scalar) != 1L || !S7:::class_inherits(scalar, class)) {
-        type_name <- if (identical(class, class_numeric)) {
-            "numeric"
-        } else if (inherits(class, "S7_union")) {
-            paste(class$classes, collapse = " | ")
-        } else {
-            class$class
-        }
-        msg <- sprintf("`%s` must be a single %s value", arg, type_name)
-        stop(msg, call. = FALSE)
-    }
-    if (is.na(scalar)) {
-        msg <- sprintf("`%s` must not be NA", arg)
-        stop(msg, call. = FALSE)
-    }
-}
-
-nullable <- function(prop) {
-    if (is.null(prop) || S7:::is_foundation_class(prop))
-        prop <- new_property(prop)
-    prop$class <- new_union(NULL, prop$class)
-    if (identical(prop$default, missing_name()))
-        prop["default"] <- list(NULL)
-    prop
-}
-
-optional <- function(prop) {
-    prop <- nullable(prop)
-    class(prop) <- c("optional_S7_property", class(prop))
-    prop
-}
-
-named <- function(prop) {
-    if (S7:::is_foundation_class(prop))
-        prop <- new_property(prop)
-    validator <- prop$validator
-    prop$validator <- \(value) {
-        c(
-            if (is.vector(value) && is.null(names(value)))
-                "must have names",
-            if (!is.null(validator))
-                validator(value)
-        )
-    }
-    if (is.null(prop$default))
-        prop$default <- S7:::prop_default(prop)
-    if (!is.null(prop$default) && is.null(names(prop$default)))
-        names(prop$default) <- rep("", length(prop$default))
-    prop
-}
-
-with_default <- function(prop, default) {
-    prop$default <- default
-    prop
-}
-
-literal <- function(value) {
-    prop <- new_property(class_object(value),
-                         validator = eval(substitute(function(value) {
-                             if (!identical(value, VALUE))
-                                 paste("must match", VALUE)
-                         }, list(VALUE = value))),
-                         default = value)
-    if (is.vector(value) && length(value) == 1L)
-        prop <- scalar(prop)
-    class(prop) <- c("literal_S7_property", class(prop))
-    prop$value <- value
-    prop
-}
-
-static_inherits <- function(x, parent) {
-    while (!is.null(x) && !identical(x@parent, parent))
-        x <- x@parent
-    !is.null(x)
-}
-
-S7_class_with_parent <- function(parent, validator = NULL, ...) {
-    new_property(S7_class, validator = function(value) {
-        c(if (!static_inherits(value, parent))
-              paste("must be a descendant of", parent@name),
-          if (!is.null(validator))
-              validator(value))
-    }, ...)
-}
-
-missing_name <- function() alist(x = )[[1L]]
-
-scalar <- function(x, ..., validator = x$validator, default = x$default,
-                   choices = NULL, min = -Inf, max = Inf) {
-    if (S7:::is_foundation_class(x))
-        x <- new_property(x, ...)
-    stopifnot(inherits(x, "S7_property"))
-    x$default <- if (is.null(default)) {
-        if (inherits(x$class, "S7_union") && is.null(x$class$classes[[1L]]))
-            NULL
-        else if (length(choices) > 0L)
-            choices[1L]
-        else missing_name()
-    } else {
-        if (!is.language(default))
-            assert_scalar(default, x$class)
-        default
-    }
-    force(validator)
-    x$validator <- function(value) {
-        if (is.null(value))
-            return(NULL)
-        c(
-            if (length(value) != 1L || is.na(value))
-                "must be of length one and not missing",
-            if (!is.null(choices) && !all(value %in% choices))
-                paste("contains values not in", deparse(choices)),
-            if (is.numeric(value))
-                c(
-                    if (any(value < min))
-                        paste("must be >=", min),
-                    if (any(value > max))
-                        paste("must be <=", max)
-                ),
-            if (!is.null(validator))
-                validator(value)
-        )
-    }
-    class(x) <- c("scalar_S7_property", class(x))
-    x
-}
-
-list_of <- function(class, ...) {
-    new_list_property(of = class, ...)
-}
-
-new_list_property <- function(..., validator = NULL,
-                              default = if (isTRUE(named))
-                                  quote(setNames(list(), character()))
-                              else quote(list()),
-                              of = class_any, named = NA,
-                              min_length = 0L, max_length = Inf) {
-    prop <- new_property(class_list, ..., validator = function(value) {
-        c(
-            if (!identical(of, class_any) &&
-                    !all(vapply(value, S7:::class_inherits, logical(1L), of)))
-                paste("must only contain elements of class",
-                      S7:::class_desc(of)),
-            if (!is.null(of_validator)) {
-                msgs <- unlist(lapply(value, of_validator))
-                if (length(msgs) > 0L) {
-                    paste("element(s) failed validation:",
-                          paste0("'", unique(msgs), "'", collapse = ", "))
-                }
-            },
-            if (isTRUE(named) && is.null(names(value)))
-                "must have names",
-            if (identical(named, FALSE) && !is.null(names(value)))
-                "must not have names",
-            if (length(value) < min_length || length(value) > max_length)
-                paste0("must have length in [", min_length, ", ", max_length,
-                       "]"),
-            if (!is.null(validator))
-                validator(value)
-        )
-    }, default = default)
-    prop$of <- of
-    if (inherits(of, "S7_property")) {
-        of_validator <- of$validator
-        of <- of$class
-    } else {
-        of_validator <- NULL
-    }
-    prop$named <- named
-    class(prop) <- c("list_S7_property", class(prop))
-    prop
-}
-
-zero_row_data_frame <- function(col.names) {
-    data.frame(matrix(nrow = 0L, ncol = length(col.names))) |>
-        setNames(col.names)
-}
-
-new_data_frame_property <- function(..., validator = NULL,
-                                    col.names = colnames(prototype),
-                                    default = substitute(prototype) %||%
-                                        zero_row_data_frame(col.names),
-                                    prototype = NULL) {
-    types <- lapply(prototype, class_object)
-    prop <- new_property(class_data.frame, ..., validator = function(value) {
-        c(
-            if (!is.null(col.names) &&
-                    !identical(colnames(value), col.names))
-                paste("colnames() must be", deparse(col.names))
-            else if (!is.null(prototype)) {
-                wrong_type <- !mapply(inherits, value, types)
-                if (any(wrong_type))
-                    paste(colnames(value)[wrong_type], "must be a",
-                          vapply(types[wrong_type], S7:::class_desc,
-                                 character(1L)),
-                          collapse = ", ")
-            },
-            if (!is.null(validator))
-                validator(value)
-        )
-    }, default = default)
-    prop$prototype <- prototype
-    prop$col.names <- col.names
-    class(prop) <- c("data_frame_S7_property", class(prop))
-    prop
-}
-
 zip <- function(...) {
     Map(list, ...)
 }
@@ -349,6 +141,33 @@ find_name <- function(what, env) {
     assign(nm, eval(call, parent.frame()), parent.frame())
 }
 
+static_inherits <- function(x, parent) {
+    while (!is.null(x) && !identical(x@parent, parent))
+        x <- x@parent
+    !is.null(x)
+}
+
+S7_class_with_parent <- function(parent, validator = NULL, ...) {
+    new_property(class_S7_class, validator = function(value) {
+        c(if (!static_inherits(value, parent))
+              paste("must be a descendant of", parent@name),
+          if (!is.null(validator))
+              validator(value))
+    }, ...)
+}
+
+union_classes <- class_S7_any | NULL | class_S7_class | class_S7_base_class |
+    class_S7_union | class_S7_S3_class |
+    methods::getClass("classRepresentation")
+
+norm_json_schema <- function(x) {
+    if (is.list(x) && !is.null(x$required)) {
+        x$required <- I(x$required)
+        lapply(x, norm_json_schema)
+    }
+    x
+}
+
 require_ns <- function(x, to, version = NULL) {
     assert_character(x)
     assert_string(to)
@@ -467,68 +286,6 @@ resp_await_sse <- function(resp) {
     sse
 }
 
-## Destined for S7?
-
-method(convert, list(class_any, class_logical)) <-
-    function(from, to, ...) as.logical(from, ...)
-method(convert, list(class_any, class_integer)) <-
-    function(from, to, ...) as.integer(from, ...)
-method(convert, list(class_any, class_double)) <-
-    function(from, to, ...) as.double(from, ...)
-method(convert, list(class_any, class_complex)) <-
-    function(from, to, ...) as.complex(from, ...)
-method(convert, list(class_any, class_character)) <-
-    function(from, to, ...) as.character(from, ...)
-method(convert, list(class_any, class_raw)) <-
-    function(from, to, ...) as.raw(from, ...)
-method(convert, list(class_any, class_list)) <-
-    function(from, to, ...) as.list(from, ...)
-method(convert, list(class_any, class_expression)) <-
-    function(from, to, ...) as.expression(from, ...)
-method(convert, list(class_any, class_function)) <-
-    function(from, to, ...) as.function(from, ...)
-method(convert, list(class_any, class_environment)) <-
-    function(from, to, ...) as.environment(from, ...)
-method(convert, list(class_any, class_name)) <-
-    function(from, to, ...) as.name(from, ...)
-method(convert, list(class_any, class_call)) <-
-    function(from, to, ...) as.call(from, ...)
-
-method(convert, list(class_any, class_data.frame)) <-
-    function(from, to, ...) as.data.frame(from, ...)
-method(convert, list(class_any, class_Date)) <-
-    function(from, to, ...) as.Date(from, ...)
-method(convert, list(class_any, class_factor)) <-
-    function(from, to, ...) as.factor(from, ...)
-method(convert, list(class_any, class_POSIXct)) <-
-    function(from, to, ...) as.POSIXct(from, ...)
-method(convert, list(class_any, class_POSIXlt)) <-
-    function(from, to, ...) as.POSIXlt(from, ...)
-method(convert, list(class_any, class_formula)) <-
-    function(from, to, ...) as.formula(from, ...)
-
-S7_class <- new_S3_class("S7_class")
-S7_any <- new_S3_class("S7_any", constructor = \(.data) class_any)
-S7_base_class <- new_S3_class("S7_base_class")
-S7_union <- new_S3_class("S7_union")
-S7_S3_class <- new_S3_class("S7_S3_class")
-
-union_classes <- S7_any | NULL | S7_class | S7_base_class | S7_union |
-    S7_S3_class | getClass("classRepresentation")
-
-S7_property <- new_S3_class("S7_property")
-scalar_S7_property <- new_S3_class(c("scalar_S7_property", "S7_property"))
-string_S7_property <- new_S3_class(c("string_S7_property", "S7_property"))
-list_S7_property <- new_S3_class(c("list_S7_property", "S7_property"))
-numeric_S7_property <- new_S3_class(c("numeric_S7_property", "S7_property"))
-data_frame_S7_property <- new_S3_class(c("data_frame_S7_property",
-                                         "S7_property"))
-optional_S7_property <- new_S3_class(c("optional_S7_property", "S7_property"))
-
-class_json <- new_S3_class("json") # from jsonlite
-
-nameOfClass.S7_S3_class <- function(x) x$class[1L]
-
 as_stub_closure <- function(x) {
     eval(parse(text = capture.output(args(x)))[[1L]])
 }
@@ -537,13 +294,6 @@ function_formals <- function(x) {
     if (is.primitive(x))
         x <- as_stub_closure(x)
     formals(x)
-}
-
-class_object <- function(x) {
-    if (is.null(x))
-        return(NULL)
-    S7_class(x) %||% as_class(getClassDef(class(x)[1L])) %||%
-        new_S3_class(class(x))
 }
 
 strfit <- function(x, width = getOption("width")) {
@@ -568,10 +318,6 @@ rename <- function(x, ...) {
         stop("arguments in '...' must be named")
     names(x)[match(names(dots), names(x))] <- dots
     x
-}
-
-prop_read_only <- function(prop) {
-    !is.null(prop$getter) && is.null(prop$setter)
 }
 
 writable_props <- function(x) {
@@ -627,11 +373,6 @@ rbind_list <- function(x) {
 ensure_cols <- function(x, cols) {
     x[setdiff(cols, names(x))] <- list(rep(NA, nrow(x)))
     x
-}
-
-## To S7?
-method(convert, list(S7_class, S7_property)) <- function(from, to, ...) {
-    new_property(from, ...)
 }
 
 method(as.environment, S7_object) <- function(x) as.environment(props(x))

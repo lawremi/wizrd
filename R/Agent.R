@@ -9,7 +9,7 @@ Agent <- new_class("Agent",
                        io = TextProtocol,
                        tools = list_of(ToolBinding),
                        params = LanguageModelParams,
-                       examples = new_data_frame_property(
+                       examples = data_frame_of(
                            col.names = c("input", "output")
                        ),
                        system_prompt_format = new_property(

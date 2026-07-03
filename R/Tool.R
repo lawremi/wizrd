@@ -40,7 +40,7 @@ Tool <- new_class("Tool", class_function,
                           }
                       )),
                       value_description = nullable(scalar(class_character)),
-                      examples = new_data_frame_property(
+                      examples = data_frame_of(
                           col.names = c("input", "output"),
                           setter = \(self, value) {
                               self@examples <- norm_examples(value, self)
@@ -166,7 +166,7 @@ can_accept_as <- function(`_x`, ..., `_parameters` = list(...)) {
 
 can_return_as <- function(x, type) {
     stopifnot(inherits(x, Tool))
-    x@signature@value <- convert(type, S7_property)
+    x@signature@value <- convert(type, class_S7_property)
     x
 }
 

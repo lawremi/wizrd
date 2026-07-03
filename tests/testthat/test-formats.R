@@ -15,10 +15,10 @@ test_that("structured output works", {
     expect_contains(ans@last_name, "Gentleman")
 
     Person <- S7::new_class("Person", properties = list(
-        first_name = wizrd:::scalar(class_character),
-        last_name = wizrd:::scalar(class_character)
+        first_name = eleven::scalar(class_character),
+        last_name = eleven::scalar(class_character)
     ))
-    model <- output_as(model, wizrd:::new_list_property(of = Person))
+    model <- output_as(model, eleven::list_of(Person))
     ans <- predict(model, "Who created R?")
     expect_match(ans[[1L]]@first_name, "Robert|Ross")
 

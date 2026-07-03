@@ -67,13 +67,13 @@ method(unary, TextFormat) <- function(x) TRUE
 
 as_parameters <- function(x) {
     if (unary(x))
-        list(x = convert(x, S7_property))
-    else convert(x, S7_class)
+        list(x = convert(x, class_S7_property))
+    else convert(x, class_S7_class)
 }
 
 model_signature <- function(model) {
     parameters <- as_parameters(model@io@input)
-    value <- convert(model@io@output, S7_property)
+    value <- convert(model@io@output, class_S7_property)
     ToolSignature(parameters = parameters, value = value)
 }
 

@@ -13,7 +13,7 @@ JSONFormat <- new_class("JSONFormat", TextFormat,
                                 default = list(type = "object")
                             ),
                             schema_class = union_classes | class_data.frame |
-                                S7_property))
+                                class_S7_property))
 
 CSVFormat <- new_class("CSVFormat", TextFormat,
                        properties = list(
@@ -101,31 +101,32 @@ method(convert, list(whisker, TextFormat)) <- function(from, to) {
     WhiskerFormat(from)
 }
 
-method(convert, list(PlainTextFormat, S7_property)) <- function(from, to) {
-    scalar(class_character)
-}
+method(convert, list(PlainTextFormat, class_S7_property)) <-
+    function(from, to) {
+        scalar(class_character)
+    }
 
 glue_params <- function(x) {
     regmatches(x, gregexec("\\{(.*?)\\}", x))[[1L]][2L, ]
 }
 
-method(convert, list(GlueFormat, S7_class)) <- function(from, to) {
+method(convert, list(GlueFormat, class_S7_class)) <- function(from, to) {
     params <- glue_params(from@template)
     props <- setNames(rep(list(class_character), length(params)), params)
     new_class("glue_parameters", Parameters, properties = props)
 }
 
-method(convert, list(class_data.frame, S7_property)) <- function(from, to,
-                                                                 ...) {
-    new_data_frame_property(prototype = from)
+method(convert, list(class_data.frame, class_S7_property)) <- function(from, to,
+                                                                       ...) {
+    data_frame_of(prototype = from)
 }
 
-method(convert, list(JSONFormat, S7_property)) <- function(from, to) {
-    convert(from@schema_class, S7_property)
+method(convert, list(JSONFormat, class_S7_property)) <- function(from, to) {
+    convert(from@schema_class, class_S7_property)
 }
 
-method(convert, list(TextFormat, S7_property)) <- function(from, to) {
-    convert(convert(from, S7_class), S7_property)
+method(convert, list(TextFormat, class_S7_property)) <- function(from, to) {
+    convert(convert(from, class_S7_class), class_S7_property)
 }
 
 textify <- new_generic("textify", c("x", "format"))
@@ -169,44 +170,6 @@ method(textify, list(union_raster, PlainTextFormat)) <- function(x, format) {
     convert(x, MediaURI)
 }
 
-jsonify <- new_generic("jsonify", "x")
-
-method(jsonify, class_any) <- identity
-
-method(jsonify, class_expression | class_list) <- function(x) lapply(x, jsonify)
-
-method(jsonify, class_environment) <- function(x) jsonify(as.list(x))
-
-method(jsonify, class_name | class_call | class_formula) <-
-    function(x) deparse(x)
-
-jsonify_as := new_generic("x")
-
-method(jsonify_as, class_any) <- function(x, val) jsonify(val)
-
-method(jsonify_as, scalar_S7_property) <- function(x, val) jsonlite::unbox(val)
-
-method(jsonify_as, list_S7_property) <- function(x, val) {
-    lapply(val, jsonify_as, x = x$of)
-}
-
-method(jsonify, S7_object) <- function(x) {
-    prop_jsonify <- function(property) {
-        val <- prop(x, property$name)
-        jsonify_as(property, val)
-    }
-    prop_keep <- function(property) {
-        !is.null(prop(x, property$name)) ||
-            !inherits(property, optional_S7_property)
-    }
-    props <- S7_class(x)@properties
-    prop_json <- lapply(props, prop_jsonify)
-    keep <- vapply(props, prop_keep, logical(1L))
-    .data <- S7_data(x)
-    c(if (typeof(.data) != "object") list(.data = .data), prop_json[keep]) |>
-        ensure_named()
-}
-
 method(textify, list(class_list | class_any | class_data.frame, JSONFormat)) <-
     function(x, format) {
         jsonify(x) |>
@@ -235,102 +198,7 @@ method(textify, list(template_contexts, FunctionFormat)) <- function(x,
     do.call(format@fun, x)
 }
 
-## Could this be done with S7?
-jsonic <- function(x) structure(x, class = "jsonic")
-class_jsonic <- new_S3_class("jsonic")
-
-dejsonify <- new_generic("dejsonify", c("x", "spec"))
-
-method(dejsonify, list(NULL, class_any)) <- function(x, spec) NULL
-
-method(dejsonify,
-       list(class_list | class_jsonic | class_data.frame, S7_class)) <-
-    function(x, spec) {
-        keep <- intersect(names(x), names(spec@properties))
-        do.call(spec, Map(dejsonify, x[keep], spec@properties[keep]),
-                quote = TRUE)
-    }
-
-method(dejsonify, list(class_any, S7_property)) <- function(x, spec) {
-    dejsonify(x, spec$class)
-}
-
-method(dejsonify, list(class_any, list_S7_property)) <- function(x, spec) {
-    lapply(x, dejsonify, spec$of)
-}
-
-method(dejsonify, list(class_data.frame, list_S7_property)) <- function(x,
-                                                                        spec) {
-    dejsonify(split(x, seq_len(nrow(x))), spec)
-}
-
-method(convert, list(class_jsonic, class_raw)) <- function(from, to) {
-    require_ns("base64enc", "decode raw vectors from JSON")
-    base64enc::base64decode(from)
-}
-
-method(convert, list(class_jsonic, class_function)) <- function(from, to) {
-    p <- parse(text = from)[[1L]]
-    as.function(c(p[[2L]], p[[3L]]), .GlobalEnv)
-}
-
-method(convert, list(class_jsonic, class_call)) <- function(from, to) {
-    parse(text = from)[[1L]]
-}
-
-as.data.frame.jsonic <- as.data.frame.list
-
-as.Date.jsonic <- as.Date.character
-
-as.POSIXlt.jsonic <- as.POSIXlt.character
-
-S3_or_base <- S7_S3_class | S7_base_class
-method(dejsonify, list(class_any, S3_or_base)) <- function(x, spec) {
-    ## cannot target unions with convert()
-    if (identical(spec, class_numeric))
-        return(as.numeric(x))
-    if (identical(spec, class_atomic))
-        return(unlist(x))
-    if (identical(spec, class_vector))
-        return(as.vector(x))
-    if (identical(spec, class_language))
-        return(parse(text = x)[[1L]])
-    convert(jsonic(x), spec)
-}
-
-method(dejsonify, list(class_any, S7_union)) <- function(x, spec) {
-    if (identical(spec, class_numeric))
-        return(type.convert(x, as.is = TRUE))
-    for (class in spec$classes) {
-        ans <- try(dejsonify(x, class), silent = TRUE)
-        if (!inherits(ans, "try-error"))
-            return(ans)
-    }
-    stop("failed to convert to ", capture.output(print(spec)))
-}
-
-method(dejsonify, list(class_list, class_data.frame)) <-
-    function(x, spec) {
-        do.call(rbind, c(list(spec), x))
-    }
-
-method(dejsonify, list(class_data.frame, class_data.frame)) <-
-    function(x, spec) {
-        x[colnames(spec)] # JSON schema does not ensure order
-    }
-
-method(dejsonify, list(class_data.frame, data_frame_S7_property)) <-
-    function(x, spec) {
-        dejsonify(x, spec$prototype)
-    }
-
-method(dejsonify, list(class_any, S7_any)) <- function(x, spec) x
-
 detextify <- new_generic("detextify", c("x", "format"))
-
-unbox_json <- function(x) x$"__boxed" %||% x
-is_json_object <- function(x) is.list(x) && !is.null(names(x))
-box_json <- function(x) if (!is_json_object(x)) list("__boxed" = x) else x
 
 method(detextify, list(class_character, JSONFormat)) <- function(x, format) {
     if (length(x) != 1L) # could make simplification optional flag on format
