@@ -16,7 +16,8 @@ ToolSignature := new_class(
             },
             default = quote(new_parameters())
         ),
-        value = class_S7_property
+        value = new_property(class_S7_property,
+                             default = quote(new_property(class_any)))
     ))
 
 method(print, ToolSignature) <- function(x, ...) {
