@@ -491,10 +491,12 @@ put <- function(x, `_list` = list(...), ...) {
 download_file <- function(url, destfile, ...) {
     if (!dir.exists(dirname(destfile)))
         dir.create(dirname(destfile), recursive = TRUE)
-    result <- curl::multi_download(url, destfile, resume = TRUE, ...)
+    part_file <- paste0(destfile, ".part")
+    result <- curl::multi_download(url, part_file, resume = TRUE, ...)
     if (!result$success) {
         stop("Failed to download ", url, ": ", result$error)
     }
+    file.rename(part_file, destfile)
     invisible(TRUE)
 }
 
