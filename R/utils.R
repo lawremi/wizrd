@@ -199,7 +199,7 @@ require_ns <- function(x, to, version = NULL) {
 S3_connection <- new_S3_class("connection")
 
 S3_processx_connection <- new_S3_class("processx_connection")
-S3_process <- new_S3_class("process")
+S3_process <- new_S3_class(c("process", "R6"))
 
 union_connection <- S3_connection | S3_processx_connection
 
