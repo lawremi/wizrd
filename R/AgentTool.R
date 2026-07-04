@@ -17,10 +17,10 @@ AgentTool := new_class(
         signature = new_property(
             ToolSignature,
             setter = \(self, value) {
-                S7_data(self, check = FALSE) <- model_fun(self@model, value,
-                                                          self@predict_args)
                 self@signature <- value
                 self@examples <- self@model@examples
+                S7_data(self, check = FALSE) <- model_fun(self@model, value,
+                                                          self@predict_args)
                 self
             }
         ),
@@ -28,10 +28,10 @@ AgentTool := new_class(
             class_list,
             default = quote(list()),
             setter = \(self, value) {
+                self@predict_args <- value
                 S7_data(self, check = FALSE) <- model_fun(self@model,
                                                           self@signature,
                                                           value)
-                self@predict_args <- value
                 self
             }
         )
@@ -78,8 +78,12 @@ model_signature <- function(model) {
 }
 
 method(convert, list(Agent, Tool)) <-
-    function(from, to, name = from@name, description = from@instructions, ...) {
-        AgentTool(name = name, model = from, description = description, ...)
+    function(from, to, name = from@name, description = from@instructions,
+             predict_args = list(), ...) {
+        signature <- model_signature(from)
+        AgentTool(model_fun(from, signature, predict_args),
+                  name = name, model = from, signature = signature,
+                  predict_args = predict_args, description = description, ...)
     }
 
 method(convert, list(Agent, class_function)) <- function(from, to, ...) {
