@@ -37,7 +37,7 @@ FunctionFormat := new_class(TextFormat,
                             properties = list(fun = class_function))
 
 is_schema_class <- function(x) {
-    S7:::class_inherits(x, JSONFormat@properties$schema_class$class)
+    S7_inherits(x, JSONFormat@properties$schema_class$class)
 }
 
 json_format <- function(schema = list(), ...) {
