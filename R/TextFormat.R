@@ -75,10 +75,6 @@ method(convert, list(class_any, TextFormat)) <- function(from, to, ...) {
     json_format(from, ...)
 }
 
-method(convert, list(TextFormat, TextFormat)) <- function(from, to) {
-    from
-}
-
 method(convert, list(File, TextFormat)) <- function(from, to) {
     convert(as_glue(read_as_string(from)), to)
 }

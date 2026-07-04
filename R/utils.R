@@ -168,6 +168,12 @@ norm_json_schema <- function(x) {
     x
 }
 
+ensure_inherits <- function(x, class, ...) {
+    if (S7_inherits(x, class))
+        x
+    else convert(x, class, ...)
+}
+
 require_ns <- function(x, to, version = NULL) {
     assert_character(x)
     assert_string(to)

@@ -257,7 +257,7 @@ prompt_as := new_generic(c("x", "format"))
 
 method(prompt_as, list(Agent, class_any | class_glue | File)) <-
     function(x, format) {
-        x@io@input <- convert(format, TextFormat)
+        x@io@input <- ensure_inherits(format, TextFormat)
         x
     }
 
@@ -277,7 +277,7 @@ system_prompt_as := new_generic(c("x", "format"))
 
 method(system_prompt_as, list(Agent, class_any | class_glue | File)) <-
     function(x, format) {
-        x@system_prompt_format <- convert(format, TextFormat)
+        x@system_prompt_format <- ensure_inherits(format, TextFormat)
         x
     }
 
@@ -287,7 +287,7 @@ method(system_prompt_as, list(Agent, class_character)) <-
     }
 
 output_as <- function(x, format, ...) {
-    x@io@output <- convert(format, TextFormat, ...)
+    x@io@output <- ensure_inherits(format, TextFormat, ...)
     x
 }
 
