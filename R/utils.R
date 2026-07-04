@@ -235,7 +235,7 @@ Pipe := new_class(
 )
 
 method(print, Pipe) <- function(x, ...) {
-    cat(S7:::obj_desc(x), ""); print(x@process)
+    cat(S7_class_desc(class(x)), ""); print(x@process)
 }
 
 pipex <- function(command, args) {

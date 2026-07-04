@@ -37,7 +37,7 @@ server_request <- function(server) {
 }
 
 method(print, LanguageModelServer) <- function(x, ...) {
-    cat(S7:::obj_desc(x), "")
+    cat(S7_class_desc(class(x)), "")
     cat(x@url)
     cat("\n")
 }

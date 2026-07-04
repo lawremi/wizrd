@@ -111,7 +111,7 @@ method(print, EmbeddingTextIndex) <- function(x, ...) {
 }
 
 method(print, TextStore) <- function(x, ...) {
-    cat(S7:::obj_desc(x))
+    cat(S7_class_desc(class(x)))
     cat("\n")
     cat("@index: "); print(x@index)
     cat("@text:", if (!is.null(x@text)) nrow(x@text) else 0L, "records")

@@ -1,13 +1,13 @@
 ChatPipeline := new_class(
     class_list,
     validator = \(self) {
-        if (!all(sapply(self, S7:::class_inherits, Chat | Agent)))
+        if (!all(sapply(self, S7_inherits, Chat | Agent)))
             paste("all elements must inherit from Chat or Agent")
     }
 )
 
 method(print, ChatPipeline) <- function(x, ...) {
-    cat(S7:::obj_desc(x)); cat(" ")
+    cat(S7_class_desc(class(x))); cat(" ")
     cat(paste(names(x) %||% seq_along(x), collapse = " |> "))
     cat("\n")
 }

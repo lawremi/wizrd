@@ -20,11 +20,11 @@ ToolSignature := new_class(
     ))
 
 method(print, ToolSignature) <- function(x, ...) {
-    classes <- vapply(x@parameters@properties, \(p) S7:::class_desc(p$class),
+    classes <- vapply(x@parameters@properties, \(p) S7_class_desc(p$class),
                       character(1L))
     cat("(", paste0(names(x@parameters@properties), ": ",
                     classes, collapse = ", "),
-        "): ", S7:::class_desc(x@value$class), "\n", sep = "")
+        "): ", S7_class_desc(x@value$class), "\n", sep = "")
 }
 
 dodge_dots <- function(x) {

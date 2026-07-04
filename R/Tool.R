@@ -51,7 +51,7 @@ Tool <- new_class("Tool", class_function,
                   validator = validate_Tool)
 
 method(print, Tool) <- function(x, ...) {
-    cat(S7:::obj_desc(x))
+    cat(S7_class_desc(class(x)))
     cat("", x@name)
     print(x@signature)
     cat(cli::ansi_strtrim(paste("@description:", x@description)))
@@ -178,7 +178,7 @@ ToolBinding <- new_class("ToolBinding",
                          ))
 
 method(print, ToolBinding) <- function(x, ...) {
-    cat(S7:::obj_desc(x))
+    cat(S7_class_desc(class(x)))
     cat("\n@tool:", x@tool@name)
     cat("\n@io: "); print(x@io, ...)
     cat(cli::ansi_strtrim(paste("@instructions:", x@instructions)))

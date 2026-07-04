@@ -29,7 +29,7 @@ embed_text <- new_generic("embed_text", "x",
                           function(x, text, ndim = NULL, ...) S7_dispatch())
 
 method(print, Agent) <- function(x, ...) {
-    cat(S7:::obj_desc(x))
+    cat(S7_class_desc(class(x)))
     if (!is.null(x@name)) cat("", x@name)
     cat("\n")
     cat(cli::ansi_strtrim(paste("@instructions:", x@instructions)))

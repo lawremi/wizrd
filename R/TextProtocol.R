@@ -9,8 +9,8 @@ TextProtocol <- new_class("TextProtocol",
                           ))
 
 method(print, TextProtocol) <- function(x, ...) {
-    cat(S7:::obj_desc(x@input),
+    cat(S7_class_desc(class(x@input)),
         cli::symbol$arrow_right, cli::symbol$arrow_left,
-        S7:::obj_desc(x@output))
+        S7_class_desc(class(x@output)))
     cat("\n")
 }
