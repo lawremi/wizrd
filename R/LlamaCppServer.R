@@ -136,7 +136,7 @@ llama_cpp_server <- function(model_name, url, embedding = FALSE,
 
 .run_llama_cpp_server <- function(path = llamafile_path(),
                                   model = NULL, alias = NULL, embedding = FALSE,
-                                  gpu = FALSE, port = 0L, ...) {
+                                  gpu = TRUE, port = 0L, ...) {
     if (!file.exists(path) && identical(path, llamafile_path()))
         prompt_install_llamafile()
     assert_file_exists(path, access = "x")
@@ -211,7 +211,7 @@ init_llamafile_v2_process <- function(path, args) {
 }
 
 run_llamafile <- function(path = llamafile_path(), threads = 8L, port = 0L,
-                          gpu = FALSE, ...) {
+                          gpu = TRUE, ...) {
     .run_llama_cpp_server(path, threads = threads, port = port, gpu = gpu, ...)
 }
 
@@ -219,7 +219,7 @@ run_llama_cpp_server <- function(model,
                                  threads = 8L, ctx_size = 512L,
                                  n_predict = -1L, batch_size = 512L,
                                  temp = 0.8, flash_attn = FALSE, port = 0L,
-                                 embedding = FALSE, gpu = FALSE,
+                                 embedding = FALSE, gpu = TRUE,
                                  path = llamafile_path(),
                                  ...) {
     assert_integerish(threads, lower = 1L)
