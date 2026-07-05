@@ -160,7 +160,6 @@ llama_cpp_server <- function(model_name, url, embedding = FALSE,
         tools::file_ext(path) == "llamafile"
     args <- make_args(server = TRUE, log_disable = TRUE, model = model,
                       alias = alias, embedding = embedding, port = port,
-                      nobrowser = if (is_llamafile) TRUE,
                       ngl = if (gpu) 9999, ...)
     p <- init_llamafile_process(path, args)
 
