@@ -168,8 +168,16 @@ llama_cpp_server <- function(model_name, url, embedding = FALSE,
     llama_cpp_server(alias, url, embedding, process = p)
 }
 
+init_llamafile_process_helper <- function(path, args, error_callback) {
+    if (.Platform$OS.type == "unix") {
+        args <- c(path, args)
+        path <- "sh"
+    }
+    init_process(path, args, llamafile_ready, error_callback)
+}
+
 init_llamafile_process <- function(path, args) {
-    init_process(path, args, llamafile_ready, llamafile_error)
+    init_llamafile_process_helper(path, args, llamafile_error)
 }
 
 run_llamafile_v2 <- function(model, port = 0L, path = llamafile_path(),
@@ -199,7 +207,7 @@ run_llamafile_v2 <- function(model, port = 0L, path = llamafile_path(),
 }
 
 init_llamafile_v2_process <- function(path, args) {
-    init_process(path, args, llamafile_ready, llamafile_v2_error)
+    init_llamafile_process_helper(path, args, llamafile_v2_error)
 }
 
 run_llamafile <- function(path = llamafile_path(), threads = 8L, port = 0L,
