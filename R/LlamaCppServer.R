@@ -193,10 +193,10 @@ run_llamafile_v2 <- function(model, port = 0L, path = llamafile_path(),
 
     require_ns("processx", "run llamafile")
 
-    addr <- paste0("127.0.0.1:", port)
-    url <- paste0("http://", addr)
-    args <- make_args(log_disable = TRUE, server = TRUE, v2 = TRUE,
-                      model = model, listen = addr, ...)
+    host <- "127.0.0.1"
+    url <- paste0("http://", host, ":", port)
+    args <- make_args(log_disable = TRUE, server = TRUE, model = model,
+                      host = host, port = port, embedding = TRUE, ...)
     p <- init_llamafile_v2_process(path, args)
 
     model_name <- alias %||%
