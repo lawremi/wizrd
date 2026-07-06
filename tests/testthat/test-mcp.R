@@ -36,14 +36,14 @@ test_that("we can generate prompts with MCP", {
         prompt_as(pf$ask_review) |>
         predict(list(code_snippet = "for (i in 1:length(n)) v <- c(v, i)",
                      language = "R"))
-    expect_match(result, "R code snippet", fixed = TRUE)
+    expect_match(result, "critical performance issues", fixed = TRUE)
 
     error_message <-
         "Error in if (x) y else x (from #1) : argument is of length zero"
     msgs <- pf$debug_session_start(error_message)
     info <- "Trying to use if() in R. Traceback: 1: fun(integer())"
     result <- predict(model, c(msgs, info))
-    expect_match(result, "empty vector", fixed = TRUE)
+    expect_match(result, "argument is of length zero", fixed = TRUE)
 })
 
 test_that("the SSE transport layer works", {
