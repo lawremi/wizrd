@@ -110,7 +110,7 @@ prompt_install_llamafile <- function() {
 }
 
 llamafile_ready <- function(stdout) {
-    grepl("server (is )?listening|server listen", stdout)
+    grepl("server is listening", stdout, fixed = TRUE)
 }
 
 llamafile_error <- function(stderr) {
