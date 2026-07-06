@@ -110,7 +110,7 @@ prompt_install_llamafile <- function() {
 }
 
 llamafile_ready <- function(stdout) {
-    grepl("server listen", stdout)
+    grepl("server (is )?listening|server listen", stdout)
 }
 
 llamafile_error <- function(stderr) {
@@ -194,8 +194,8 @@ run_llamafile_v2 <- function(model, port = 0L, path = llamafile_path(),
 
     host <- "127.0.0.1"
     url <- paste0("http://", host, ":", port)
-    args <- make_args(log_disable = TRUE, server = TRUE, model = model,
-                      host = host, port = port, embedding = TRUE, ...)
+    args <- make_args(server = TRUE, model = model, host = host, port = port,
+                      embedding = TRUE, ...)
     p <- init_llamafile_v2_process(path, args)
 
     model_name <- alias %||%
@@ -214,7 +214,7 @@ run_llamafile <- function(path = llamafile_path(), threads = 8L, port = 0L,
 }
 
 run_llama_cpp_server <- function(model,
-                                 threads = 8L, ctx_size = 512L,
+                                 threads = 8L, ctx_size = 0L,
                                  n_predict = -1L, batch_size = 512L,
                                  temp = 0.8, flash_attn = FALSE, port = 0L,
                                  embedding = FALSE, gpu = TRUE,
