@@ -156,9 +156,8 @@ llama_cpp_server <- function(model_name, url, embedding = FALSE,
         model_path <- if (!is.null(model)) model else path
         alias <- tools::file_path_sans_ext(basename(model_path))
     }
-    args <- make_args(server = TRUE, log_disable = TRUE, model = model,
-                      alias = alias, embedding = embedding, port = port,
-                      ...)
+    args <- make_args(server = TRUE, model = model, alias = alias,
+                      embedding = embedding, port = port, ...)
     if (gpu)
         args <- c(args, "-ngl", "9999")
     p <- init_llamafile_process(path, args)
