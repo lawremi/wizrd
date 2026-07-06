@@ -162,7 +162,7 @@ llama_cpp_server <- function(model_name, url, embedding = FALSE,
         args <- c(args, "-ngl", "9999")
     p <- init_llamafile_process(path, args)
 
-    url <- paste0("http://localhost:", port)
+    url <- paste0("http://127.0.0.1:", port)
     llama_cpp_server(alias, url, embedding, process = p)
 }
 
