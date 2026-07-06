@@ -1,7 +1,7 @@
 test_that("llama.cpp chatting works with a llamafile", {
-    ans <- wizrd:::llamafile_ministral(port = 18080L) |>
-        predict("How was R created, in three sentences?")
-    expect_match(ans, "Robert.*Ross|Ross.*Robert")
+    ans <- wizrd:::llamafile_ministral(port = 18080L, max_tokens = 64L) |>
+        predict("Reply with exactly: wizrd llama.cpp OK")
+    expect_match(ans, "wizrd llama.cpp OK", fixed = TRUE)
 })
 
 test_that("llama.cpp supports external weights and generating embeddings", {
