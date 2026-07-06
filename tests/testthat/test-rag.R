@@ -18,6 +18,7 @@ test_that("RAG works with Rd", {
 test_that("RAG works with vignettes", {
     vignettes <- utils::vignette(package = "S7")
     chunks <- chunk(vignettes)
+    skip_if(nrow(chunks) == 0L, "S7 vignettes are not installed")
     store <- text_store(embedding_model(server), chunks)
     model <- test_model(server) |> prompt_as(rag_with(store))
     ans <- predict(model, "new_property example")
