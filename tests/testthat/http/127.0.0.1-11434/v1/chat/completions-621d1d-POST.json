@@ -1,0 +1,34 @@
+{
+    "id": "chatcmpl-584",
+    "object": "chat.completion",
+    "created": 1783300138,
+    "model": "gemma4:e4b",
+    "system_fingerprint": "fp_ollama",
+    "choices": [
+        {
+            "index": 0,
+            "message": {
+                "role": "assistant",
+                "content": "",
+                "reasoning": "The user is asking for the mean of a variable named 'var'. I have access to a tool called `meanie` which can compute the mean of a named variable. The function signature requires one argument, `x`, which is the name of the variable. I should call this tool with 'var' as the argument.",
+                "tool_calls": [
+                    {
+                        "id": "call_u2gxdlth",
+                        "index": 0,
+                        "type": "function",
+                        "function": {
+                            "name": "meanie",
+                            "arguments": "{\"x\":\"var\"}"
+                        }
+                    }
+                ]
+            },
+            "finish_reason": "tool_calls"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 122,
+        "completion_tokens": 84,
+        "total_tokens": 206
+    }
+}

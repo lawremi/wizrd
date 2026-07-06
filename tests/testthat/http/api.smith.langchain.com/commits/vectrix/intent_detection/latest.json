@@ -1,0 +1,84 @@
+{
+    "commit_hash": "b9eb38e51a98fcea66327ab04028a8fc394e0f747d725e869e6cf9c86ffaeba0",
+    "manifest": {
+        "id": [
+            "langchain_core",
+            "prompts",
+            "structured",
+            "StructuredPrompt"
+        ],
+        "lc": 1,
+        "type": "constructor",
+        "kwargs": {
+            "schema_": {
+                "type": "object",
+                "title": "Intent",
+                "required": [
+                    "intent"
+                ],
+                "properties": {
+                    "intent": {
+                        "enum": [
+                            "greeting",
+                            "metadata_query",
+                            "specific_question"
+                        ],
+                        "type": "string",
+                        "description": "The intent from the user prompt"
+                    }
+                },
+                "description": "Classify a users question"
+            },
+            "messages": [
+                {
+                    "lc": 1,
+                    "type": "constructor",
+                    "id": [
+                        "langchain",
+                        "prompts",
+                        "chat",
+                        "HumanMessagePromptTemplate"
+                    ],
+                    "kwargs": {
+                        "prompt": {
+                            "lc": 1,
+                            "type": "constructor",
+                            "id": [
+                                "langchain",
+                                "prompts",
+                                "prompt",
+                                "PromptTemplate"
+                            ],
+                            "kwargs": {
+                                "input_variables": [
+                                    "chat_history",
+                                    "question"
+                                ],
+                                "template_format": "f-string",
+                                "template": "You are an AI assistant tasked with detecting the intent of an incoming message. Your goal is to categorize the message into one of three intents: greeting, specific_question, or metadata_query.\nHere are the definitions for each intent:\n1. Greeting: A simple salutation or farewell, such as \"Hello,\" \"Hi,\" \"Good morning,\" \"Goodbye,\" or \"See you later.\"\n2. Specific_question: A specific inquiry about a subject asked by the user. This could be any question that doesn't fall under the metadata_query category.\n3. Metadata_query: Any request involving a count, sort, or retrieval of specific subsets of data. This includes questions about the latest documents, counting items, or sorting results.\n\n<chat_history>\n{chat_history}\n<chat_history>\n\n<question>\n{question}\n<\/question>\n\nCarefully read and analyze the message to determine its intent based on the definitions provided above.\nGuidelines for categorization:\n- If the message is a simple greeting or farewell, classify it as \"greeting\"\n- If the message asks for information about counts, sorting, or retrieving specific subsets of data, classify it as \"metadata_query\"\n- For questions that require extra info or cannot be answer based on the existing chat history, classify it as \"specific_question\"\nAfter analyzing the message, provide your reasoning for the classification in <reasoning> tags."
+                            }
+                        }
+                    }
+                }
+            ],
+            "input_variables": [
+                "chat_history",
+                "question"
+            ]
+        }
+    },
+    "examples": [
+
+    ],
+    "model_config": {
+        "model": "claude-3-5-sonnet-20240620",
+        "anthropic_api_key": {
+            "id": [
+                "ANTHROPIC_API_KEY"
+            ],
+            "lc": 1,
+            "type": "secret"
+        }
+    },
+    "model_provider": "ChatAnthropic"
+}

@@ -1,0 +1,34 @@
+{
+    "id": "chatcmpl-580",
+    "object": "chat.completion",
+    "created": 1783300116,
+    "model": "gemma4:e4b",
+    "system_fingerprint": "fp_ollama",
+    "choices": [
+        {
+            "index": 0,
+            "message": {
+                "role": "assistant",
+                "content": "",
+                "reasoning": "The user is asking for \"the mean of var\". I need to determine if there is an R variable named `var` that I can calculate the mean of. Since no data or context is provided, and assuming `var` might be a placeholder or a misunderstanding, I cannot proceed with a calculation without knowing what `var` refers to in the context of available variables.\n\nHowever, looking at the prompt structure, if the user provides a variable name, I should use the `mean` tool. Since they provided \"var\", I will assume they mean an R variable named `var`. I must call the tool with this assumed variable name.",
+                "tool_calls": [
+                    {
+                        "id": "call_t01u9uii",
+                        "index": 0,
+                        "type": "function",
+                        "function": {
+                            "name": "mean",
+                            "arguments": "{\"x\":\"var\"}"
+                        }
+                    }
+                ]
+            },
+            "finish_reason": "tool_calls"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 222,
+        "completion_tokens": 148,
+        "total_tokens": 370
+    }
+}

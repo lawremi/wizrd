@@ -1,0 +1,34 @@
+{
+    "id": "chatcmpl-321",
+    "object": "chat.completion",
+    "created": 1783300029,
+    "model": "gemma4:e4b",
+    "system_fingerprint": "fp_ollama",
+    "choices": [
+        {
+            "index": 0,
+            "message": {
+                "role": "assistant",
+                "content": "",
+                "reasoning": "The user wants to use the `add` tool to calculate the sum of 1 and 2. I need to call the `add` function with `a=1` and `b=2`.",
+                "tool_calls": [
+                    {
+                        "id": "call_i932md0r",
+                        "index": 0,
+                        "type": "function",
+                        "function": {
+                            "name": "add",
+                            "arguments": "{\"a\":1,\"b\":2}"
+                        }
+                    }
+                ]
+            },
+            "finish_reason": "tool_calls"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 168,
+        "completion_tokens": 61,
+        "total_tokens": 229
+    }
+}

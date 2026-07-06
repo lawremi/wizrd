@@ -1,0 +1,34 @@
+{
+    "id": "chatcmpl-37",
+    "object": "chat.completion",
+    "created": 1783300118,
+    "model": "gemma4:e4b",
+    "system_fingerprint": "fp_ollama",
+    "choices": [
+        {
+            "index": 0,
+            "message": {
+                "role": "assistant",
+                "content": "",
+                "reasoning": "The user wants to find the mean of a variable named `var`. I have access to a tool called `mean` which calculates the arithmetic mean. I should call this tool with `x='var'`.",
+                "tool_calls": [
+                    {
+                        "id": "call_g6fliflr",
+                        "index": 0,
+                        "type": "function",
+                        "function": {
+                            "name": "mean",
+                            "arguments": "{\"x\":\"var\"}"
+                        }
+                    }
+                ]
+            },
+            "finish_reason": "tool_calls"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 157,
+        "completion_tokens": 59,
+        "total_tokens": 216
+    }
+}

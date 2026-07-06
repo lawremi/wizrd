@@ -1,0 +1,23 @@
+{
+    "id": "chatcmpl-450",
+    "object": "chat.completion",
+    "created": 1783300026,
+    "model": "gemma4:e4b",
+    "system_fingerprint": "fp_ollama",
+    "choices": [
+        {
+            "index": 0,
+            "message": {
+                "role": "assistant",
+                "content": "{\"intent\": \"greeting\"}",
+                "reasoning": "The user wants me to act as an intent detection AI assistant.\nI need to analyze the provided `<question>`: \"Hello?\".\nI must categorize it into one of three intents: `greeting`, `specific_question`, or `metadata_query`.\n\nDefinitions:\n1. Greeting: Simple salutation or farewell (\"Hello,\" \"Hi,\" etc.).\n2. Specific_question: Specific inquiry about a subject (not metadata).\n3. Metadata_query: Request involving count, sort, or retrieval of specific subsets of data (e.g., latest documents, counting items).\n\nAnalysis of \"Hello?\":\nThis is a simple salutation/greeting.\n\nClassification: `greeting`.\n\nReasoning structure: Must explain why it fits the definition of 'Greeting'."
+            },
+            "finish_reason": "stop"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 347,
+        "completion_tokens": 7,
+        "total_tokens": 354
+    }
+}

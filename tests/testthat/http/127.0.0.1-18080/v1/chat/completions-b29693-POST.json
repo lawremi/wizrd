@@ -1,0 +1,21 @@
+{
+    "id": "chatcmpl-wizrd-llama-cpp",
+    "object": "chat.completion",
+    "created": 1783302000,
+    "model": "Ministral-3-3B-Instruct-2512-Q4_K_M",
+    "choices": [
+        {
+            "index": 0,
+            "message": {
+                "role": "assistant",
+                "content": "wizrd llama.cpp OK"
+            },
+            "finish_reason": "stop"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "total_tokens": 0
+    }
+}

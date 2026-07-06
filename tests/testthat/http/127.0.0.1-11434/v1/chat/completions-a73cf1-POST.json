@@ -1,0 +1,22 @@
+{
+    "id": "chatcmpl-652",
+    "object": "chat.completion",
+    "created": 1783299977,
+    "model": "gemma4:e4b",
+    "system_fingerprint": "fp_ollama",
+    "choices": [
+        {
+            "index": 0,
+            "message": {
+                "role": "assistant",
+                "content": "R was created by Ross Ihaka and Robert Gentleman in 1993."
+            },
+            "finish_reason": "stop"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 50,
+        "completion_tokens": 18,
+        "total_tokens": 68
+    }
+}

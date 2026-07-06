@@ -1,0 +1,23 @@
+{
+    "id": "chatcmpl-63",
+    "object": "chat.completion",
+    "created": 1783300021,
+    "model": "gemma4:e4b",
+    "system_fingerprint": "fp_ollama",
+    "choices": [
+        {
+            "index": 0,
+            "message": {
+                "role": "assistant",
+                "content": "{\n  \"__boxed\": [\n    {\n      \"created\": true\n    }\n  ]\n}",
+                "reasoning": "The user wants me to extract person names from the provided text.\nText: \"R was created by Robert Gentleman.\"\nPerson name found: \"Robert Gentleman\"."
+            },
+            "finish_reason": "stop"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 65,
+        "completion_tokens": 31,
+        "total_tokens": 96
+    }
+}

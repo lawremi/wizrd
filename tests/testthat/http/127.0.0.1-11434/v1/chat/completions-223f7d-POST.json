@@ -1,0 +1,23 @@
+{
+    "id": "chatcmpl-124",
+    "object": "chat.completion",
+    "created": 1783300141,
+    "model": "gemma4:e4b",
+    "system_fingerprint": "fp_ollama",
+    "choices": [
+        {
+            "index": 0,
+            "message": {
+                "role": "assistant",
+                "content": "Could you please provide more context? What would you like to find out about \"var\"? For example, are you referring to:\n\n1. **Variance** (a statistical measure)?\n2. A specific **variable name** in a dataset?\n3. Something else entirely?",
+                "reasoning": "The user has provided a single word \"var\". This is ambiguous and could refer to several things depending on the context (e.g., variance in statistics, or simply an abbreviation).\n\nLooking at the available tool, `mean`, it computes the arithmetic mean of a named variable. It does not compute variance (`var`).\n\nSince the user input is extremely minimal and lacks any clear intent or data, I cannot use the `mean` tool. The tool requires a specific variable name to calculate the mean.\n\nI must ask for clarification from the user to understand what they want me to do with \"var\"."
+            },
+            "finish_reason": "stop"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 168,
+        "completion_tokens": 185,
+        "total_tokens": 353
+    }
+}

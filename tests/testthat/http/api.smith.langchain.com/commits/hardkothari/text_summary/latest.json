@@ -1,0 +1,85 @@
+{
+    "commit_hash": "74594bf038428d6013c0dbbd84968d8fe11e01f48a46b8103682366f97565d4a",
+    "manifest": {
+        "id": [
+            "langchain",
+            "prompts",
+            "chat",
+            "ChatPromptTemplate"
+        ],
+        "lc": 1,
+        "type": "constructor",
+        "kwargs": {
+            "messages": [
+                {
+                    "id": [
+                        "langchain",
+                        "prompts",
+                        "chat",
+                        "SystemMessagePromptTemplate"
+                    ],
+                    "lc": 1,
+                    "type": "constructor",
+                    "kwargs": {
+                        "prompt": {
+                            "id": [
+                                "langchain",
+                                "prompts",
+                                "prompt",
+                                "PromptTemplate"
+                            ],
+                            "lc": 1,
+                            "type": "constructor",
+                            "kwargs": {
+                                "template": "You are an expert summarizer and analyzer who can help me.",
+                                "input_variables": [
+
+                                ],
+                                "template_format": "f-string"
+                            }
+                        }
+                    }
+                },
+                {
+                    "id": [
+                        "langchain",
+                        "prompts",
+                        "chat",
+                        "HumanMessagePromptTemplate"
+                    ],
+                    "lc": 1,
+                    "type": "constructor",
+                    "kwargs": {
+                        "prompt": {
+                            "id": [
+                                "langchain",
+                                "prompts",
+                                "prompt",
+                                "PromptTemplate"
+                            ],
+                            "lc": 1,
+                            "type": "constructor",
+                            "kwargs": {
+                                "template": "Generate a concise and coherent summary from the given Context. \n\nCondense the context into a well-written summary that captures the main ideas, key points, and insights presented in the context. \n\nPrioritize clarity and brevity while retaining the essential information. \n\nAim to convey the context's core message and any supporting details that contribute to a comprehensive understanding. \n\nCraft the summary to be self-contained, ensuring that readers can grasp the content even if they haven't read the context. \n\nProvide context where necessary and avoid excessive technical jargon or verbosity.\n\nThe goal is to create a summary that effectively communicates the context's content while being easily digestible and engaging.\n\nSummary should NOT be more than {word_count} words for {target_audience} audience.\n\nCONTEXT: {text}\n\nSUMMARY: ",
+                                "input_variables": [
+                                    "word_count",
+                                    "target_audience",
+                                    "text"
+                                ],
+                                "template_format": "f-string"
+                            }
+                        }
+                    }
+                }
+            ],
+            "input_variables": [
+                "word_count",
+                "target_audience",
+                "text"
+            ]
+        }
+    },
+    "examples": [
+
+    ]
+}

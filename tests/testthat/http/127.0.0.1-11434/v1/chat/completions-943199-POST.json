@@ -1,0 +1,22 @@
+{
+    "id": "chatcmpl-980",
+    "object": "chat.completion",
+    "created": 1783300029,
+    "model": "gemma4:e4b",
+    "system_fingerprint": "fp_ollama",
+    "choices": [
+        {
+            "index": 0,
+            "message": {
+                "role": "assistant",
+                "content": "The sum of 1 and 2 is 3."
+            },
+            "finish_reason": "stop"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 194,
+        "completion_tokens": 13,
+        "total_tokens": 207
+    }
+}

@@ -1,0 +1,23 @@
+{
+    "id": "chatcmpl-348",
+    "object": "chat.completion",
+    "created": 1783300136,
+    "model": "gemma4:e4b",
+    "system_fingerprint": "fp_ollama",
+    "choices": [
+        {
+            "index": 0,
+            "message": {
+                "role": "assistant",
+                "content": "{\n  \"__boxed\": [\n    {\n      \"first_name\": \"Ross\",\n      \"last_name\": \"Ihaka\"\n    },\n    {\n      \"first_name\": \"Robert\",\n      \"last_name\": \"Gentleman\"\n    }\n  ]\n}",
+                "reasoning": "The user is asking \"Who created R?\".\nI must use the provided fact: \"R was created by Ross Ihaka and Robert Gentleman.\"\nI will format the answer as JSON."
+            },
+            "finish_reason": "stop"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 68,
+        "completion_tokens": 69,
+        "total_tokens": 137
+    }
+}

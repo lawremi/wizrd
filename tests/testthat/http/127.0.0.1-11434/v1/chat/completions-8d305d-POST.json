@@ -1,0 +1,22 @@
+{
+    "id": "chatcmpl-164",
+    "object": "chat.completion",
+    "created": 1783300090,
+    "model": "gemma4:e4b",
+    "system_fingerprint": "fp_ollama",
+    "choices": [
+        {
+            "index": 0,
+            "message": {
+                "role": "assistant",
+                "content": "2"
+            },
+            "finish_reason": "stop"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 30,
+        "completion_tokens": 2,
+        "total_tokens": 32
+    }
+}

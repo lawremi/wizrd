@@ -1,0 +1,23 @@
+{
+    "id": "chatcmpl-364",
+    "object": "chat.completion",
+    "created": 1783300018,
+    "model": "gemma4:e4b",
+    "system_fingerprint": "fp_ollama",
+    "choices": [
+        {
+            "index": 0,
+            "message": {
+                "role": "assistant",
+                "content": "{\n  \"__boxed\": [\n    {\n      \"first_name\": \"Ross\",\n      \"last_name\": \"Ihaka\"\n    },\n    {\n      \"first_name\": \"Robert\",\n      \"last_name\": \"Gentleman\"\n    }\n  ]\n}",
+                "reasoning": "The user wants to extract person names from the provided text.\nText: \"R was created by Ross Ihaka and Robert Gentleman.\"\nNames identified: \"Ross Ihaka\", \"Robert Gentleman\"."
+            },
+            "finish_reason": "stop"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 69,
+        "completion_tokens": 70,
+        "total_tokens": 139
+    }
+}

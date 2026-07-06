@@ -1,0 +1,23 @@
+{
+    "id": "chatcmpl-780",
+    "object": "chat.completion",
+    "created": 1783299883,
+    "model": "gemma4:e4b",
+    "system_fingerprint": "fp_ollama",
+    "choices": [
+        {
+            "index": 0,
+            "message": {
+                "role": "assistant",
+                "content": "I cannot calculate the mean of 'var' without more context. Please provide the actual data or dataset you would like me to use for the calculation.",
+                "reasoning": "The user asked for the mean of a variable named 'var'. I used the `meanie` tool with 'var' as the input. The tool returned an error message asking for more context, suggesting that simply providing the name is insufficient and that I need to understand what the variable represents or what calculation is desired.\n\nSince the tool failed due to lack of context, I must inform the user about this limitation and ask them for the necessary information (e.g., data values, a dataset, or clarification on what 'var' refers to)."
+            },
+            "finish_reason": "stop"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 168,
+        "completion_tokens": 146,
+        "total_tokens": 314
+    }
+}

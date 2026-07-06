@@ -1,0 +1,23 @@
+{
+    "id": "chatcmpl-895",
+    "object": "chat.completion",
+    "created": 1783300009,
+    "model": "gemma4:e4b",
+    "system_fingerprint": "fp_ollama",
+    "choices": [
+        {
+            "index": 0,
+            "message": {
+                "role": "assistant",
+                "content": "Gentleman and Ihaka",
+                "reasoning": "Thinking Process:\n\n1.  **Analyze the Request:** The user is asking \"Who created R?\".\n2.  **Analyze the Context/Format:** The provided example shows a specific input-output mapping:\n    *   Input: Who created R?\n    *   Output: Gentleman and Ihaka\n3.  **Determine the Goal:** The goal is to provide an answer that matches the format and content implied by the single example, even if the factual basis of the example (R being associated with \"Gentleman and Ihaka\") seems arbitrary or specific to a non-standard knowledge base.\n4.  **Execute the Mapping:** Since the input *is* \"Who created R?\", and the provided correct output for that exact query is \"Gentleman and Ihaka\", I must reproduce that output.\n\n*(Self-Correction/Verification: Although in reality, R (the programming language) was developed by Ross Ihaka and Robert Gentleman, the prompt's example dictates the required answer.)*\n\n5.  **Final Output Generation:** Gentleman and Ihaka"
+            },
+            "finish_reason": "stop"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 41,
+        "completion_tokens": 228,
+        "total_tokens": 269
+    }
+}
