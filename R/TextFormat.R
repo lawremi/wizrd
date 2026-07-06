@@ -10,7 +10,7 @@ JSONFormat <- new_class("JSONFormat", TextFormat,
                                     if (!identical(value$type, "object"))
                                         "must specify an object"
                                 },
-                                default = list(type = "object")
+                                default = quote(list(type = "object"))
                             ),
                             schema_class = union_classes | class_data.frame |
                                 class_S7_property))
