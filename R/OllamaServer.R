@@ -103,11 +103,27 @@ ollama_dir <- function() {
     file.path(home_dir(), ".ollama")
 }
 
+ollama_models_dir <- function() {
+    env <- Sys.getenv("OLLAMA_MODELS")
+    if (nzchar(env))
+        return(env)
+
+    user_models <- file.path(ollama_dir(), "models")
+    if (dir.exists(user_models))
+        return(user_models)
+
+    system_models <- "/var/lib/ollama"
+    if (dir.exists(file.path(system_models, "manifests")) &&
+            dir.exists(file.path(system_models, "blobs")))
+        return(system_models)
+
+    user_models
+}
+
 ollama_weights_path <- function(name) {
     assert_string(name)
-    ollama <- ollama_dir()
-    lib <- file.path(ollama, "models", "manifests", "registry.ollama.ai",
-                     "library")
+    ollama <- ollama_models_dir()
+    lib <- file.path(ollama, "manifests", "registry.ollama.ai", "library")
     manifest_path <- file.path(lib, sub(":", .Platform$file.sep, name))
     if (!file.exists(manifest_path))
         require_ollama_model(name)
@@ -115,7 +131,7 @@ ollama_weights_path <- function(name) {
     digest <- manifest$layers$digest[manifest$layers$mediaType ==
                                          "application/vnd.ollama.image.model"]
     stopifnot(length(digest) == 1L)
-    blobs <- file.path(ollama, "models", "blobs")
+    blobs <- file.path(ollama, "blobs")
     file.path(blobs, sub(":", "-", digest))
 }
 
