@@ -40,7 +40,8 @@ azure_openai_agent(name = "gpt-4o", url = getOption("wizrd_azure_openai_url"),
     server process will be killed when the returned object goes out of
     scope. Thus, it is safest to start the server explicitly using
     \code{\link{ollama_server}} and keep a reference around (or just run
-    \command{ollama serve} in a shell).
+    \command{ollama serve} in a shell). To explicitly stop a server process
+    associated with a returned agent, call \code{\link{stop_model}}.
   }
   \item{path}{
     A string pointing to a

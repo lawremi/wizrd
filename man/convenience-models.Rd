@@ -40,6 +40,8 @@ embedding_model(server = ollama_server(), temperature = 0, ...)
 
   \code{quick_start_model} is meant as a quick start. It will download and
   cache a self-contained, cross-platform llamafile binary. No Ollama required.
+  Call \code{\link{stop_model}} on the returned agent to stop its local
+  server process explicitly.
 }
 \section{Issues with llamafile}{
   See \code{\link{llama_cpp_agent}} for resolving OS-specific issues

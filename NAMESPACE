@@ -24,7 +24,7 @@ export(equip, unequip, instruct, output_as, prompt_as, system_prompt_as,
 # accessors
 export(last_output, last_message, tools, resources, prompts)
 # operations
-export(embed_text)
+export(embed_text, stop_model)
 # chunking
 export(chunk, default_chunking)
 # querying
