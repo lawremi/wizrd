@@ -158,8 +158,8 @@ llama_cpp_server <- function(model_name, url, embedding = FALSE,
     }
     args <- make_args(server = TRUE, model = model, alias = alias,
                       embedding = embedding, port = port, ...)
-    if (gpu)
-        args <- c(args, "-ngl", "9999")
+    if (!gpu)
+        args <- c(args, "-ngl", "0")
     p <- init_llamafile_process(path, args)
 
     url <- paste0("http://127.0.0.1:", port)
