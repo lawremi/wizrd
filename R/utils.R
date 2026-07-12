@@ -271,12 +271,11 @@ init_process <- function(path, args, ready_callback, error_callback,
         }
     }
 
-    if (p$get_exit_status() > 0L) {
-        stop("Failed to run ", path, ": ",
-             error_callback(paste0(error, p$read_error())))
-    }
-
-    p
+    status <- p$get_exit_status()
+    msg <- error_callback(paste0(error, p$read_error()))
+    if (!nzchar(msg))
+        msg <- paste("process exited before becoming ready, status", status)
+    stop("Failed to run ", path, ": ", msg)
 }
 
 assert_port <- function(port) {
