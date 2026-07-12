@@ -214,17 +214,17 @@ run_llamafile <- function(path = llamafile_path(), threads = 8L, port = 0L,
 }
 
 run_llama_cpp_server <- function(model,
-                                 threads = 8L, ctx_size = 0L,
-                                 n_predict = -1L, batch_size = 512L,
-                                 temp = 0.8, flash_attn = FALSE, port = 0L,
+                                 threads = NULL, ctx_size = NULL,
+                                 n_predict = NULL, batch_size = NULL,
+                                 temp = NULL, flash_attn = FALSE, port = 0L,
                                  embedding = FALSE, gpu = TRUE,
                                  path = llamafile_path(),
                                  ...) {
-    assert_integerish(threads, lower = 1L)
-    assert_integerish(ctx_size, lower = 0L)
-    assert_integerish(n_predict, lower = -2L)
-    assert_integerish(batch_size, lower = 1L)
-    assert_number(temp, lower = 0)
+    assert_integerish(threads, lower = 1L, null.ok = TRUE)
+    assert_integerish(ctx_size, lower = 0L, null.ok = TRUE)
+    assert_integerish(n_predict, lower = -2L, null.ok = TRUE)
+    assert_integerish(batch_size, lower = 1L, null.ok = TRUE)
+    assert_number(temp, lower = 0, null.ok = TRUE)
     assert_flag(flash_attn)
 
     .run_llama_cpp_server(path, model = model, threads = threads,
