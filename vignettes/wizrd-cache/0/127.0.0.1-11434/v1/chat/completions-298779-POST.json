@@ -1,0 +1,23 @@
+{
+    "id": "chatcmpl-896",
+    "object": "chat.completion",
+    "created": 1783878335,
+    "model": "gemma4:e4b",
+    "system_fingerprint": "fp_ollama",
+    "choices": [
+        {
+            "index": 0,
+            "message": {
+                "role": "assistant",
+                "content": "{\"__boxed\": [-0.87]}",
+                "reasoning": "The user wants me to round the given number (-0.867659376517228) to two decimal places.\n\n1.  Identify the number: -0.867659376517228\n2.  Identify the rounding precision: Two decimal places (the hundredths place).\n3.  Look at the third decimal place: 7.\n4.  Since 7 is 5 or greater, I must round up the second decimal place (6).\n5.  Rounding up 6 gives 7.\n6.  The result is -0.87."
+            },
+            "finish_reason": "stop"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 1342,
+        "completion_tokens": 13,
+        "total_tokens": 1355
+    }
+}

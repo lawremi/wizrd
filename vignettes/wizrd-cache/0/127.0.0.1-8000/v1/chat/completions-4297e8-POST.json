@@ -1,0 +1,36 @@
+{
+    "choices": [
+        {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+                "role": "assistant",
+                "content": "To compute the **mean mpg** and create an **mpg-vs-wt plot**, you need the columns **`mpg`** and **`wt`**."
+            }
+        }
+    ],
+    "created": 1783878308,
+    "model": "Ministral-3-3B-Instruct-2512-Q4_K_M",
+    "system_fingerprint": "b1780423590-dbe9c0c8c",
+    "object": "chat.completion",
+    "usage": {
+        "completion_tokens": 37,
+        "prompt_tokens": 480,
+        "total_tokens": 517,
+        "prompt_tokens_details": {
+            "cached_tokens": 448
+        }
+    },
+    "id": "chatcmpl-6zYuRSL6a0wyoJA5AVB70TfU11oHk51B",
+    "timings": {
+        "cache_n": 448,
+        "prompt_n": 32,
+        "prompt_ms": 174.352,
+        "prompt_per_token_ms": 5.4485,
+        "prompt_per_second": 183.53675323483526,
+        "predicted_n": 37,
+        "predicted_ms": 3139.313,
+        "predicted_per_token_ms": 84.8462972972973,
+        "predicted_per_second": 11.786018151105035
+    }
+}

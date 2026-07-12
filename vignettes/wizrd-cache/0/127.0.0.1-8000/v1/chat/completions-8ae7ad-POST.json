@@ -1,0 +1,36 @@
+{
+    "choices": [
+        {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+                "role": "assistant",
+                "content": "This preview shows **mpg** (miles per gallon) alongside engine details like **cyl** (cylinders), **disp** (displacement), **hp** (horsepower), and **drat** (rear axle ratio). Other columns include **wt** (weight), **qsec** (quarter-mile time), and categorical features like **vs** (V vs. straight engine), **am** (automatic transmission), **gear** (number of gears), and **carb** (number of carburetors)."
+            }
+        }
+    ],
+    "created": 1783878290,
+    "model": "Ministral-3-3B-Instruct-2512-Q4_K_M",
+    "system_fingerprint": "b1780423590-dbe9c0c8c",
+    "object": "chat.completion",
+    "usage": {
+        "completion_tokens": 112,
+        "prompt_tokens": 292,
+        "total_tokens": 404,
+        "prompt_tokens_details": {
+            "cached_tokens": 0
+        }
+    },
+    "id": "chatcmpl-vhDzGLDVFjBdtp2WrHpU14jsf0wwPxUY",
+    "timings": {
+        "cache_n": 0,
+        "prompt_n": 292,
+        "prompt_ms": 381.556,
+        "prompt_per_token_ms": 1.3066986301369863,
+        "prompt_per_second": 765.2874021113545,
+        "predicted_n": 112,
+        "predicted_ms": 11915.316,
+        "predicted_per_token_ms": 106.38675,
+        "predicted_per_second": 9.399666781812584
+    }
+}

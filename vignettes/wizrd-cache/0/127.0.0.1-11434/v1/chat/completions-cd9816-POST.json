@@ -1,0 +1,23 @@
+{
+    "id": "chatcmpl-93",
+    "object": "chat.completion",
+    "created": 1783878353,
+    "model": "gemma4:e4b",
+    "system_fingerprint": "fp_ollama",
+    "choices": [
+        {
+            "index": 0,
+            "message": {
+                "role": "assistant",
+                "content": "{\n\"__boxed\": [\n    {\"mpg\": 21, \"hp\": 110, \"wt\": 2.62},\n    {\"mpg\": 21, \"hp\": 110, \"wt\": 2.875},\n    {\"mpg\": 22.8, \"hp\": 93, \"wt\": 2.32},\n    {\"mpg\": 21.4, \"hp\": 110, \"wt\": 3.215},\n    {\"mpg\": 18.7, \"hp\": 175, \"wt\": 3.44}\n]\n}",
+                "reasoning": "The user wants the first five rows of data, but only for the columns 'mpg', 'hp', and 'wt'.\n\nInput Data Structure (Header): \"mpg\",\"cyl\",\"disp\",\"hp\",\"drat\",\"wt\",\"qsec\",\"vs\",\"am\",\"gear\",\"carb\"\nColumns to extract: mpg (1st), hp (4th), wt (6th).\n\nFirst five rows:\n1. 21,6,160,110,3.9,2.62,16.46,0,1,4,4 -> mpg=21, hp=110, wt=2.62\n2. 21,6,160,110,3.9,2.875,17.02,0,1,4,4 -> mpg=21, hp=110, wt=2.875\n3. 22.8,4,108,93,3.85,2.32,18.61,1,1,4,1 -> mpg=22.8, hp=93, wt=2.32\n4. 21.4,6,258,110,3.08,3.215,19.44,1,0,3,1 -> mpg=21.4, hp=110, wt=3.215\n5. 18.7,8,360,175,3.15,3.44,17.02,0,0,3,2 -> mpg=18.7, hp=175, wt=3.44\n\nI will format this as a table or list of JSON objects/values for clarity, ensuring only the requested columns are present."
+            },
+            "finish_reason": "stop"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 1328,
+        "completion_tokens": 150,
+        "total_tokens": 1478
+    }
+}

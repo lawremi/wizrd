@@ -1,0 +1,23 @@
+{
+    "id": "chatcmpl-298",
+    "object": "chat.completion",
+    "created": 1783878369,
+    "model": "gemma4:e4b",
+    "system_fingerprint": "fp_ollama",
+    "choices": [
+        {
+            "index": 0,
+            "message": {
+                "role": "assistant",
+                "content": "{\"__boxed\": [\n    {\"mpg\": 32.4, \"cyl\": 4, \"disp\": 78.7, \"hp\": 66, \"drat\": 4.08, \"wt\": 2.2, \"qsec\": 19.47, \"vs\": 1, \"am\": 1, \"gear\": 4, \"carb\": 1},\n    {\"mpg\": 30.4, \"cyl\": 4, \"disp\": 75.7, \"hp\": 52, \"drat\": 4.93, \"wt\": 1.615, \"qsec\": 18.52, \"vs\": 1, \"am\": 1, \"gear\": 4, \"carb\": 2}\n]}",
+                "reasoning": "The user wants to filter the dataset and retrieve rows where the 'mpg' column value is greater than 30.\n\nSteps:\n1.  Parse the provided CSV-like data.\n2.  Identify the columns: \"mpg\", \"cyl\", \"disp\", \"hp\", \"drat\", \"wt\", \"qsec\", \"vs\", \"am\", \"gear\", \"carb\".\n3.  Filter rows where `mpg > 30`.\n\nData check for mpg > 30:\nRow 1: 21, ... (No)\nRow 2: 21, ... (No)\nRow 3: 22.8, ... (No)\nRow 4: 21.4, ... (No)\nRow 5: 18.7, ... (No)\nRow 6: 18.1, ... (No)\nRow 7: 14.3, ... (No)\nRow 8: 24.4, ... (No)\nRow 9: 22.8, ... (No)\nRow 10: 19.2, ... (No)\nRow 11: 17.8, ... (No)\nRow 12: 16.4, ... (No)\nRow 13: 17.3, ... (No)\nRow 14: 15.2, ... (No)\nRow 15: 10.4, ... (No)\nRow 16: 10.4, ... (No)\nRow 17: 14.7, ... (No)\nRow 18: 32.4, 4, 78.7, 66, 4.08, 2.2, 19.47, 1, 1, 4, 1 -> Keep\nRow 19: 30.4, 4, 75.7, 52, 4.93, 1.615, 18.52, 1, 1, 4, 2 -> Keep\nRow 20: 33.9, 4, 71.1, 65, 4.22, 1.835, 19.9, 1, 1, 4, 1 -> Keep\nRow 21: 21.5, ... (No)\nRow 22: 15.5, ... (No)\nRow 23: 15.2, ... (No)\nRow 24: 13.3, ... (No)\nRow 25: 19.2, ... (No)\nRow 26: 27.3, ... (No)\nRow 27: 26, ... (No)\nRow 28: 30.4, 4, 95.1, 113, 3.77, 1.513, 16.9, 1, 1, 5, 2 -> Keep\nRow 29: 15.8, ... (No)\nRow 30: 19.7, ... (No)\nRow 31: 15, ... (No)\nRow 32: 21.4, ... (No)\n\nResults to return:\n1. 32.4,4,78.7,66,4.08,2.2,19.47,1,1,4,1\n2. 30.4,4,75.7,52,4.93,1.615,18.52,1,1,4,2\n3. 33.9,4,71.1,65,4.22,1.835,19.9,1,1,4,1\n4. 30.4,4,95.1,113,3.77,1.513,16.9,1,1,5,2"
+            },
+            "finish_reason": "stop"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 1323,
+        "completion_tokens": 185,
+        "total_tokens": 1508
+    }
+}

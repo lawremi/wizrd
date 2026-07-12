@@ -1,0 +1,23 @@
+{
+    "id": "chatcmpl-674",
+    "object": "chat.completion",
+    "created": 1783878345,
+    "model": "gemma4:e4b",
+    "system_fingerprint": "fp_ollama",
+    "choices": [
+        {
+            "index": 0,
+            "message": {
+                "role": "assistant",
+                "content": "{\n\"__boxed\": [\n    {\"mpg\": 21, \"horsepower\": 110, \"weight\": 2.62},\n    {\"mpg\": 21, \"horsepower\": 110, \"weight\": 2.875},\n    {\"mpg\": 22.8, \"horsepower\": 93, \"weight\": 2.32},\n    {\"mpg\": 21.4, \"horsepower\": 110, \"weight\": 3.215},\n    {\"mpg\": 18.7, \"horsepower\": 175, \"weight\": 3.44}\n]\n}",
+                "reasoning": "The user wants the first five rows (cars) from the provided dataset. I need to extract these rows and format them as a JSON object containing only the data."
+            },
+            "finish_reason": "stop"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 1320,
+        "completion_tokens": 160,
+        "total_tokens": 1480
+    }
+}

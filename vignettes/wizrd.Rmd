@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
     collapse = TRUE,
     comment = "#>"
 )
-wizrd:::start_vignette_with_api_key("wizrd-cache", "OPENAI_API_KEY")
+httptest2::start_vignette("wizrd-cache")
 options(width = 78)
 ```
 
@@ -38,8 +38,13 @@ pretty_rmd <- function(x) {
 To start analyzing data with an agent:
 ```{r quickstart, results='asis'}
 library(wizrd)
-agent <- quick_start_model()
-predict(agent, "Describe the mtcars dataset") |> pretty_rmd()
+agent <- quick_start_model() |>
+    instruct("Answer questions using this preview of the mtcars dataset:",
+             head(mtcars))
+predict(agent, paste(
+    "In two short sentences, describe what this preview shows.",
+    "Mention only columns visible in the preview."
+)) |> pretty_rmd()
 ```
 
 The call to `quick_start_model()` will download, cache and run a
@@ -55,8 +60,11 @@ exchanges with an agent. To maintain a context over multiple exchanges,
 use the `chat()` function:
 ```{r chat}
 ctx <- agent |>
-    chat("Describe the mtcars dataset") |>
-    chat("How can I manipulate it in R?")
+    chat("What columns are visible in the preview?") |>
+    chat(paste(
+        "Which visible columns are needed to compute mean mpg and make",
+        "an mpg-vs-wt plot? Answer in one short plain-text sentence."
+    ))
 ctx
 ```
 A useful feature of the returned Chat object is that it prints the
@@ -70,6 +78,12 @@ The returned value can then be used in further computations.
 
 As an exercise, try to create a readline-based chatbot interface. 
 See `wizrd:::readline_chat` for one answer.
+
+Before switching to another local model, stop the quick-start server so
+its GPU memory is released:
+```{r stop-quick-start}
+stop_model(agent)
+```
 
 # LLMs as functions
 
@@ -86,9 +100,9 @@ example, so it can run locally without an API key.
 agent <- test_model() |>
     instruct("Answer questions about this dataset:", mtcars)
 ```
-For reproducibility reasons, it is best to explicitly specify the
-underlying model, as above, because the default will change as new
-models are released.
+For exact reproducibility, explicitly specify the underlying model with
+`ollama_agent()`, because the convenience alias used here may change as
+new local models are released.
 
 The `instruct()` function configures the agent with a system prompt,
 instructing the agent and providing basic context. In this case, we
@@ -145,9 +159,12 @@ object. We can use the `output_as()` function to structure the outputs:
 
 ```{r output_as}
 # Return the correlation as a single number
-equipped_agent |>
+correlation <- calculate_correlation("mpg", "wt")
+agent |>
     output_as(S7::class_numeric) |>
-    predict(list(var1 = "mpg", var2 = "wt"))
+    predict(
+        paste("Round this value to two decimal places:", correlation)
+    )
 
 # Return a filtered subset of mtcars, which serves as the prototype
 filtered_agent <- agent |>
@@ -220,7 +237,6 @@ tools$get_mean(mtcars$mpg)
 
 # Equip a agent with the MCP tools and analyze the data
 mcp_agent <- agent |>
-    output_as(S7::class_numeric) |>
     equip(tools)
 predict(mcp_agent, "What is the mean fuel efficiency in the mtcars dataset?")
 ```

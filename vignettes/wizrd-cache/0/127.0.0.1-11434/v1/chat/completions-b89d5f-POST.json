@@ -1,0 +1,34 @@
+{
+    "id": "chatcmpl-109",
+    "object": "chat.completion",
+    "created": 1783878331,
+    "model": "gemma4:e4b",
+    "system_fingerprint": "fp_ollama",
+    "choices": [
+        {
+            "index": 0,
+            "message": {
+                "role": "assistant",
+                "content": "",
+                "reasoning": "The user wants to analyze the relationship between 'mpg' (miles per gallon) and 'wt' (weight). I should use the `calculate_correlation` tool to find the correlation coefficient between these two variables.",
+                "tool_calls": [
+                    {
+                        "id": "call_o6eyq4a2",
+                        "index": 0,
+                        "type": "function",
+                        "function": {
+                            "name": "calculate_correlation",
+                            "arguments": "{\"var1\":\"mpg\",\"var2\":\"wt\"}"
+                        }
+                    }
+                ]
+            },
+            "finish_reason": "tool_calls"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 1357,
+        "completion_tokens": 70,
+        "total_tokens": 1427
+    }
+}

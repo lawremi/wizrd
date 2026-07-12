@@ -1,0 +1,23 @@
+{
+    "id": "chatcmpl-546",
+    "object": "chat.completion",
+    "created": 1783878342,
+    "model": "gemma4:e4b",
+    "system_fingerprint": "fp_ollama",
+    "choices": [
+        {
+            "index": 0,
+            "message": {
+                "role": "assistant",
+                "content": "{\n\"__boxed\": [\n    {\"mpg\": 21, \"cyl\": 6, \"disp\": 160, \"hp\": 110, \"drat\": 3.9, \"wt\": 2.62, \"qsec\": 16.46, \"vs\": 0, \"am\": 1, \"gear\": 4, \"carb\": 4},\n    {\"mpg\": 21, \"cyl\": 6, \"disp\": 160, \"hp\": 110, \"drat\": 3.9, \"wt\": 2.875, \"qsec\": 17.02, \"vs\": 0, \"am\": 1, \"gear\": 4, \"carb\": 4},\n    {\"mpg\": 22.8, \"cyl\": 4, \"disp\": 108, \"hp\": 93, \"drat\": 3.85, \"wt\": 2.32, \"qsec\": 18.61, \"vs\": 1, \"am\": 1, \"gear\": 4, \"carb\": 1},\n    {\"mpg\": 21.4, \"cyl\": 6, \"disp\": 258, \"hp\": 110, \"drat\": 3.08, \"wt\": 3.215, \"qsec\": 19.44, \"vs\": 1, \"am\": 0, \"gear\": 3, \"carb\": 1},\n    {\"mpg\": 18.7, \"cyl\": 8, \"disp\": 360, \"hp\": 175, \"drat\": 3.15, \"wt\": 3.44, \"qsec\": 17.02, \"vs\": 0, \"am\": 0, \"gear\": 3, \"carb\": 2}\n]\n}",
+                "reasoning": "The user wants to retrieve the first five rows (cars) from the provided dataset. I need to format this output as a JSON object containing only the requested data."
+            },
+            "finish_reason": "stop"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 1319,
+        "completion_tokens": 443,
+        "total_tokens": 1762
+    }
+}

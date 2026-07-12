@@ -1,0 +1,36 @@
+{
+    "choices": [
+        {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+                "role": "assistant",
+                "content": "In the provided preview of the **mtcars** dataset, the visible columns are:\n\n1. **mpg** (Miles per Gallon)\n2. **cyl** (Number of Cylinders)\n3. **disp** (Displacement in cubic inches)\n4. **hp** (Horsepower)\n5. **drat** (Recommended gear ratio)\n6. **wt** (Weight in pounds)\n7. **qsec** (Acceleration time in seconds)\n8. **vs** (Viner Smoothness indicator: 0 = V, 1 = A)\n9. **am** (Transmission type: 0 = Automatic, 1 = Manual)\n10. **gear** (Number of gears)\n11. **carb** (Number of carburetors)"
+            }
+        }
+    ],
+    "created": 1783878305,
+    "model": "Ministral-3-3B-Instruct-2512-Q4_K_M",
+    "system_fingerprint": "b1780423590-dbe9c0c8c",
+    "object": "chat.completion",
+    "usage": {
+        "completion_tokens": 169,
+        "prompt_tokens": 280,
+        "total_tokens": 449,
+        "prompt_tokens_details": {
+            "cached_tokens": 271
+        }
+    },
+    "id": "chatcmpl-jxbRejdwJ0b3konao6eQ0RJlJC045QHw",
+    "timings": {
+        "cache_n": 271,
+        "prompt_n": 9,
+        "prompt_ms": 275.57,
+        "prompt_per_token_ms": 30.61888888888889,
+        "prompt_per_second": 32.65957832855536,
+        "predicted_n": 169,
+        "predicted_ms": 14283.105,
+        "predicted_per_token_ms": 84.51541420118343,
+        "predicted_per_second": 11.832161144232995
+    }
+}

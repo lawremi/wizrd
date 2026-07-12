@@ -1,0 +1,22 @@
+{
+    "id": "chatcmpl-52",
+    "object": "chat.completion",
+    "created": 1783878332,
+    "model": "gemma4:e4b",
+    "system_fingerprint": "fp_ollama",
+    "choices": [
+        {
+            "index": 0,
+            "message": {
+                "role": "assistant",
+                "content": "The correlation between `mpg` (miles per gallon) and `wt` (weight) is approximately **-0.87**.\n\nThis indicates a strong negative linear relationship: as the weight of the car increases, the miles per gallon tends to decrease, and vice versa."
+            },
+            "finish_reason": "stop"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 1410,
+        "completion_tokens": 57,
+        "total_tokens": 1467
+    }
+}
