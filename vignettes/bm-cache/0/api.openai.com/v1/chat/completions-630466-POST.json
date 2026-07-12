@@ -1,8 +1,8 @@
 {
-    "id": "chatcmpl-BwHcFOR7nSf9ztf67W0cp79jxR6OW",
+    "id": "chatcmpl-E0srBbIGS2n2en6KvL1i08CAkATwl",
     "object": "chat.completion",
-    "created": 1753230439,
-    "model": "o4-mini-2025-04-16",
+    "created": 1783879577,
+    "model": "gpt-5.5-2026-04-23",
     "choices": [
         {
             "index": 0,
@@ -11,11 +11,19 @@
                 "content": null,
                 "tool_calls": [
                     {
-                        "id": "call_jWrpngYPKTgrnLzQc6vL6P11",
+                        "id": "call_MDFUFmpcHWkQwejVPWbMaGci",
+                        "type": "function",
+                        "function": {
+                            "name": "list_common_attributes",
+                            "arguments": "{\"mart\": \"ENSEMBL_MART_ENSEMBL\", \"dataset\": \"hsapiens_gene_ensembl\"}"
+                        }
+                    },
+                    {
+                        "id": "call_AF3wREYSZH45XQcaXnocpKXj",
                         "type": "function",
                         "function": {
                             "name": "list_filters",
-                            "arguments": "{\"mart\":\"ENSEMBL_MART_ENSEMBL\",\"dataset\":\"hsapiens_gene_ensembl\"}"
+                            "arguments": "{\"mart\": \"ENSEMBL_MART_ENSEMBL\", \"dataset\": \"hsapiens_gene_ensembl\"}"
                         }
                     }
                 ],
@@ -28,15 +36,15 @@
         }
     ],
     "usage": {
-        "prompt_tokens": 2133,
-        "completion_tokens": 234,
-        "total_tokens": 2367,
+        "prompt_tokens": 2226,
+        "completion_tokens": 200,
+        "total_tokens": 2426,
         "prompt_tokens_details": {
-            "cached_tokens": 2048,
+            "cached_tokens": 2176,
             "audio_tokens": 0
         },
         "completion_tokens_details": {
-            "reasoning_tokens": 192,
+            "reasoning_tokens": 108,
             "audio_tokens": 0,
             "accepted_prediction_tokens": 0,
             "rejected_prediction_tokens": 0

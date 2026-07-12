@@ -1,8 +1,8 @@
 {
-    "id": "chatcmpl-BwHaX4XREeqAYz9gujJIQogTnQ28C",
+    "id": "chatcmpl-E0srW6RY57tilJU8YO6PXSunZvg4a",
     "object": "chat.completion",
-    "created": 1753230333,
-    "model": "o4-mini-2025-04-16",
+    "created": 1783879598,
+    "model": "gpt-5.5-2026-04-23",
     "choices": [
         {
             "index": 0,
@@ -11,11 +11,19 @@
                 "content": null,
                 "tool_calls": [
                     {
-                        "id": "call_MPCx2qGhTrJJDeRvsiofald9",
+                        "id": "call_vBVvBsiirNpLOKxVdGl3AEJJ",
                         "type": "function",
                         "function": {
-                            "name": "batch_translate",
-                            "arguments": "{\"mart\":\"ENSEMBL_MART_ENSEMBL\",\"dataset\":\"hsapiens_gene_ensembl\",\"from_attr\":\"hgnc_symbol\",\"to_attr\":\"ensembl_gene_id\",\"targets\":[\"TP53\",\"BRCA2\"]}"
+                            "name": "list_filters",
+                            "arguments": "{\"mart\": \"ENSEMBL_MART_ENSEMBL\", \"dataset\": \"hsapiens_gene_ensembl\"}"
+                        }
+                    },
+                    {
+                        "id": "call_2R5ACQrvjGzSiNaUKlv4yOc8",
+                        "type": "function",
+                        "function": {
+                            "name": "list_common_attributes",
+                            "arguments": "{\"mart\": \"ENSEMBL_MART_ENSEMBL\", \"dataset\": \"hsapiens_gene_ensembl\"}"
                         }
                     }
                 ],
@@ -28,15 +36,15 @@
         }
     ],
     "usage": {
-        "prompt_tokens": 3012,
-        "completion_tokens": 1285,
-        "total_tokens": 4297,
+        "prompt_tokens": 2316,
+        "completion_tokens": 114,
+        "total_tokens": 2430,
         "prompt_tokens_details": {
             "cached_tokens": 2176,
             "audio_tokens": 0
         },
         "completion_tokens_details": {
-            "reasoning_tokens": 1216,
+            "reasoning_tokens": 22,
             "audio_tokens": 0,
             "accepted_prediction_tokens": 0,
             "rejected_prediction_tokens": 0

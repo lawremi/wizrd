@@ -1,14 +1,14 @@
 {
-    "id": "chatcmpl-BwHbVq6mhcyWiDIRmyjx32bLSXGnj",
+    "id": "chatcmpl-E0sr9c0m90HbGXIT1MuamL3oWDOF0",
     "object": "chat.completion",
-    "created": 1753230393,
-    "model": "o4-mini-2025-04-16",
+    "created": 1783879575,
+    "model": "gpt-5.5-2026-04-23",
     "choices": [
         {
             "index": 0,
             "message": {
                 "role": "assistant",
-                "content": "{\"__boxed\":[{\"seqnames\":\"17\",\"start\":7661779,\"end\":7687546,\"width\":25768,\"strand\":\"-\"},{\"seqnames\":\"13\",\"start\":32315086,\"end\":32400268,\"width\":85183,\"strand\":\"+\"}]}",
+                "content": "{\"__boxed\":[{\"end\":32400268,\"seqnames\":\"13\",\"start\":32315086,\"strand\":\"+\",\"width\":85183},{\"end\":7687546,\"seqnames\":\"17\",\"start\":7661779,\"strand\":\"-\",\"width\":25768}]}",
                 "refusal": null,
                 "annotations": [
 
@@ -18,11 +18,11 @@
         }
     ],
     "usage": {
-        "prompt_tokens": 3598,
-        "completion_tokens": 73,
-        "total_tokens": 3671,
+        "prompt_tokens": 3548,
+        "completion_tokens": 63,
+        "total_tokens": 3611,
         "prompt_tokens_details": {
-            "cached_tokens": 2176,
+            "cached_tokens": 3200,
             "audio_tokens": 0
         },
         "completion_tokens_details": {

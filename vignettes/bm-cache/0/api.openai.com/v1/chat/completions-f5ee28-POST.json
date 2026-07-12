@@ -1,8 +1,8 @@
 {
-    "id": "chatcmpl-BwHb1t52hs1n0iZWtgCCLJal8cBC4",
+    "id": "chatcmpl-E0sqmncP3fNa46BH5MT5tWVZwuW5H",
     "object": "chat.completion",
-    "created": 1753230363,
-    "model": "o4-mini-2025-04-16",
+    "created": 1783879552,
+    "model": "gpt-5.5-2026-04-23",
     "choices": [
         {
             "index": 0,
@@ -11,11 +11,11 @@
                 "content": null,
                 "tool_calls": [
                     {
-                        "id": "call_iEA8bTjLIx7lOxzm7LJpwHuh",
+                        "id": "call_FExBhZYfACt1nn286Nv5nEyk",
                         "type": "function",
                         "function": {
                             "name": "get_data",
-                            "arguments": "{\"mart\":\"ENSEMBL_MART_ENSEMBL\",\"dataset\":\"hsapiens_gene_ensembl\",\"attributes\":[\"external_gene_name\",\"chromosome_name\",\"start_position\",\"end_position\",\"strand\"],\"filters\":{\"ensembl_gene_id\":\"ENSG00000141510,ENSG00000139618\"}}"
+                            "arguments": "{\"mart\":\"ENSEMBL_MART_ENSEMBL\",\"dataset\":\"hsapiens_gene_ensembl\",\"attributes\":[\"hgnc_symbol\",\"ensembl_gene_id\",\"chromosome_name\",\"start_position\",\"end_position\",\"strand\"],\"filters\":{\"hgnc_symbol\":\"TP53,BRCA2\"}}"
                         }
                     }
                 ],
@@ -28,15 +28,15 @@
         }
     ],
     "usage": {
-        "prompt_tokens": 3348,
-        "completion_tokens": 2131,
-        "total_tokens": 5479,
+        "prompt_tokens": 2263,
+        "completion_tokens": 306,
+        "total_tokens": 2569,
         "prompt_tokens_details": {
-            "cached_tokens": 2944,
+            "cached_tokens": 2176,
             "audio_tokens": 0
         },
         "completion_tokens_details": {
-            "reasoning_tokens": 2048,
+            "reasoning_tokens": 224,
             "audio_tokens": 0,
             "accepted_prediction_tokens": 0,
             "rejected_prediction_tokens": 0

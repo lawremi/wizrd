@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
     collapse = TRUE,
     comment = "#>"
 )
-wizrd:::start_vignette_with_api_key("bm-cache", "OPENAI_API_KEY")
+httptest2::start_vignette("bm-cache")
 ```
 
 # Overview
@@ -66,7 +66,7 @@ for easy downstream analysis.
 
 ```{r biomart-agent}
 biomart_tools <- tools(session)
-agent <- test_model() |>
+agent <- openai_agent("gpt-5.5") |>
     equip(biomart_tools) |>
     instruct(
         "You are an expert in Ensembl gene annotation.",
@@ -131,7 +131,7 @@ activity (GO:0004707):
 ```{r go-query}
 go_genes <- agent |>
     predict(
-        "List all EntrezGene IDs and gene symbols with MAP kinase activity"
+        "List all EntrezGene IDs and gene symbols with MAP kinase activity (GO:0004707)"
     )
 go_genes
 ```
