@@ -1,0 +1,47 @@
+{
+    "id": "chatcmpl-E1Y2xOvrqE9g45GEgfBZ2qP7AoPCu",
+    "object": "chat.completion",
+    "created": 1784037911,
+    "model": "gpt-5.5-2026-04-23",
+    "choices": [
+        {
+            "index": 0,
+            "message": {
+                "role": "assistant",
+                "content": null,
+                "tool_calls": [
+                    {
+                        "id": "call_6bw0ggWRVJQ9aLkwOt8EEXbM",
+                        "type": "function",
+                        "function": {
+                            "name": "batch_translate",
+                            "arguments": "{\"mart\":\"ENSEMBL_MART_ENSEMBL\",\"dataset\":\"hsapiens_gene_ensembl\",\"from_attr\":\"hgnc_symbol\",\"to_attr\":\"ensembl_gene_id\",\"targets\":[\"TP53\",\"BRCA2\"]}"
+                        }
+                    }
+                ],
+                "refusal": null,
+                "annotations": [
+
+                ]
+            },
+            "finish_reason": "tool_calls"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 3289,
+        "completion_tokens": 63,
+        "total_tokens": 3352,
+        "prompt_tokens_details": {
+            "cached_tokens": 2688,
+            "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+            "reasoning_tokens": 0,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+        }
+    },
+    "service_tier": "default",
+    "system_fingerprint": null
+}

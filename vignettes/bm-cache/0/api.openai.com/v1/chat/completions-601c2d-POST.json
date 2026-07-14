@@ -1,0 +1,47 @@
+{
+    "id": "chatcmpl-E1Y2dMK1i9sZAIvsS0pBNH7bSykAA",
+    "object": "chat.completion",
+    "created": 1784037891,
+    "model": "gpt-5.5-2026-04-23",
+    "choices": [
+        {
+            "index": 0,
+            "message": {
+                "role": "assistant",
+                "content": null,
+                "tool_calls": [
+                    {
+                        "id": "call_xmh3mrhSBcHEHPashvJ58Rah",
+                        "type": "function",
+                        "function": {
+                            "name": "get_data",
+                            "arguments": "{\"mart\":\"ENSEMBL_MART_ENSEMBL\",\"dataset\":\"hsapiens_gene_ensembl\",\"attributes\":[\"external_gene_name\",\"ensembl_gene_id\",\"chromosome_name\",\"start_position\",\"end_position\",\"strand\"],\"filters\":{\"hgnc_symbol\":\"TP53,BRCA2\"}}"
+                        }
+                    }
+                ],
+                "refusal": null,
+                "annotations": [
+
+                ]
+            },
+            "finish_reason": "tool_calls"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 2366,
+        "completion_tokens": 146,
+        "total_tokens": 2512,
+        "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+            "reasoning_tokens": 65,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+        }
+    },
+    "service_tier": "default",
+    "system_fingerprint": null
+}

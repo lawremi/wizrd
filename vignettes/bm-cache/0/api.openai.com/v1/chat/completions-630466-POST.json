@@ -1,7 +1,7 @@
 {
-    "id": "chatcmpl-E0srBbIGS2n2en6KvL1i08CAkATwl",
+    "id": "chatcmpl-E1Y3TbwbIi3ohUDvChAmyZBdppyV1",
     "object": "chat.completion",
-    "created": 1783879577,
+    "created": 1784037943,
     "model": "gpt-5.5-2026-04-23",
     "choices": [
         {
@@ -11,19 +11,11 @@
                 "content": null,
                 "tool_calls": [
                     {
-                        "id": "call_MDFUFmpcHWkQwejVPWbMaGci",
+                        "id": "call_AbfJ2wLlDm6eYlo4NgfLYHfG",
                         "type": "function",
                         "function": {
-                            "name": "list_common_attributes",
-                            "arguments": "{\"mart\": \"ENSEMBL_MART_ENSEMBL\", \"dataset\": \"hsapiens_gene_ensembl\"}"
-                        }
-                    },
-                    {
-                        "id": "call_AF3wREYSZH45XQcaXnocpKXj",
-                        "type": "function",
-                        "function": {
-                            "name": "list_filters",
-                            "arguments": "{\"mart\": \"ENSEMBL_MART_ENSEMBL\", \"dataset\": \"hsapiens_gene_ensembl\"}"
+                            "name": "get_data",
+                            "arguments": "{\"mart\":\"ENSEMBL_MART_ENSEMBL\",\"dataset\":\"hsapiens_gene_ensembl\",\"attributes\":[\"entrezgene_id\",\"external_gene_name\"],\"filters\":{\"go\":\"GO:0004707\"}}"
                         }
                     }
                 ],
@@ -37,14 +29,14 @@
     ],
     "usage": {
         "prompt_tokens": 2226,
-        "completion_tokens": 200,
-        "total_tokens": 2426,
+        "completion_tokens": 305,
+        "total_tokens": 2531,
         "prompt_tokens_details": {
-            "cached_tokens": 2176,
+            "cached_tokens": 0,
             "audio_tokens": 0
         },
         "completion_tokens_details": {
-            "reasoning_tokens": 108,
+            "reasoning_tokens": 241,
             "audio_tokens": 0,
             "accepted_prediction_tokens": 0,
             "rejected_prediction_tokens": 0

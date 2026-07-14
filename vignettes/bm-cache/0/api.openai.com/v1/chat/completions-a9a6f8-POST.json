@@ -1,7 +1,7 @@
 {
-    "id": "chatcmpl-E0sr4O0eYDkclrYdmswDC7MK4UFJg",
+    "id": "chatcmpl-E1Y2jkutV0mU9QfDocz8G5JpNmjUJ",
     "object": "chat.completion",
-    "created": 1783879570,
+    "created": 1784037897,
     "model": "gpt-5.5-2026-04-23",
     "choices": [
         {
@@ -11,11 +11,11 @@
                 "content": null,
                 "tool_calls": [
                     {
-                        "id": "call_GwcV93M3p1BSSdsy7EuTSnNL",
+                        "id": "call_p5k7A8DpEFIgMO3NCZA3EGsx",
                         "type": "function",
                         "function": {
-                            "name": "batch_translate",
-                            "arguments": "{\"mart\":\"ENSEMBL_MART_ENSEMBL\",\"dataset\":\"hsapiens_gene_ensembl\",\"from_attr\":\"hgnc_symbol\",\"to_attr\":\"ensembl_gene_id\",\"targets\":[\"TP53\",\"BRCA2\"]}"
+                            "name": "list_filters",
+                            "arguments": "{\"mart\":\"ENSEMBL_MART_ENSEMBL\",\"dataset\":\"hsapiens_gene_ensembl\"}"
                         }
                     }
                 ],
@@ -28,15 +28,15 @@
         }
     ],
     "usage": {
-        "prompt_tokens": 3246,
-        "completion_tokens": 138,
-        "total_tokens": 3384,
+        "prompt_tokens": 2471,
+        "completion_tokens": 36,
+        "total_tokens": 2507,
         "prompt_tokens_details": {
-            "cached_tokens": 2688,
+            "cached_tokens": 0,
             "audio_tokens": 0
         },
         "completion_tokens_details": {
-            "reasoning_tokens": 69,
+            "reasoning_tokens": 0,
             "audio_tokens": 0,
             "accepted_prediction_tokens": 0,
             "rejected_prediction_tokens": 0

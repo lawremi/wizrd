@@ -11,6 +11,7 @@ vignette: >
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
+    cache.path = "bm-knitr-cache/",
     collapse = TRUE,
     comment = "#>"
 )
@@ -82,7 +83,7 @@ agent <- openai_agent("gpt-5.5") |>
 In biomaRt, you must specify the dataset, attributes, and filters. With
 wizrd, just ask:
 
-```{r gene-coordinates}
+```{r gene-coordinates, cache=TRUE}
 suppressPackageStartupMessages(library(GenomicRanges))
 coords <- agent |>
     output_as(as.data.frame(GRanges())) |>
@@ -128,7 +129,7 @@ getBM(
 Retrieve all EntrezGene IDs and gene symbols for genes with MAP kinase
 activity (GO:0004707):
 
-```{r go-query}
+```{r go-query, cache=TRUE}
 go_genes <- agent |>
     predict(
         "List all EntrezGene IDs and gene symbols with MAP kinase activity (GO:0004707)"
@@ -141,7 +142,7 @@ go_genes
 Retrieve all HUGO gene symbols of genes located on chromosome 20
 and associated with a specific GO term:
 
-```{r chr-go-query}
+```{r chr-go-query, cache=TRUE}
 chr_go_genes <- agent |>
     predict(paste(
         "Retrieve all HUGO gene symbols of genes on chromosome 20",

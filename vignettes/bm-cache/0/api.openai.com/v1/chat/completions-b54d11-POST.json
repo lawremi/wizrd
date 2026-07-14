@@ -1,7 +1,7 @@
 {
-    "id": "chatcmpl-E0srW6RY57tilJU8YO6PXSunZvg4a",
+    "id": "chatcmpl-E1Y3EJJ1mWZsJodI1sqkqHKjJ7C5w",
     "object": "chat.completion",
-    "created": 1783879598,
+    "created": 1784037928,
     "model": "gpt-5.5-2026-04-23",
     "choices": [
         {
@@ -11,19 +11,11 @@
                 "content": null,
                 "tool_calls": [
                     {
-                        "id": "call_vBVvBsiirNpLOKxVdGl3AEJJ",
+                        "id": "call_BHlS03AwyZpqmZCrZ8z2XsHw",
                         "type": "function",
                         "function": {
-                            "name": "list_filters",
-                            "arguments": "{\"mart\": \"ENSEMBL_MART_ENSEMBL\", \"dataset\": \"hsapiens_gene_ensembl\"}"
-                        }
-                    },
-                    {
-                        "id": "call_2R5ACQrvjGzSiNaUKlv4yOc8",
-                        "type": "function",
-                        "function": {
-                            "name": "list_common_attributes",
-                            "arguments": "{\"mart\": \"ENSEMBL_MART_ENSEMBL\", \"dataset\": \"hsapiens_gene_ensembl\"}"
+                            "name": "get_data",
+                            "arguments": "{\"mart\":\"ENSEMBL_MART_ENSEMBL\",\"dataset\":\"hsapiens_gene_ensembl\",\"attributes\":[\"external_gene_name\",\"ensembl_gene_id\",\"chromosome_name\",\"start_position\",\"end_position\",\"strand\"],\"filters\":{\"link_ensembl_gene_id\":\"ENSG00000141510,ENSG00000139618\"}}"
                         }
                     }
                 ],
@@ -36,15 +28,15 @@
         }
     ],
     "usage": {
-        "prompt_tokens": 2316,
-        "completion_tokens": 114,
-        "total_tokens": 2430,
+        "prompt_tokens": 3422,
+        "completion_tokens": 85,
+        "total_tokens": 3507,
         "prompt_tokens_details": {
-            "cached_tokens": 2176,
+            "cached_tokens": 2688,
             "audio_tokens": 0
         },
         "completion_tokens_details": {
-            "reasoning_tokens": 22,
+            "reasoning_tokens": 0,
             "audio_tokens": 0,
             "accepted_prediction_tokens": 0,
             "rejected_prediction_tokens": 0

@@ -1,0 +1,47 @@
+{
+    "id": "chatcmpl-E1Y2umDylspPMUEqyhxO90lFYjSve",
+    "object": "chat.completion",
+    "created": 1784037908,
+    "model": "gpt-5.5-2026-04-23",
+    "choices": [
+        {
+            "index": 0,
+            "message": {
+                "role": "assistant",
+                "content": null,
+                "tool_calls": [
+                    {
+                        "id": "call_CSh0Yd91idT54om0HZxLZPVm",
+                        "type": "function",
+                        "function": {
+                            "name": "list_common_attributes",
+                            "arguments": "{\"mart\":\"ENSEMBL_MART_ENSEMBL\",\"dataset\":\"hsapiens_gene_ensembl\"}"
+                        }
+                    }
+                ],
+                "refusal": null,
+                "annotations": [
+
+                ]
+            },
+            "finish_reason": "tool_calls"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 2994,
+        "completion_tokens": 91,
+        "total_tokens": 3085,
+        "prompt_tokens_details": {
+            "cached_tokens": 2176,
+            "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+            "reasoning_tokens": 48,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+        }
+    },
+    "service_tier": "default",
+    "system_fingerprint": null
+}

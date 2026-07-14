@@ -1,0 +1,37 @@
+{
+    "id": "chatcmpl-E1Y3sl074A6y0uZ1D37JwWFIYLZX8",
+    "object": "chat.completion",
+    "created": 1784037968,
+    "model": "gpt-5.5-2026-04-23",
+    "choices": [
+        {
+            "index": 0,
+            "message": {
+                "role": "assistant",
+                "content": "{\"__boxed\":[{\"NCBI gene (formerly Entrezgene) ID\":\"1022\",\"Gene name\":\"CDK7\"},{\"NCBI gene (formerly Entrezgene) ID\":\"225689\",\"Gene name\":\"MAPK15\"},{\"NCBI gene (formerly Entrezgene) ID\":\"6300\",\"Gene name\":\"MAPK12\"},{\"NCBI gene (formerly Entrezgene) ID\":\"5596\",\"Gene name\":\"MAPK4\"},{\"NCBI gene (formerly Entrezgene) ID\":\"5600\",\"Gene name\":\"MAPK11\"},{\"NCBI gene (formerly Entrezgene) ID\":\"5595\",\"Gene name\":\"MAPK3\"},{\"NCBI gene (formerly Entrezgene) ID\":\"6885\",\"Gene name\":\"MAP3K7\"},{\"NCBI gene (formerly Entrezgene) ID\":\"1432\",\"Gene name\":\"MAPK14\"},{\"NCBI gene (formerly Entrezgene) ID\":\"5597\",\"Gene name\":\"MAPK6\"},{\"NCBI gene (formerly Entrezgene) ID\":\"5127\",\"Gene name\":\"CDK16\"},{\"NCBI gene (formerly Entrezgene) ID\":\"5594\",\"Gene name\":\"MAPK1\"},{\"NCBI gene (formerly Entrezgene) ID\":\"5891\",\"Gene name\":\"MOK\"},{\"NCBI gene (formerly Entrezgene) ID\":\"2932\",\"Gene name\":\"GSK3B\"},{\"NCBI gene (formerly Entrezgene) ID\":\"8621\",\"Gene name\":\"CDK13\"},{\"NCBI gene (formerly Entrezgene) ID\":\"5599\",\"Gene name\":\"MAPK8\"},{\"NCBI gene (formerly Entrezgene) ID\":\"5601\",\"Gene name\":\"MAPK9\"},{\"NCBI gene (formerly Entrezgene) ID\":\"5603\",\"Gene name\":\"MAPK13\"},{\"NCBI gene (formerly Entrezgene) ID\":\"5602\",\"Gene name\":\"MAPK10\"},{\"NCBI gene (formerly Entrezgene) ID\":\"51701\",\"Gene name\":\"NLK\"},{\"NCBI gene (formerly Entrezgene) ID\":\"5598\",\"Gene name\":\"MAPK7\"}]}",
+                "refusal": null,
+                "annotations": [
+
+                ]
+            },
+            "finish_reason": "stop"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 7577,
+        "completion_tokens": 432,
+        "total_tokens": 8009,
+        "prompt_tokens_details": {
+            "cached_tokens": 2176,
+            "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+            "reasoning_tokens": 0,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+        }
+    },
+    "service_tier": "default",
+    "system_fingerprint": null
+}
