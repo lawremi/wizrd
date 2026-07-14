@@ -2,10 +2,11 @@
 \alias{stop_model}
 \title{Stop a local model process}
 \usage{
-stop_model(x)
+stop_model(x, ...)
 }
 \arguments{
     \item{x}{An agent, chat, pipeline, or model backend.}
+    \item{\dots}{Ignored.}
 }
 \description{
     Stops an associated local model process, if one exists and is still running.
