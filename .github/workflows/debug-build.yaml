@@ -5,13 +5,8 @@ on:
 jobs:
   debug-build:
     runs-on: ubuntu-latest
-    env:
-      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Setup Ollama
-        uses: ai-action/setup-ollama@v1
         
       - uses: r-lib/actions/setup-pandoc@v2
       
