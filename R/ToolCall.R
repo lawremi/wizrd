@@ -5,7 +5,7 @@ ToolCall <- new_class("ToolCall",
                           arguments = class_list
                       ))
 
-method(as.character, ToolCall) <- function(x) {
+method(as.character, ToolCall) <- function(x, ...) {
     deparse(convert(x, class_call))
 }
 
